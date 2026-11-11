@@ -3,7 +3,7 @@
 ## Milestones
 
 - [x] M1 Scaffold: Laravel, Breeze (Livewire), Pest, Tailwind, SQLite, vi locale, timezone, git init, README stub
-- [ ] M2 Data model: migrations, models, factories, default category seeding on register, policies + isolation tests
+- [x] M2 Data model: migrations, models, factories, default category seeding on register, policies + isolation tests
 - [ ] M3 Parsing core: MoneyParser, DateParser, TextNormalizer with thorough unit tests
 - [ ] M4 Bank parsers: VCB, TCB, MB plus fixtures and the data-driven fixture test
 - [ ] M5 Mailbox: interface, Webklex client, Fake client, `thuchi:import-eml`
