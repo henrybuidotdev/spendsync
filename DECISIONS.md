@@ -10,3 +10,6 @@
 - PHP backed enums for direction/status/type/match_field; DB columns stay `enum(...)` as specced.
 - Policies are plain owner checks (`user_id`) for view/update/delete; auto-discovered by naming convention.
 - Added unique(user_id, match_field, match_value) on category_rules so "create or update a rule" is an upsert.
+- MoneyParser returns a signed int (sign carries direction); a trailing separator followed by 1–2 digits is a decimal fraction (rounded half-up), otherwise every `.`/`,`/space is a thousands separator. VND never has 3-digit fractions.
+- DateParser returns CarbonImmutable in the display timezone; callers must `->utc()` before saving because Eloquent does not convert timezones on write.
+- Unit tests extend the Laravel TestCase (no DB) so `config()` works.
