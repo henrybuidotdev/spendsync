@@ -1,0 +1,9 @@
+{
+    "direction": "out",
+    "amount": 150000,
+    "balance_after": 10345678,
+    "counterparty": null,
+    "description": "THANH TOAN QR BUN BO HUE CO BA",
+    "reference": null,
+    "occurred_at": "2026-11-11T12:05:00+07:00"
+}

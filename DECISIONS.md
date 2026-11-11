@@ -13,3 +13,9 @@
 - MoneyParser returns a signed int (sign carries direction); a trailing separator followed by 1–2 digits is a decimal fraction (rounded half-up), otherwise every `.`/`,`/space is a thousands separator. VND never has 3-digit fractions.
 - DateParser returns CarbonImmutable in the display timezone; callers must `->utc()` before saving because Eloquent does not convert timezones on write.
 - Unit tests extend the Laravel TestCase (no DB) so `config()` works.
+- No `samples/` directory existed → all fixtures are synthetic, generated as real MIME (.eml with 8bit / quoted-printable / base64 parts) so the MIME decoding path is exercised.
+- `config/banks.php` also holds the parser class per bank; `ParserRegistry::fromConfig()` builds from it, so adding a bank = config entry + parser class.
+- Shared logic lives in `AbstractBankParser` (label-based field extraction, sign/keyword direction, fallback date). Emails mentioning OTP/khuyến mãi/ưu đãi, or without an amount field, return null.
+- Error-case parsing (amount_missing, direction_unknown) is tested inline rather than as fixtures, so `parse-stats` over imported fixtures can show 100%.
+- `.eml` reading reuses `Webklex\PHPIMAP\Message::fromString` (same code path as live IMAP) via `FetchedMessage::fromEml`.
+- Fixture folders use the uppercase bank code (`tests/Fixtures/emails/VCB`).

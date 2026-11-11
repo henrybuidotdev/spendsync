@@ -1,0 +1,9 @@
+{
+    "direction": "in",
+    "amount": 3000000,
+    "balance_after": 8500000,
+    "counterparty": "LE VAN CUONG",
+    "description": "LE VAN CUONG chuyen tien tra no",
+    "reference": "FT26315999888",
+    "occurred_at": "2026-11-11T18:42:10+07:00"
+}

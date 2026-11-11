@@ -1,0 +1,9 @@
+{
+    "direction": "in",
+    "amount": 2000000,
+    "balance_after": 12345678,
+    "counterparty": "PHAM MINH DUC",
+    "description": "PHAM MINH DUC chuyen tien an cuoi",
+    "reference": "FT26316ABCD1",
+    "occurred_at": "2026-11-12T10:20:05+07:00"
+}

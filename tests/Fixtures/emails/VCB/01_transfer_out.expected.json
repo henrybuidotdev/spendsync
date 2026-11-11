@@ -1,0 +1,9 @@
+{
+    "direction": "out",
+    "amount": 1250000,
+    "balance_after": 15420000,
+    "counterparty": "TRAN THI BICH",
+    "description": "MBVCB.11223344.CHUYEN TIEN AN TRUA.CT tu 0071000xxx123 NGUYEN VAN AN toi 1903xxx456 TRAN THI BICH",
+    "reference": "5123.12112026.140321",
+    "occurred_at": "2026-11-12T14:03:21+07:00"
+}
