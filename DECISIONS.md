@@ -19,3 +19,13 @@
 - Error-case parsing (amount_missing, direction_unknown) is tested inline rather than as fixtures, so `parse-stats` over imported fixtures can show 100%.
 - `.eml` reading reuses `Webklex\PHPIMAP\Message::fromString` (same code path as live IMAP) via `FetchedMessage::fromEml`.
 - Fixture folders use the uppercase bank code (`tests/Fixtures/emails/VCB`).
+- Mailbox: `webklex/php-imap` (not the Laravel wrapper) — we build the client config ourselves, so no extra config file.
+- `MailboxConnectionException` added next to `InvalidCredentialsException`: network/TLS failures must not flip the account to `needs_reconnect`; the job records `connection_failed` and rethrows so the queue retries (tries=2).
+- Any non-connection failure during IMAP login is treated as invalid credentials; our exceptions never wrap Webklex's (their traces hold the password). `$appPassword` params carry `#[\SensitiveParameter]`.
+- All Mail folder lookup tries `[Gmail]/All Mail`, `[Google Mail]/All Mail`, `[Gmail]/Tất cả thư`, then `INBOX` (Webklex doesn't expose the `\All` special-use flag).
+- SyncMailAccount also drops any fetched message whose sender isn't configured (defense in depth on top of IMAP SEARCH FROM).
+- `last_error` stores short codes (`invalid_credentials`, `connection_failed`); the UI translates them.
+- `thuchi:sync` runs the sync inline (dispatchSync) — "runs a sync now"; the scheduler queues jobs instead.
+- `thuchi:import-eml` and `thuchi:reparse` parse inline (dispatchSync) so the CLI shows results immediately; import skips files from unsupported senders.
+- Reparse uses `updateOrCreate` on raw_email_id, keeping category and note.
+- Category rules: counterparty rules = exact normalized match; description rules = normalized substring. Counterparty rules first. When a transaction has no counterparty, "remember" creates a description rule from its full description.
