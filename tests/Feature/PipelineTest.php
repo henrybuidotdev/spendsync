@@ -247,3 +247,17 @@ test('parsed transactions get categorized by existing rules', function () {
 
     expect($user->transactions()->where('category_id', $food->id)->pluck('amount')->all())->toBe([89000]);
 });
+
+test('the demo seeder creates a populated, categorized demo account', function () {
+    $this->seed(Database\Seeders\DemoSeeder::class);
+    $this->seed(Database\Seeders\DemoSeeder::class);
+
+    $user = User::where('email', 'demo@thuchi.test')->sole();
+
+    expect(Illuminate\Support\Facades\Hash::check('password', $user->password))->toBeTrue()
+        ->and($user->transactions()->count())->toBe(11)
+        ->and($user->transactions()->whereNotNull('category_id')->count())->toBe(6)
+        ->and($user->rawEmails()->whereNotNull('parse_error')->count())->toBe(0);
+
+    $this->actingAs($user)->get('/')->assertOk()->assertSee('TRAN THI BICH');
+});

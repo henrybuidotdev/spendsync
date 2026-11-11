@@ -10,7 +10,7 @@
 - [x] M6 Pipeline: SyncMailAccount, ParseRawEmail, scheduler, `sync`/`reparse`/`parse-stats` commands, dedupe tests, needs_reconnect test
 - [x] M7 Categorization: CategoryMatcher, rule creation from the UI flow, backfill, tests
 - [x] M8 UI: connect/onboarding, transactions list and detail, reports, settings, privacy page, PWA manifest
-- [ ] M9 Demo data: DemoSeeder
+- [x] M9 Demo data: DemoSeeder
 - [ ] M10 Hardening
 
 ## Blocked

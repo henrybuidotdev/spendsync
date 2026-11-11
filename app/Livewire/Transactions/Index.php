@@ -8,6 +8,7 @@ use App\Jobs\SyncMailAccount;
 use App\Livewire\Concerns\WithMonth;
 use App\Models\Transaction;
 use App\Support\Format;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -77,7 +78,25 @@ class Index extends Component
             'income' => (int) $totals->income,
             'days' => $transactions->groupBy(fn (Transaction $transaction) => Format::local($transaction->occurred_at)->toDateString()),
             'monthStart' => $this->monthStart(),
+            'latestMonth' => $this->latestMonthWithData($transactions->isEmpty()),
             'hasAnyTransactions' => $transactions->isNotEmpty() || $user->transactions()->exists(),
         ])->title(__('Giao dịch'));
+    }
+
+    private function latestMonthWithData(bool $currentIsEmpty): ?string
+    {
+        if (! $currentIsEmpty) {
+            return null;
+        }
+
+        $latest = auth()->user()->transactions()->max('occurred_at');
+
+        if ($latest === null) {
+            return null;
+        }
+
+        $month = Format::local(CarbonImmutable::parse($latest, 'UTC'))->format('Y-m');
+
+        return $month === $this->monthStart()->format('Y-m') ? null : $month;
     }
 }

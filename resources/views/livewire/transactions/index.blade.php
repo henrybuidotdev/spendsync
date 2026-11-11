@@ -86,7 +86,9 @@
             @if($hasAnyTransactions)
                 <p class="mt-2 font-semibold">{{ __('Không có giao dịch nào ở đây') }}</p>
                 <p class="mt-1 text-sm text-slate-600">{{ __('Thử chọn tháng khác hoặc bỏ bộ lọc.') }}</p>
-                @if($filter !== 'all')
+                @if($latestMonth)
+                    <button type="button" wire:click="$set('month', '{{ $latestMonth }}')" class="mt-3 min-h-11 rounded-xl bg-emerald-600 px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem tháng :month', ['month' => \Carbon\CarbonImmutable::createFromFormat('!Y-m', $latestMonth)->format('m/Y')]) }}</button>
+                @elseif($filter !== 'all')
                     <button type="button" wire:click="setFilter('all')" class="mt-3 min-h-11 rounded-xl bg-emerald-600 px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem tất cả') }}</button>
                 @endif
             @else

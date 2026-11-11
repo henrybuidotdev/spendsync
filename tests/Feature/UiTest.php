@@ -434,3 +434,13 @@ test('every main page renders for a populated account', function () {
         $this->actingAs($user)->get($url)->assertOk();
     }
 });
+
+test('an empty month offers a jump to the latest month with data', function () {
+    $user = connectedUser();
+    Transaction::factory()->for($user)->create(['counterparty' => 'CU', 'occurred_at' => '2026-08-10 03:00:00']);
+
+    Livewire::actingAs($user)->test(Index::class)
+        ->assertSee('Xem tháng 08/2026')
+        ->set('month', '2026-08')
+        ->assertSee('CU');
+});

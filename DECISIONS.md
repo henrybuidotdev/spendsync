@@ -41,3 +41,4 @@
 - Dropped Breeze's Bunny Fonts link: system font stack, no third-party requests (privacy + offline PWA).
 - PWA icon is a single SVG (`sizes: any`); no PNG generation tooling needed.
 - "Xóa toàn bộ dữ liệu" reuses Breeze's password-confirmed delete-user form (FK cascades remove all data).
+- DemoSeeder deletes and recreates demo@thuchi.test, pre-creates 6 category rules, then runs `thuchi:import-eml` over all fixtures (rules apply in the real pipeline). DatabaseSeeder dropped `WithoutModelEvents` so seeded users get default categories.
