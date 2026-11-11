@@ -15,8 +15,11 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Parsing\ParserRegistry;
 use Carbon\CarbonImmutable;
+use Database\Seeders\DemoSeeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 
 function fixturesPath(): string
 {
@@ -229,13 +232,13 @@ test('thuchi:sync syncs active accounts now', function () {
 });
 
 test('the scheduler queues a sync for each active account every five minutes', function () {
-    Illuminate\Support\Facades\Queue::fake();
+    Queue::fake();
     MailAccount::factory()->count(2)->create();
     MailAccount::factory()->needsReconnect()->create();
 
     $this->artisan('schedule:run');
 
-    Illuminate\Support\Facades\Queue::assertPushed(SyncMailAccount::class, 2);
+    Queue::assertPushed(SyncMailAccount::class, 2);
 });
 
 test('parsed transactions get categorized by existing rules', function () {
@@ -249,15 +252,30 @@ test('parsed transactions get categorized by existing rules', function () {
 });
 
 test('the demo seeder creates a populated, categorized demo account', function () {
-    $this->seed(Database\Seeders\DemoSeeder::class);
-    $this->seed(Database\Seeders\DemoSeeder::class);
+    $this->seed(DemoSeeder::class);
+    $this->seed(DemoSeeder::class);
 
     $user = User::where('email', 'demo@thuchi.test')->sole();
 
-    expect(Illuminate\Support\Facades\Hash::check('password', $user->password))->toBeTrue()
+    expect(Hash::check('password', $user->password))->toBeTrue()
         ->and($user->transactions()->count())->toBe(11)
         ->and($user->transactions()->whereNotNull('category_id')->count())->toBe(6)
         ->and($user->rawEmails()->whereNotNull('parse_error')->count())->toBe(0);
 
     $this->actingAs($user)->get('/')->assertOk()->assertSee('TRAN THI BICH');
+});
+
+test('the app password never appears in exception traces', function () {
+    $client = new FakeMailboxClient(failConnection: true);
+
+    try {
+        $client->connect('me@gmail.com', 'supersecretpassw');
+    } catch (MailboxConnectionException $exception) {
+        expect($exception->getTraceAsString())->not->toContain('supersecretpassw')
+            ->and($exception->getTrace()[0]['args'][1] ?? null)->not->toBe('supersecretpassw');
+
+        return;
+    }
+
+    $this->fail('Expected a MailboxConnectionException.');
 });

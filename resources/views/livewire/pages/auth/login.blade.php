@@ -66,4 +66,9 @@ $login = function () {
             </x-primary-button>
         </div>
     </form>
+
+    <p class="mt-6 border-t border-slate-100 pt-4 text-center text-sm text-slate-600">
+        {{ __('Chưa có tài khoản?') }}
+        <a href="{{ route('register') }}" wire:navigate class="inline-flex min-h-11 items-center font-semibold text-emerald-700 underline">{{ __('Đăng ký') }}</a>
+    </p>
 </div>

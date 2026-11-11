@@ -29,18 +29,18 @@
 
     <x-month-switcher :month="$monthStart" />
 
-    <dl class="grid grid-cols-3 gap-2 text-center">
+    <dl class="grid grid-cols-2 gap-2">
         <div class="rounded-2xl bg-white p-3 shadow-sm">
             <dt class="text-xs text-slate-500">{{ __('Chi') }}</dt>
-            <dd class="mt-1 text-sm font-bold tabular-nums text-red-600">{{ Format::money($spent) }}</dd>
+            <dd class="mt-1 whitespace-nowrap font-bold tabular-nums text-red-600">{{ Format::money($spent) }}</dd>
         </div>
         <div class="rounded-2xl bg-white p-3 shadow-sm">
             <dt class="text-xs text-slate-500">{{ __('Thu') }}</dt>
-            <dd class="mt-1 text-sm font-bold tabular-nums text-emerald-600">{{ Format::money($income) }}</dd>
+            <dd class="mt-1 whitespace-nowrap font-bold tabular-nums text-emerald-600">{{ Format::money($income) }}</dd>
         </div>
-        <div class="rounded-2xl bg-white p-3 shadow-sm">
-            <dt class="text-xs text-slate-500">{{ __('Chênh lệch') }}</dt>
-            <dd @class(['mt-1 text-sm font-bold tabular-nums', 'text-emerald-600' => $income >= $spent, 'text-red-600' => $income < $spent])>{{ Format::money($income - $spent, signed: true) }}</dd>
+        <div class="col-span-2 flex items-center justify-between rounded-2xl bg-white px-3 py-2.5 shadow-sm">
+            <dt class="text-sm text-slate-500">{{ __('Chênh lệch') }}</dt>
+            <dd @class(['whitespace-nowrap font-bold tabular-nums', 'text-emerald-600' => $income >= $spent, 'text-red-600' => $income < $spent])>{{ Format::money($income - $spent, signed: true) }}</dd>
         </div>
     </dl>
 
@@ -65,12 +65,12 @@
                             <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xl" aria-hidden="true">{{ $transaction->category?->icon ?? '❔' }}</span>
                             <span class="min-w-0 flex-1">
                                 <span class="block truncate font-medium">{{ $transaction->label() }}</span>
-                                <span class="flex items-center gap-2 text-xs text-slate-500">
-                                    {{ Format::local($transaction->occurred_at)->format('H:i') }} · {{ $transaction->bank_code }}
+                                <span class="flex min-w-0 items-center gap-1.5 whitespace-nowrap text-xs text-slate-500">
+                                    {{ Format::local($transaction->occurred_at)->format('H:i') }} ·
                                     @if($transaction->category)
-                                        · {{ $transaction->category->name }}
+                                        <span class="truncate">{{ $transaction->category->name }}</span>
                                     @else
-                                        <span class="rounded-full bg-amber-100 px-2 py-0.5 font-medium text-amber-800">{{ __('Chưa phân loại') }}</span>
+                                        <span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-800">{{ __('Chưa phân loại') }}</span>
                                     @endif
                                 </span>
                             </span>

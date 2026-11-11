@@ -15,7 +15,7 @@ interface MailboxClient
     /**
      * Only messages from the given senders, filtered server-side (IMAP SEARCH FROM ... SINCE ...).
      *
-     * @param array<int, string> $senders
+     * @param  array<int, string>  $senders
      * @return iterable<FetchedMessage>
      */
     public function fetchFrom(array $senders, CarbonInterface $since): iterable;

@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
+use Livewire\Volt\Volt;
 
 beforeEach(function () {
     $this->travelTo(CarbonImmutable::parse('2026-11-12 05:00:00', 'UTC'));
@@ -417,7 +418,7 @@ test('deleting all data removes the user and everything they own', function () {
     Transaction::factory()->for($user)->create(['raw_email_id' => $rawEmail->id]);
     CategoryRule::factory()->for($user)->create(['category_id' => $user->categories()->first()->id]);
 
-    \Livewire\Volt\Volt::actingAs($user)->test('profile.delete-user-form')
+    Volt::actingAs($user)->test('profile.delete-user-form')
         ->set('password', 'password')
         ->call('deleteUser');
 
