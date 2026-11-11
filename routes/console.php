@@ -1,8 +1,11 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Enums\MailAccountStatus;
+use App\Jobs\SyncMailAccount;
+use App\Models\MailAccount;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+Schedule::call(function () {
+    MailAccount::where('status', MailAccountStatus::Active)
+        ->each(fn (MailAccount $account) => SyncMailAccount::dispatch($account));
+})->name('sync-mail-accounts')->everyFiveMinutes()->withoutOverlapping();
