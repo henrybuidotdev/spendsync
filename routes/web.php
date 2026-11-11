@@ -1,15 +1,24 @@
 <?php
 
+use App\Livewire\ConnectGmail;
+use App\Livewire\Reports;
+use App\Livewire\Settings;
+use App\Livewire\Transactions\Index as TransactionsIndex;
+use App\Livewire\Transactions\Show as TransactionsShow;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::view('privacy', 'privacy')->name('privacy');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::middleware('auth')->group(function () {
+    Route::get('connect', ConnectGmail::class)->name('connect');
+    Route::get('settings', Settings::class)->name('settings');
+    Route::view('profile', 'profile')->name('profile');
 
-Route::view('profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
+    Route::middleware('connected')->group(function () {
+        Route::get('/', TransactionsIndex::class)->name('transactions');
+        Route::get('transactions/{transaction}', TransactionsShow::class)->name('transactions.show');
+        Route::get('reports', Reports::class)->name('reports');
+    });
+});
 
 require __DIR__.'/auth.php';

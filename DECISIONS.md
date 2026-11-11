@@ -29,3 +29,15 @@
 - `thuchi:import-eml` and `thuchi:reparse` parse inline (dispatchSync) so the CLI shows results immediately; import skips files from unsupported senders.
 - Reparse uses `updateOrCreate` on raw_email_id, keeping category and note.
 - Category rules: counterparty rules = exact normalized match; description rules = normalized substring. Counterparty rules first. When a transaction has no counterparty, "remember" creates a description rule from its full description.
+- Breeze tests adjusted for the new routing (log why, per rule 4): "navigation menu can be rendered" now loads `/settings` (the `/` page redirects users without a mailbox to `/connect`), and the example test asserts guests are redirected from `/` to `/login` (no public welcome page).
+- `/` is the transactions page (route `transactions`); Breeze's `dashboard` route and welcome page were removed and all redirects point at `transactions`.
+- The "no mail account → /connect" redirect also lets through users who have imported raw emails, so the demo user (imported via `thuchi:import-eml`, no Gmail) can explore the app.
+- One mail account per user in the MVP: connecting again (same or different Gmail) updates the existing row; a new address resets `last_synced_at` so the first sync looks back 30 days.
+- Connect form: the password is moved into a local variable and the public property cleared as the very first step, so it never round-trips in the Livewire snapshot, even on validation errors. App password format check is a hand-written regex error (no value echo).
+- Language preference lives in the session (`SetLocale` middleware), not a DB column.
+- UI copy uses Vietnamese strings as translation keys (`__('Giao dịch')`) with `lang/en.json`; Breeze's English strings are translated in `lang/vi.json`. `lang/vi/validation.php` covers only the rules we use; others fall back to English.
+- Transaction detail is a full page (`/transactions/{id}`), not a bottom sheet — simpler and linkable.
+- Reports chart is pure CSS bars (no Chart.js dependency).
+- Dropped Breeze's Bunny Fonts link: system font stack, no third-party requests (privacy + offline PWA).
+- PWA icon is a single SVG (`sizes: any`); no PNG generation tooling needed.
+- "Xóa toàn bộ dữ liệu" reuses Breeze's password-confirmed delete-user form (FK cascades remove all data).

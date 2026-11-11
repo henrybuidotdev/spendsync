@@ -36,7 +36,7 @@ $sendVerification = function () {
     $user = Auth::user();
 
     if ($user->hasVerifiedEmail()) {
-        $this->redirectIntended(default: route('dashboard', absolute: false));
+        $this->redirectIntended(default: route('transactions', absolute: false));
 
         return;
     }
@@ -76,7 +76,7 @@ $sendVerification = function () {
                     <p class="text-sm mt-2 text-gray-800">
                         {{ __('Your email address is unverified.') }}
 
-                        <button wire:click.prevent="sendVerification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <button wire:click.prevent="sendVerification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
                     </p>
