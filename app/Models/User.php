@@ -29,6 +29,12 @@ class User extends Authenticatable
         ];
     }
 
+    /** Always returns a model: users who never changed a setting get the defaults (unsaved). */
+    public function settings(): HasOne
+    {
+        return $this->hasOne(UserSetting::class)->withDefault();
+    }
+
     public function mailAccount(): HasOne
     {
         return $this->hasOne(MailAccount::class)->latestOfMany();

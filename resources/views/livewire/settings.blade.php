@@ -189,26 +189,24 @@
             <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="language-heading">
                 <h2 id="language-heading" class="font-semibold">{{ __('Ngôn ngữ') }}</h2>
                 <div class="mt-2 grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1" role="group">
-                    @foreach(['vi' => 'Tiếng Việt', 'en' => 'English'] as $code => $label)
-                        <button type="button" wire:click="setLocale('{{ $code }}')" aria-pressed="{{ app()->getLocale() === $code ? 'true' : 'false' }}"
-                                @class(['min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => app()->getLocale() === $code, 'text-slate-600 hover:text-slate-900' => app()->getLocale() !== $code])>{{ $label }}</button>
+                    @foreach(\App\Enums\Locale::cases() as $locale)
+                        <button type="button" wire:click="setLocale('{{ $locale->value }}')" aria-pressed="{{ app()->getLocale() === $locale->value ? 'true' : 'false' }}"
+                                @class(['min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => app()->getLocale() === $locale->value, 'text-slate-600 hover:text-slate-900' => app()->getLocale() !== $locale->value])>{{ $locale->label() }}</button>
                     @endforeach
                 </div>
             </section>
 
             <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="theme-heading"
                      x-data="{
-                         theme: document.documentElement.dataset.theme ?? 'system',
+                         theme: window.appTheme,
                          setTheme(theme) {
-                             this.theme = theme;
-
-                             try {
-                                 theme === 'system' ? localStorage.removeItem('theme') : localStorage.setItem('theme', theme);
-                             } catch (e) {}
+                             this.theme = window.appTheme = theme;
 
                              theme === 'system'
                                  ? delete document.documentElement.dataset.theme
                                  : document.documentElement.dataset.theme = theme;
+
+                             $wire.setTheme(theme);
                          },
                      }">
                 <h2 id="theme-heading" class="font-semibold">{{ __('Giao diện') }}</h2>

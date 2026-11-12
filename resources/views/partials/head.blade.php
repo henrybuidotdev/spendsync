@@ -6,17 +6,13 @@
 <link rel="preconnect" href="https://fonts.bunny.net">
 <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet">
 <script>
-    // Runs before paint so a saved theme never flashes; wire:navigate resets <html> attributes, so re-apply after each visit.
-    (() => {
-        const applyTheme = () => {
-            try {
-                const theme = localStorage.getItem('theme');
+    // Runs before paint so the saved theme never flashes; wire:navigate resets <html> attributes, so re-apply after each visit.
+    window.appTheme = @js(($theme ?? \App\Enums\Theme::System)->value);
 
-                if (theme) {
-                    document.documentElement.dataset.theme = theme;
-                }
-            } catch (e) {}
-        };
+    (() => {
+        const applyTheme = () => window.appTheme === 'system'
+            ? delete document.documentElement.dataset.theme
+            : document.documentElement.dataset.theme = window.appTheme;
 
         applyTheme();
         document.addEventListener('livewire:navigated', applyTheme);

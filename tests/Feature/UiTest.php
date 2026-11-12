@@ -1,8 +1,10 @@
 <?php
 
 use App\Enums\Direction;
+use App\Enums\Locale;
 use App\Enums\MailAccountStatus;
 use App\Enums\MatchField;
+use App\Enums\Theme;
 use App\Jobs\ParseRawEmail;
 use App\Jobs\SyncMailAccount;
 use App\Livewire\ConnectGmail;
@@ -423,12 +425,52 @@ test('rules are listed and can be deleted', function () {
     expect($rule->fresh())->toBeNull();
 });
 
-test('the language switch changes the UI to English', function () {
+test('the language switch is saved to the user settings', function () {
     $user = connectedUser();
 
     Livewire::actingAs($user)->test(Settings::class)->call('setLocale', 'en')->assertRedirect(route('settings', 'appearance'));
 
-    $this->actingAs($user)->withSession(['locale' => 'en'])->get('/')->assertSee('Transactions')->assertSee('Sync now');
+    expect($user->settings()->first()->locale)->toBe(Locale::En);
+
+    $this->actingAs($user->fresh())->get('/')
+        ->assertSee('Transactions')
+        ->assertSee('Sync now')
+        ->assertCookie('locale', 'en');
+});
+
+test('the theme switch is saved to the user settings and rendered on every page', function () {
+    $user = connectedUser();
+
+    Livewire::actingAs($user)->test(Settings::class)->call('setTheme', 'dark');
+
+    expect($user->settings()->first()->theme)->toBe(Theme::Dark);
+
+    $this->actingAs($user->fresh())->get('/')
+        ->assertSee("window.appTheme = 'dark'", false)
+        ->assertCookie('theme', 'dark');
+});
+
+test('unknown settings values are ignored', function () {
+    $user = connectedUser();
+
+    Livewire::actingAs($user)->test(Settings::class)->call('setLocale', 'fr')->call('setTheme', 'neon');
+
+    expect($user->settings()->exists())->toBeFalse();
+});
+
+test('users who never changed a setting get the defaults', function () {
+    $user = connectedUser();
+
+    $this->actingAs($user)->get('/')
+        ->assertSee('Giao dịch')
+        ->assertSee("window.appTheme = 'system'", false);
+});
+
+test('logged-out pages use the last settings from the cookies', function () {
+    $this->withCookie('locale', 'en')->withCookie('theme', 'dark')->get('/login')
+        ->assertSee('Log in')
+        ->assertDontSee('Đăng nhập')
+        ->assertSee("window.appTheme = 'dark'", false);
 });
 
 test('deleting all data removes the user and everything they own', function () {

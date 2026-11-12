@@ -3,8 +3,9 @@
 namespace App\Livewire;
 
 use App\Enums\CategoryType;
+use App\Enums\Locale;
 use App\Enums\MailAccountStatus;
-use App\Http\Middleware\SetLocale;
+use App\Enums\Theme;
 use App\Livewire\Actions\Logout;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -114,13 +115,32 @@ class Settings extends Component
 
     public function setLocale(string $locale): void
     {
-        if (! in_array($locale, SetLocale::LOCALES, true)) {
+        $locale = Locale::tryFrom($locale);
+
+        if ($locale === null) {
             return;
         }
 
-        session()->put('locale', $locale);
+        $this->saveSettings(['locale' => $locale]);
 
         $this->redirectRoute('settings', 'appearance');
+    }
+
+    public function setTheme(string $theme): void
+    {
+        $theme = Theme::tryFrom($theme);
+
+        if ($theme === null) {
+            return;
+        }
+
+        $this->saveSettings(['theme' => $theme]);
+    }
+
+    /** @param array<string, Locale|Theme> $values */
+    private function saveSettings(array $values): void
+    {
+        auth()->user()->settings()->updateOrCreate([], $values);
     }
 
     public function logout(Logout $logout): void
