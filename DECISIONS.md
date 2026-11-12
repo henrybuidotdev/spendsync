@@ -42,3 +42,6 @@
 - PWA icon is a single SVG (`sizes: any`); no PNG generation tooling needed.
 - "Xóa toàn bộ dữ liệu" reuses Breeze's password-confirmed delete-user form (FK cascades remove all data).
 - DemoSeeder deletes and recreates demo@thuchi.test, pre-creates 6 category rules, then runs `thuchi:import-eml` over all fixtures (rules apply in the real pipeline). DatabaseSeeder dropped `WithoutModelEvents` so seeded users get default categories.
+- VCB receipts (real samples, 2026-11-12): stacked "Vietnamese label / English label / value" blocks parsed with `AbstractBankParser::blockField()`. Receipts are always outgoing (sent from the user's "Tài khoản nguồn / Debit Account"); there's no balance line. Fees ("Số tiền phí") were 0 in all 47 samples and are ignored. If a non-zero fee shows up, decide whether it belongs in `amount`.
+- Removed the synthetic VCB `01_transfer_out` fixture: it invented a layout for the real "Biên lai chuyển tiền" subject. Real samples are the source of truth.
+- Real fixtures are redacted (owner name → NGUYEN VAN AN, account/phone/order numbers → fake, beneficiary names → fake, synthetic Message-IDs), and checked with a grep for any original identifiers.

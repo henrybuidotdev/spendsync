@@ -19,10 +19,10 @@
 
 ## Needs real samples
 
-- VCB (`app/Parsing/Banks/VietcombankParser.php`) — no `samples/` dir; 4 synthetic + 1 OTP fixture.
+- VCB (`app/Parsing/Banks/VietcombankParser.php`) — **receipts are now real** ("Biên lai chuyển tiền qua tài khoản", "Biên lai thanh toán"): 47/47 of the owner's real emails parse; 3 redacted real fixtures + 1 real non-transaction (transfer limit). Still synthetic: the "Thông báo biến động số dư" layout (fixtures 02–04) and the OTP fixture — no real ones seen yet.
 - TCB (`app/Parsing/Banks/TechcombankParser.php`) — synthetic bilingual format; 3 + 1 promo.
 - MB (`app/Parsing/Banks/MbBankParser.php`) — synthetic HTML + compact pipe format; 4 + 1 OTP.
-- All sender addresses in `config/banks.php` are guesses (`// TODO verify`).
+- Sender addresses: VCB `vcbdigibank@info.vietcombank.com.vn` is verified against real mail; TCB and MB are still guesses (`// TODO verify`).
 
 ## Test status
 

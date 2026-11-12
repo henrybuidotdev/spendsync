@@ -91,3 +91,16 @@ test('amount label without colon inside html table cells is parsed', function ()
 
     expect((new VietcombankParser)->parse($input)->amount)->toBe(12000);
 });
+
+test('vietcombank receipts read the amount block, not the fee block', function () {
+    $text = "Biên lai chuyển tiền qua tài khoản\nSố tiền\nAmount\n480,000 VND\nSố tiền phí\nCharge Amount\nNet income\nVAT\n0 VND";
+
+    $result = (new VietcombankParser)->parse(input($text));
+
+    expect($result->amount)->toBe(480000)
+        ->and($result->direction->value)->toBe('out');
+});
+
+test('vietcombank receipts with a blank amount throw amount_missing', function () {
+    (new VietcombankParser)->parse(input("Số tiền\nAmount\n*** VND\nSố tiền phí\nCharge Amount\n0 VND"));
+})->throws(UnparseableEmailException::class, 'amount_missing');

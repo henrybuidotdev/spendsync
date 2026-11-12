@@ -12,7 +12,7 @@ return [
     'VCB' => [
         'name' => 'Vietcombank',
         'senders' => [
-            'vcbdigibank@info.vietcombank.com.vn', // TODO verify
+            'vcbdigibank@info.vietcombank.com.vn', // verified with real receipts
         ],
         'parser' => VietcombankParser::class,
     ],

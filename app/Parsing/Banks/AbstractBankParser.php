@@ -34,6 +34,21 @@ abstract class AbstractBankParser implements BankEmailParser
         return $match[1];
     }
 
+    /**
+     * Value on the line after a "Vietnamese label / English label" pair, as in receipts laid out as
+     * "Số tiền\nAmount\n480,000 VND". Each argument may list alternatives separated by "|".
+     */
+    protected function blockField(string $text, string $labels, string $englishLabels): ?string
+    {
+        $quote = fn (string $alternatives) => implode('|', array_map(fn (string $label) => preg_quote($label, '/'), explode('|', $alternatives)));
+
+        if (! preg_match('/^(?:'.$quote($labels).')\n(?:'.$quote($englishLabels).')\n(.+)$/mu', $text, $match)) {
+            return null;
+        }
+
+        return trim($match[1]);
+    }
+
     protected function isNonTransaction(ParsedEmailInput $input): bool
     {
         return (bool) preg_match('/\b(otp|ma xac thuc|khuyen mai|uu dai)\b/', TextNormalizer::fold($input->subject.' '.$input->text));

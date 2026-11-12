@@ -4,7 +4,7 @@ Mobile-first spending tracker for Vietnamese bank customers. You connect Gmail w
 
 Stack: Laravel 13, Livewire 3 + Volt (Breeze), Tailwind, SQLite, database queue, Pest, `webklex/php-imap`.
 
-Supported banks (synthetic parsers, see "Known limitations"): **Vietcombank (VCB)**, **Techcombank (TCB)**, **MB Bank (MB)**.
+Supported banks (VCB receipts verified on real emails; the rest synthetic, see "Known limitations"): **Vietcombank (VCB)**, **Techcombank (TCB)**, **MB Bank (MB)**.
 
 ## Setup
 
@@ -110,7 +110,8 @@ Gmail ──IMAP SEARCH FROM+SINCE──▶ SyncMailAccount ──firstOrCreate(
 
 ## Known limitations
 
-- **All three parsers and their sender addresses are synthetic.** No real bank emails were available. The fixtures copy the typical Vietnamese notification style but are not real. Replace them with real redacted samples before trusting the numbers (see `PROGRESS.md → Needs real samples`).
+- **Vietcombank receipts are built from real (redacted) emails; everything else is synthetic.** Techcombank, MB, and the Vietcombank balance-change format follow the typical Vietnamese notification style but have never seen a real email. Replace them with real samples before trusting the numbers (see `PROGRESS.md → Needs real samples`).
+- Transfers between your own accounts count as spending.
 - One Gmail account per user.
 - For localized Gmail UIs, the All Mail folder lookup only knows the English and Vietnamese names. Otherwise it falls back to `INBOX`, which misses archived mail.
 - Category rules are matched in PHP (SQL can't strip Vietnamese accents), so backfill is O(user's transactions). That's fine at MVP scale.

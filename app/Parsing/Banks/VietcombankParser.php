@@ -1,12 +1,16 @@
 <?php
 
-// SYNTHETIC — replace with real samples
-
 namespace App\Parsing\Banks;
 
 use App\Parsing\ParsedEmailInput;
 use App\Parsing\ParsedTransaction;
 
+/**
+ * Receipts ("Biên lai chuyển tiền qua tài khoản", "Biên lai thanh toán") are built from real redacted samples:
+ * stacked "Vietnamese label / English label / value" lines, always money leaving the user's account.
+ *
+ * SYNTHETIC — the "Label: value" balance-change format below is a guess; replace with real samples.
+ */
 class VietcombankParser extends AbstractBankParser
 {
     public function bankCode(): string
@@ -20,6 +24,30 @@ class VietcombankParser extends AbstractBankParser
             return null;
         }
 
+        if (str_contains($input->text, "Số tiền\nAmount\n")) {
+            return $this->parseReceipt($input);
+        }
+
+        return $this->parseBalanceNotification($input);
+    }
+
+    private function parseReceipt(ParsedEmailInput $input): ParsedTransaction
+    {
+        $text = $input->text;
+
+        return $this->transaction(
+            input: $input,
+            amount: $this->blockField($text, 'Số tiền', 'Amount'),
+            directionHint: 'ghi nợ',
+            counterparty: $this->blockField($text, 'Tên người hưởng', 'Beneficiary Name'),
+            description: $this->blockField($text, 'Nội dung chuyển tiền|Nội dung thanh toán', 'Details of Payment'),
+            reference: $this->blockField($text, 'Số lệnh giao dịch', 'Order Number'),
+            time: $this->blockField($text, 'Ngày, giờ giao dịch', 'Trans. Date, Time'),
+        );
+    }
+
+    private function parseBalanceNotification(ParsedEmailInput $input): ?ParsedTransaction
+    {
         $text = $input->text;
         $amount = $this->field($text, 'Số tiền giao dịch|Số tiền');
 
