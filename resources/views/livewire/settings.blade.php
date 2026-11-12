@@ -152,8 +152,9 @@
                 </ul>
                 @error('editingName') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
 
+                @if($categoryType !== 'debt_loan')
                 <form wire:submit="addCategory" class="mt-3 space-y-2 border-t border-slate-100 pt-3">
-                    <p class="text-sm font-medium">{{ match($categoryType) { 'income' => __('Add income category'), 'debt_loan' => __('Add debt/loan category'), default => __('Add expense category') } }}</p>
+                    <p class="text-sm font-medium">{{ $categoryType === 'income' ? __('Add income category') : __('Add expense category') }}</p>
                     <div class="flex gap-2">
                         <x-emoji-picker model="newIcon" :label="__('Choose an icon')" />
                         <label for="new-name" class="sr-only">{{ __('Category name') }}</label>
@@ -162,6 +163,7 @@
                     </div>
                     @error('newName') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
                 </form>
+                @endif
             </section>
                 @break
 

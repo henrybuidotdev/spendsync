@@ -60,7 +60,7 @@ class Settings extends Component
         $validated = $this->validate([
             'newName' => ['required', 'string', 'max:50'],
             'newIcon' => ['nullable', 'string', 'max:16'],
-            'categoryType' => ['required', Rule::enum(CategoryType::class)],
+            'categoryType' => ['required', Rule::enum(CategoryType::class)->only([CategoryType::Expense, CategoryType::Income])],
         ], [], ['newName' => __('category name')]);
 
         auth()->user()->categories()->create([

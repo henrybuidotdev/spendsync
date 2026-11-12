@@ -771,6 +771,20 @@ test('settings lists one category type at a time and adds new categories as that
     $component->call('showCategoryType', 'nonsense')->assertSet('categoryType', 'expense');
 });
 
+test('users cannot add their own debt or loan category', function () {
+    $user = connectedUser();
+
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'categories'])
+        ->call('showCategoryType', 'debt_loan')
+        ->assertSee('Đi vay')
+        ->assertDontSeeHtml('wire:submit="addCategory"')
+        ->set('newName', 'Họ')
+        ->call('addCategory')
+        ->assertHasErrors('categoryType');
+
+    expect($user->categories()->count())->toBe(0);
+});
+
 test('the danger zone on the profile page offers delete data and delete account separately', function () {
     $this->actingAs(connectedUser())->get('/profile')
         ->assertSee('Vùng nguy hiểm')
