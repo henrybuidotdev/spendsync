@@ -1,5 +1,5 @@
 // Caches hashed build assets only (their URLs change with their content). Pages, data and icons always come from the network.
-const CACHE = 'beanpulse-static-v2';
+const CACHE = 'spendsync-static-v2';
 
 self.addEventListener('install', () => self.skipWaiting());
 

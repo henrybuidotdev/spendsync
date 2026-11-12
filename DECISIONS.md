@@ -5,7 +5,7 @@
 - `config('app.timezone')` stays `UTC` so Eloquent stores UTC; `APP_TIMEZONE=Asia/Ho_Chi_Minh` feeds a separate `app.display_timezone` used for parsing bank times and rendering — satisfies "store UTC, display HCM".
 - Default locale `vi`, fallback `en`.
 - `mail_accounts.app_password` is nullable: "disconnect" wipes the password but keeps the row (status `disabled`) so transactions/raw emails keep their FK.
-- `raw_emails.mail_account_id` is nullable: `beanpulse:import-eml` creates raw emails without any mail account.
+- `raw_emails.mail_account_id` is nullable: `spendsync:import-eml` creates raw emails without any mail account.
 - Default categories are seeded from a `User::created` model hook, so every user (registration, factories, demo) gets them.
 - PHP backed enums for direction/status/type/match_field; DB columns stay `enum(...)` as specced.
 - Policies are plain owner checks (`user_id`) for view/update/delete; auto-discovered by naming convention.
@@ -25,13 +25,13 @@
 - All Mail folder lookup tries `[Gmail]/All Mail`, `[Google Mail]/All Mail`, `[Gmail]/Tất cả thư`, then `INBOX` (Webklex doesn't expose the `\All` special-use flag).
 - SyncMailAccount also drops any fetched message whose sender isn't configured (defense in depth on top of IMAP SEARCH FROM).
 - `last_error` stores short codes (`invalid_credentials`, `connection_failed`); the UI translates them.
-- `beanpulse:sync` runs the sync inline (dispatchSync) — "runs a sync now"; the scheduler queues jobs instead.
-- `beanpulse:import-eml` and `beanpulse:reparse` parse inline (dispatchSync) so the CLI shows results immediately; import skips files from unsupported senders.
+- `spendsync:sync` runs the sync inline (dispatchSync) — "runs a sync now"; the scheduler queues jobs instead.
+- `spendsync:import-eml` and `spendsync:reparse` parse inline (dispatchSync) so the CLI shows results immediately; import skips files from unsupported senders.
 - Reparse uses `updateOrCreate` on raw_email_id, keeping category and note.
 - Category rules: counterparty rules = exact normalized match; description rules = normalized substring. Counterparty rules first. When a transaction has no counterparty, "remember" creates a description rule from its full description.
 - Breeze tests adjusted for the new routing (log why, per rule 4): "navigation menu can be rendered" now loads `/settings` (the `/` page redirects users without a mailbox to `/connect`), and the example test asserts guests are redirected from `/` to `/login` (no public welcome page).
 - `/` is the transactions page (route `transactions`); Breeze's `dashboard` route and welcome page were removed and all redirects point at `transactions`.
-- The "no mail account → /connect" redirect also lets through users who have imported raw emails, so the demo user (imported via `beanpulse:import-eml`, no Gmail) can explore the app.
+- The "no mail account → /connect" redirect also lets through users who have imported raw emails, so the demo user (imported via `spendsync:import-eml`, no Gmail) can explore the app.
 - One mail account per user in the MVP: connecting again (same or different Gmail) updates the existing row; a new address resets `last_synced_at` so the first sync looks back 30 days.
 - Connect form: the password is moved into a local variable and the public property cleared as the very first step, so it never round-trips in the Livewire snapshot, even on validation errors. App password format check is a hand-written regex error (no value echo).
 - Language preference lives in the session (`SetLocale` middleware), not a DB column.
@@ -41,7 +41,7 @@
 - Dropped Breeze's Bunny Fonts link: system font stack, no third-party requests (privacy + offline PWA).
 - PWA icon is a single SVG (`sizes: any`); no PNG generation tooling needed.
 - "Xóa toàn bộ dữ liệu" reuses Breeze's password-confirmed delete-user form (FK cascades remove all data).
-- DemoSeeder deletes and recreates demo@beanpulse.test, pre-creates 6 category rules, then runs `beanpulse:import-eml` over all fixtures (rules apply in the real pipeline). DatabaseSeeder dropped `WithoutModelEvents` so seeded users get default categories.
+- DemoSeeder deletes and recreates demo@spendsync.test, pre-creates 6 category rules, then runs `spendsync:import-eml` over all fixtures (rules apply in the real pipeline). DatabaseSeeder dropped `WithoutModelEvents` so seeded users get default categories.
 - VCB receipts (real samples, 2026-11-12): stacked "Vietnamese label / English label / value" blocks parsed with `AbstractBankParser::blockField()`. Receipts are always outgoing (sent from the user's "Tài khoản nguồn / Debit Account"); there's no balance line. Fees ("Số tiền phí") were 0 in all 47 samples and are ignored. If a non-zero fee shows up, decide whether it belongs in `amount`.
 - Removed the synthetic VCB `01_transfer_out` fixture: it invented a layout for the real "Biên lai chuyển tiền" subject. Real samples are the source of truth.
 - Real fixtures are redacted (owner name → NGUYEN VAN AN, account/phone/order numbers → fake, beneficiary names → fake, synthetic Message-IDs), and checked with a grep for any original identifiers.

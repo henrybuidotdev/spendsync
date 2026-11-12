@@ -1,6 +1,6 @@
 {
-    "name": "BeanPulse",
-    "short_name": "BeanPulse",
+    "name": "SpendSync",
+    "short_name": "SpendSync",
     "description": "Tự động ghi chép thu chi từ email ngân hàng",
     "lang": "vi",
     "start_url": "/",

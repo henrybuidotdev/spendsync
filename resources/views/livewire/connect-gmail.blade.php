@@ -11,7 +11,7 @@
             @foreach([
                 [__('Step 1: Turn on 2-Step Verification for your Google account.'), 'https://myaccount.google.com/signinoptions/two-step-verification', __('Open security settings')],
                 [__('Step 2: Open the App passwords page.'), 'https://myaccount.google.com/apppasswords', 'myaccount.google.com/apppasswords'],
-                [__('Step 3: Create a password named BeanPulse. Google shows 16 letters.'), null, null],
+                [__('Step 3: Create a password named SpendSync. Google shows 16 letters.'), null, null],
                 [__('Step 4: Paste those 16 letters below.'), null, null],
             ] as [$step, $url, $linkText])
                 <li>

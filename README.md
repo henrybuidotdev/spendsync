@@ -1,4 +1,4 @@
-# BeanPulse
+# SpendSync
 
 Mobile-first spending tracker for Vietnamese bank customers. You connect Gmail with a **Google app password**. Every 5 minutes the app reads **only** emails from supported bank senders over IMAP (read-only), parses each transaction (amount, direction, counterparty, time, balance, description), and shows it in a web app (installable as a PWA). There you can categorize transactions and see monthly totals.
 
@@ -27,7 +27,7 @@ php artisan db:seed --class=DemoSeeder
 php artisan serve
 ```
 
-Log in as **demo@beanpulse.test / password**. The demo seeder imports every fixture in `tests/Fixtures/emails` through the real pipeline (`beanpulse:import-eml`), and adds a few category rules so some transactions are already categorized. The fixtures are dated November 2026. If the current month is empty, the transactions page offers a button that jumps to the latest month with data.
+Log in as **demo@spendsync.test / password**. The demo seeder imports every fixture in `tests/Fixtures/emails` through the real pipeline (`spendsync:import-eml`), and adds a few category rules so some transactions are already categorized. The fixtures are dated November 2026. If the current month is empty, the transactions page offers a button that jumps to the latest month with data.
 
 ### Queue worker and scheduler
 
@@ -43,7 +43,7 @@ In production, use a single cron entry `* * * * * php artisan schedule:run` plus
 ### Connect a real Gmail
 
 1. Turn on 2-Step Verification for the Google account.
-2. Open <https://myaccount.google.com/apppasswords> and create an app password named "BeanPulse".
+2. Open <https://myaccount.google.com/apppasswords> and create an app password named "SpendSync".
 3. Sign up in the app. You land on `/connect`. Paste the Gmail address and the 16-letter password (spaces are fine).
 4. The app tests the IMAP login right away, saves the password encrypted, and queues the first sync (it looks back 30 days). Keep `queue:work` running.
 
@@ -55,10 +55,10 @@ To revoke access, delete the app password in Google, or use **Settings → Disco
 
 | Command | What it does |
 | --- | --- |
-| `beanpulse:sync {account?}` | Sync all active accounts (or one) now, inline. Parse jobs go to the queue. |
-| `beanpulse:reparse {--failed} {--bank=}` | Re-run parsing over stored raw emails. Keeps categories and notes. Use after fixing a parser. |
-| `beanpulse:import-eml {user} {path}` | Import `.eml` files (a file or a folder, recursive) as raw emails for a user id/email and parse them. Skips unsupported senders. |
-| `beanpulse:parse-stats` | Table per bank: total, parsed, failed, success %. |
+| `spendsync:sync {account?}` | Sync all active accounts (or one) now, inline. Parse jobs go to the queue. |
+| `spendsync:reparse {--failed} {--bank=}` | Re-run parsing over stored raw emails. Keeps categories and notes. Use after fixing a parser. |
+| `spendsync:import-eml {user} {path}` | Import `.eml` files (a file or a folder, recursive) as raw emails for a user id/email and parse them. Skips unsupported senders. |
+| `spendsync:parse-stats` | Table per bank: total, parsed, failed, success %. |
 
 ## Tests
 
@@ -98,7 +98,7 @@ Gmail ──IMAP SEARCH FROM+SINCE──▶ SyncMailAccount ──firstOrCreate(
 2. **Write the parser class** in `app/Parsing/Banks/AcbParser.php`. Extend `AbstractBankParser`, return the code from `bankCode()`, and implement `parse()`. The `field($text, 'Label|Other label')` helper reads `Label: value` lines from the normalized text (HTML is already flattened, one table row per line). Pass the raw strings to `$this->transaction(...)`, which parses money and dates, works out direction from the `+`/`-` sign or keywords (ghi có/credit/nhận vs ghi nợ/debit/trừ), and falls back to the received time. Return `null` for non-transaction emails. `$this->transaction()` throws `UnparseableEmailException` when the amount or direction is missing.
 3. **Add fixtures.** Save real (redacted) emails as `tests/Fixtures/emails/ACB/01_something.eml`, plus one OTP or promo email. Next to each one, write `01_something.expected.json` with `direction`, `amount`, `balance_after`, `counterparty`, `description`, `reference` and `occurred_at` (ISO 8601 with `+07:00`), or `null`.
 4. **Test.** Run `php artisan test --filter=fixture`. The data-driven test picks up the new folder automatically, and it also requires at least 3 transaction fixtures and 1 non-transaction fixture per bank.
-5. **Re-parse stored emails.** Run `php artisan beanpulse:reparse --bank=ACB` (or `--failed`), then check `php artisan beanpulse:parse-stats`.
+5. **Re-parse stored emails.** Run `php artisan spendsync:reparse --bank=ACB` (or `--failed`), then check `php artisan spendsync:parse-stats`.
 
 ## Security and privacy
 

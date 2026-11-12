@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class ReparseCommand extends Command
 {
-    protected $signature = 'beanpulse:reparse {--failed : Only emails that failed to parse} {--bank= : Only this bank code, e.g. VCB}';
+    protected $signature = 'spendsync:reparse {--failed : Only emails that failed to parse} {--bank= : Only this bank code, e.g. VCB}';
 
     protected $description = 'Re-run parsing over stored raw emails (use after fixing a parser)';
 

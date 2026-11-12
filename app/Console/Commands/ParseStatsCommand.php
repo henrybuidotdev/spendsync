@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class ParseStatsCommand extends Command
 {
-    protected $signature = 'beanpulse:parse-stats';
+    protected $signature = 'spendsync:parse-stats';
 
     protected $description = 'Parse success rate per bank';
 

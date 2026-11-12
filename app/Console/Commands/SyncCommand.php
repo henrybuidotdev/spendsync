@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 class SyncCommand extends Command
 {
-    protected $signature = 'beanpulse:sync {account? : Mail account id (default: all active accounts)}';
+    protected $signature = 'spendsync:sync {account? : Mail account id (default: all active accounts)}';
 
     protected $description = 'Sync mail accounts now (parsing jobs go to the queue)';
 
