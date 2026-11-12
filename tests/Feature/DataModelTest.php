@@ -7,13 +7,13 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
-test('every user shares the 12 Vietnamese system categories without private copies', function () {
+test('every user shares the 20 Vietnamese system categories without private copies', function () {
     $user = User::factory()->create();
 
     expect($user->categories()->count())->toBe(0)
-        ->and(Category::system()->count())->toBe(12)
-        ->and($user->availableCategories()->count())->toBe(12)
-        ->and($user->availableCategories()->where('type', 'income')->pluck('name')->all())->toBe(['Lương', 'Thu khác'])
+        ->and(Category::system()->count())->toBe(20)
+        ->and($user->availableCategories()->count())->toBe(20)
+        ->and($user->availableCategories()->where('type', 'income')->pluck('name')->all())->toBe(['Lương', 'Thu khác', 'Quà tặng', 'Bán hàng'])
         ->and($user->availableCategories()->where('name', 'Ăn uống')->value('icon'))->toBe('🍜');
 });
 
@@ -24,7 +24,7 @@ test('users see system categories and their own, never another users', function 
 
     $names = $user->availableCategories()->pluck('name');
 
-    expect($names)->toHaveCount(13)->toContain('Cà phê')->not->toContain('Bí mật');
+    expect($names)->toHaveCount(21)->toContain('Cà phê')->not->toContain('Bí mật');
 });
 
 test('nobody can update or delete a system category, but everyone can view it', function () {

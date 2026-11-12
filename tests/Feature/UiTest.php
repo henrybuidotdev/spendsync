@@ -510,7 +510,7 @@ test('deleting all data removes the user and everything they own', function () {
     }
 
     expect(DB::table('categories')->whereNotNull('user_id')->count())->toBe(0)
-        ->and(DB::table('categories')->whereNull('user_id')->count())->toBe(12);
+        ->and(DB::table('categories')->whereNull('user_id')->count())->toBe(20);
 });
 
 test('every main page renders for a populated account', function () {
@@ -633,34 +633,37 @@ test('settings counts only the current users transactions for a system category'
         ->assertViewHas('categories', fn ($categories) => $categories->firstWhere('id', $food->id)->transactions_count === 1);
 });
 
-test('the category picker only offers categories matching the transaction direction', function () {
+test('the category picker offers every type and opens on the tab for the transaction direction', function () {
     $user = connectedUser();
-    $mine = $user->categories()->create(['name' => 'Lì xì', 'icon' => '🧧', 'type' => 'income']);
     $out = Transaction::factory()->for($user)->create();
     $in = Transaction::factory()->for($user)->income()->create();
     $food = Category::system()->where('name', 'Ăn uống')->first();
     $salary = Category::system()->where('name', 'Lương')->first();
+    $loan = Category::system()->where('name', 'Cho vay')->first();
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $out])
         ->assertSeeHtml("setCategory({$food->id})")
-        ->assertDontSeeHtml("setCategory({$salary->id})")
-        ->assertDontSeeHtml("setCategory({$mine->id})");
+        ->assertSeeHtml("setCategory({$salary->id})")
+        ->assertSeeHtml("setCategory({$loan->id})")
+        ->assertViewHas('defaultTab', 'expense');
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $in])
-        ->assertSeeHtml("setCategory({$salary->id})")
-        ->assertSeeHtml("setCategory({$mine->id})")
-        ->assertDontSeeHtml("setCategory({$food->id})");
+        ->assertViewHas('defaultTab', 'income');
+
+    $out->update(['category_id' => $loan->id]);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $out->fresh()])
+        ->assertViewHas('defaultTab', 'debt_loan');
 });
 
-test('a category of the wrong kind cannot be assigned', function () {
+test('a category from another tab can be assigned', function () {
     $user = connectedUser();
     $out = Transaction::factory()->for($user)->create();
     $salary = Category::system()->where('name', 'Lương')->first();
 
-    expect(fn () => Livewire::actingAs($user)->test(Show::class, ['transaction' => $out])->call('setCategory', $salary->id))
-        ->toThrow(ModelNotFoundException::class);
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $out])->call('setCategory', $salary->id);
 
-    expect($out->fresh()->category_id)->toBeNull();
+    expect($out->fresh()->category_id)->toBe($salary->id);
 });
 
 test('settings lists one category type at a time and adds new categories as that type', function () {
@@ -731,7 +734,7 @@ test('delete data wipes the users data but keeps the login, other users and syst
         ->and($user->mailAccounts()->count())->toBe(0)
         ->and($other->transactions()->count())->toBe(1)
         ->and($other->mailAccounts()->count())->toBe(1)
-        ->and(Category::system()->count())->toBe(12);
+        ->and(Category::system()->count())->toBe(20);
 
     $this->actingAs($user)->get('/')->assertRedirect('/connect');
 });

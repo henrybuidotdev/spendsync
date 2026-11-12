@@ -1,7 +1,6 @@
 @php use App\Support\Format; @endphp
 
 <div class="space-y-4">
-    <x-flash />
 
     <a href="{{ route('transactions', ['month' => Format::local($transaction->occurred_at)->format('Y-m'), 'filter' => $backFilter]) }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">‹ {{ __('Giao dịch') }}</a>
 
@@ -42,39 +41,37 @@
     </dl>
 
     <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="category-heading"
-             x-data="{
-                 query: '',
-                 names: @js($categories->pluck('name')),
-                 fold: (value) => value.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/g, 'd'),
-                 matches(name) { return this.fold(name).includes(this.fold(this.query.trim())); },
-             }">
-        <div class="flex items-center justify-between gap-3">
-            <h2 id="category-heading" class="shrink-0 font-semibold">{{ __('Danh mục') }}</h2>
+             x-data="{ tab: @js($defaultTab) }">
+        <h2 id="category-heading" class="font-semibold">{{ __('Danh mục') }}</h2>
 
-            <label for="category-search" class="sr-only">{{ __('Tìm danh mục') }}</label>
-            <input type="search" id="category-search" x-model="query" placeholder="{{ __('Tìm danh mục') }}" autocomplete="off"
-                   class="block min-h-11 w-full max-w-52 rounded-xl border-slate-300 text-base focus:border-emerald-500 focus:ring-emerald-500">
+        <div class="mt-4 grid grid-cols-3 gap-1 rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Loại danh mục') }}">
+            @foreach(\App\Enums\CategoryType::cases() as $case)
+                <button type="button" x-on:click="tab = @js($case->value)" x-bind:aria-pressed="tab === @js($case->value)"
+                        class="min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                        x-bind:class="tab === @js($case->value) ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'">{{ $case->label() }}</button>
+            @endforeach
         </div>
 
-        <div class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+        <div class="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
             @foreach($categories as $category)
-                <button type="button" wire:click="setCategory({{ $category->id }})" wire:key="cat-{{ $category->id }}" x-show="matches(@js($category->name))"
+                <button type="button" wire:click="setCategory({{ $category->id }})" wire:key="cat-{{ $category->id }}" x-show="tab === @js($category->type->value)"
                         aria-pressed="{{ $transaction->category_id === $category->id ? 'true' : 'false' }}"
-                        @class(['flex min-h-16 flex-col items-center justify-center rounded-xl p-2 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-black text-white' => $transaction->category_id === $category->id, 'bg-slate-50 ring-1 ring-slate-200 hover:bg-emerald-50' => $transaction->category_id !== $category->id])>
+                        @class(['flex min-h-20 flex-col items-center justify-center gap-1 rounded-xl p-3 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-black text-white' => $transaction->category_id === $category->id, 'bg-slate-50 ring-1 ring-slate-200 hover:bg-emerald-50' => $transaction->category_id !== $category->id])>
                     <x-category-icon :category="$category" class="h-8 w-8 text-xl" />
                     <span class="mt-1 line-clamp-2 text-center">{{ $category->name }}</span>
                 </button>
             @endforeach
         </div>
 
-        <p x-cloak x-show="! names.some((name) => matches(name))" class="py-3 text-center text-sm text-slate-500">{{ __('Không tìm thấy danh mục nào') }}</p>
 
         @if($this->ruleTarget())
-            <label class="mt-3 flex min-h-11 cursor-pointer items-start gap-3 text-sm">
+            <label class="mt-5 flex min-h-11 cursor-pointer items-start gap-3 text-sm">
                 <input type="checkbox" wire:model="applyToFuture" class="mt-0.5 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
                 <span>{{ __('Áp dụng cho các giao dịch sau với') }} <em class="font-semibold not-italic">{{ \Illuminate\Support\Str::limit($this->ruleTarget(), 60) }}</em></span>
             </label>
         @endif
+
+        <x-flash class="mt-4" :dismiss-after="4000" />
     </section>
 
     @if($rawEmail)

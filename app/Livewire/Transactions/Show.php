@@ -85,9 +85,7 @@ class Show extends Component
     /** @return Builder<Category> */
     private function selectableCategories(): Builder
     {
-        return auth()->user()
-            ->availableCategories()
-            ->where('type', $this->transaction->direction->categoryType());
+        return auth()->user()->availableCategories();
     }
 
     public function render()
@@ -96,6 +94,7 @@ class Show extends Component
 
         return view('livewire.transactions.show', [
             'categories' => $this->selectableCategories()->orderByRaw('user_id is null desc')->orderBy('id')->get(),
+            'defaultTab' => ($this->transaction->category?->type ?? $this->transaction->direction->categoryTypes()[0])->value,
             'bankName' => config("banks.{$this->transaction->bank_code}.name", $this->transaction->bank_code),
             'rawText' => $this->showRaw && $rawEmail ? $rawEmail->toParserInput()->text : null,
             'rawEmail' => $rawEmail,

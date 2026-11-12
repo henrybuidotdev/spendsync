@@ -15,12 +15,12 @@
         @if($account?->status === \App\Enums\MailAccountStatus::Active)
             @if($account->isSyncing())
                 <button type="button" disabled wire:poll.3s role="status"
-                        class="inline-flex min-h-11 cursor-not-allowed items-center rounded-xl bg-white px-3 text-sm font-medium text-slate-500 shadow-sm ring-1 ring-slate-200">
+                        class="inline-flex min-h-11 cursor-not-allowed items-center text-sm font-medium text-slate-500">
                     {{ __('Đang đồng bộ') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
                 </button>
             @else
                 <button type="button" wire:click="syncNow" wire:loading.attr="disabled"
-                        class="inline-flex min-h-11 items-center gap-1 rounded-xl bg-white px-3 text-sm font-medium text-emerald-700 shadow-sm ring-1 ring-slate-200 hover:bg-emerald-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
+                        class="inline-flex min-h-11 items-center gap-1 rounded text-sm font-medium text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
                     ↻ {{ __('Đồng bộ ngay') }}
                 </button>
             @endif

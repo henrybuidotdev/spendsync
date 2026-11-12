@@ -15,7 +15,7 @@
     "Chưa có khoản chi nào trong tháng này": "No spending this month",
     "Chưa có quy tắc nào. Khi bạn chọn danh mục cho một giao dịch, ứng dụng sẽ ghi nhớ cho các lần sau.": "No rules yet. When you pick a category for a transaction, the app remembers it for next time.",
     "Chưa kết nối Gmail.": "Gmail is not connected.",
-    "Chưa phân loại": "Uncategorized",
+    "Chưa phân loại": "Unknown",
     "Chọn biểu tượng": "Choose an icon",
     "Cài đặt": "Settings",
     "Cách thu hồi": "How to revoke",
@@ -34,6 +34,7 @@
     "Khi ngân hàng gửi email biến động số dư, giao dịch sẽ tự hiện ở đây. Lần đồng bộ đầu lấy 90 ngày gần nhất.": "When your bank emails a balance change, the transaction shows up here. The first sync looks back 90 days.",
     "Khoản chi": "Expense",
     "Khoản thu": "Income",
+    "Vay nợ": "Debt/Loan",
     "Không có giao dịch nào ở đây": "Nothing here",
     "Không dùng biểu tượng": "No icon",
     "Không kết nối được tới Gmail, sẽ thử lại.": "Couldn't reach Gmail, will retry.",
@@ -78,6 +79,7 @@
     "Thêm": "Add",
     "Thêm khoản chi": "Add expense category",
     "Thêm khoản thu": "Add income category",
+    "Thêm khoản vay nợ": "Add debt/loan category",
     "Thử chọn tháng khác hoặc bỏ bộ lọc.": "Try another month or clear the filter.",
     "Thử chọn tháng trước, hoặc xem danh sách giao dịch.": "Try the previous month, or look at your transactions.",
     "Tiền ra": "Money out",
@@ -135,8 +137,6 @@
     "Đang đồng bộ": "Syncing",
     "Khi đăng ký, bạn đồng ý với": "By signing up, you agree to the",
     "Hiện mật khẩu": "Show password",
-    "Tìm danh mục": "Search categories",
-    "Không tìm thấy danh mục nào": "No categories found",
     "Đã lưu": "Saved",
     "+ Thêm ghi chú": "+ Add a note"
 }

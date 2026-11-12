@@ -116,10 +116,11 @@
             @case('categories')
             <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="page-heading">
 
-                <div class="mt-3 grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Loại danh mục') }}">
-                    @foreach(['expense' => __('Khoản chi'), 'income' => __('Khoản thu')] as $type => $label)
+                <div class="mt-3 grid grid-cols-3 gap-1 rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Loại danh mục') }}">
+                    @foreach(\App\Enums\CategoryType::cases() as $case)
+                        @php($type = $case->value)
                         <button type="button" wire:click="showCategoryType('{{ $type }}')" aria-pressed="{{ $categoryType === $type ? 'true' : 'false' }}"
-                                @class(['min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => $categoryType === $type, 'text-slate-600 hover:text-slate-900' => $categoryType !== $type])>{{ $label }}</button>
+                                @class(['min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => $categoryType === $type, 'text-slate-600 hover:text-slate-900' => $categoryType !== $type])>{{ $case->label() }}</button>
                     @endforeach
                 </div>
 
@@ -152,7 +153,7 @@
                 @error('editingName') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
 
                 <form wire:submit="addCategory" class="mt-3 space-y-2 border-t border-slate-100 pt-3">
-                    <p class="text-sm font-medium">{{ $categoryType === 'income' ? __('Thêm khoản thu') : __('Thêm khoản chi') }}</p>
+                    <p class="text-sm font-medium">{{ match($categoryType) { 'income' => __('Thêm khoản thu'), 'debt_loan' => __('Thêm khoản vay nợ'), default => __('Thêm khoản chi') } }}</p>
                     <div class="flex gap-2">
                         <x-emoji-picker model="newIcon" :label="__('Chọn biểu tượng')" />
                         <label for="new-name" class="sr-only">{{ __('Tên danh mục') }}</label>
