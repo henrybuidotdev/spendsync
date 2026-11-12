@@ -31,7 +31,7 @@ class Reports extends Component
             ->toBase()
             ->get()
             ->map(fn ($row) => (object) [
-                'name' => $categories->get($row->category_id)?->label ?? __('Unknown'),
+                'name' => $categories->get($row->category_id)?->label ?? __('Uncategorized'),
                 'category' => $categories->get($row->category_id),
                 'total' => (int) $row->total,
                 'count' => (int) $row->count,

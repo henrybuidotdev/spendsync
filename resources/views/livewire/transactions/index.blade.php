@@ -50,7 +50,7 @@
     </section>
 
     <div class="flex gap-1 overflow-x-auto rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Filter transactions') }}">
-        @foreach(['all' => __('All'), 'uncategorized' => __('Unknown'), 'in' => __('Money in'), 'out' => __('Money out')] as $value => $label)
+        @foreach(['all' => __('All'), 'in' => __('Money in'), 'out' => __('Money out'), 'uncategorized' => __('Uncategorized')] as $value => $label)
             <button type="button" wire:click="setFilter('{{ $value }}')" aria-pressed="{{ $filter === $value ? 'true' : 'false' }}"
                     @class(['min-h-11 flex-1 shrink-0 whitespace-nowrap rounded-full px-3 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => $filter === $value, 'text-slate-600 hover:text-slate-900' => $filter !== $value])>
                 {{ $label }}
@@ -75,7 +75,7 @@
                                     @if($transaction->category)
                                         <span class="truncate">{{ $transaction->category->label }}</span>
                                     @else
-                                        <span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-800">{{ __('Unknown') }}</span>
+                                        <span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-800">{{ __('Uncategorized') }}</span>
                                     @endif
                                 </span>
                             </span>
