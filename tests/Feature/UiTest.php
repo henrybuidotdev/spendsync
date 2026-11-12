@@ -334,6 +334,21 @@ test('choosing a category with the checkbox creates a rule and backfills', funct
         ->and(CategoryRule::first()->match_field)->toBe(MatchField::Counterparty);
 });
 
+test('saving a rule that matches no other transactions does not mention a count', function () {
+    $user = connectedUser();
+    $category = $user->availableCategories()->first();
+    $transaction = Transaction::factory()->for($user)->create(['counterparty' => 'ONLY ONE']);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
+        ->call('setCategory', $category->id)
+        ->assertSee('Đã lưu danh mục.')
+        ->assertDontSee('0 giao dịch khác')
+        ->set('applyToFuture', false)
+        ->set('applyToFuture', true)
+        ->assertSee('Đã lưu quy tắc.')
+        ->assertDontSee('0 giao dịch khác');
+});
+
 test('unticking the checkbox only categorizes this transaction', function () {
     $user = connectedUser();
     $transaction = Transaction::factory()->for($user)->create(['counterparty' => 'X']);

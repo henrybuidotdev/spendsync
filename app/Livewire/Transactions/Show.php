@@ -47,7 +47,10 @@ class Show extends Component
 
         if ($this->applyToFuture && $this->ruleTarget() !== null && $matcher->ruleFor($this->transaction) === null) {
             $count = $matcher->backfill($matcher->remember($this->transaction, $category));
-            $message = __('Category saved and applied to :count other transactions.', ['count' => $count]);
+
+            if ($count > 0) {
+                $message = __('Category saved and applied to :count other transactions.', ['count' => $count]);
+            }
         }
 
         $this->applyToFuture = $matcher->follows($this->transaction);
@@ -78,7 +81,10 @@ class Show extends Component
         }
 
         $count = $matcher->backfill($matcher->remember($this->transaction, $this->transaction->category));
-        session()->flash('status', __('Rule saved and applied to :count other transactions.', ['count' => $count]));
+
+        session()->flash('status', $count > 0 ?
+            __('Rule saved and applied to :count other transactions.', ['count' => $count]) :
+            __('Rule saved.'));
     }
 
     public function updatedNote(): void
