@@ -1,6 +1,5 @@
 {
     "An toàn & riêng tư": "Safe & private",
-    "Biểu tượng (emoji)": "Icon (emoji)",
     "Báo cáo": "Reports",
     "Bạn đã thử quá nhiều lần. Vui lòng thử lại sau :minutes phút.": "Too many attempts. Please try again in :minutes minutes.",
     "Bật xác minh 2 bước": "Turn on 2-Step Verification",
@@ -17,6 +16,7 @@
     "Chưa có tài khoản?": "Don't have an account?",
     "Chưa kết nối Gmail.": "Gmail is not connected.",
     "Chưa phân loại": "Uncategorized",
+    "Chọn biểu tượng": "Choose an icon",
     "Cài đặt": "Settings",
     "Cách thu hồi": "How to revoke",
     "Có hay không có dấu cách đều được.": "With or without spaces is fine.",
@@ -34,6 +34,7 @@
     "Khoản chi": "Expense",
     "Khoản thu": "Income",
     "Không có giao dịch nào ở đây": "Nothing here",
+    "Không dùng biểu tượng": "No icon",
     "Không kết nối được tới Gmail, sẽ thử lại.": "Couldn't reach Gmail, will retry.",
     "Không kết nối được tới Gmail. Vui lòng thử lại sau ít phút.": "Couldn't reach Gmail. Please try again in a few minutes.",
     "Kết nối": "Connect",
@@ -66,6 +67,7 @@
     "Quy tắc tự phân loại": "Auto-categorize rules",
     "Quyền riêng tư": "Privacy",
     "Số dư sau giao dịch": "Balance after",
+    "Sửa :name": "Edit :name",
     "Thu": "Income",
     "Tháng :month": "Month :month",
     "Tháng sau": "Next month",
@@ -106,6 +108,5 @@
     "Đăng xuất": "Log out",
     "Địa chỉ Gmail": "Gmail address",
     "Đồng bộ lần cuối": "Last synced",
-    "Đồng bộ ngay": "Sync now",
-    "Đổi tên :name": "Rename :name"
+    "Đồng bộ ngay": "Sync now"
 }

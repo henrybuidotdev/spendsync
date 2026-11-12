@@ -371,8 +371,10 @@ test('categories can be added, renamed and deleted', function () {
     Livewire::actingAs($user)->test(Settings::class)
         ->set('newName', 'Thú cưng')->set('newIcon', '🐶')->set('newType', 'expense')
         ->call('addCategory')->assertHasNoErrors()
-        ->call('editCategory', $category->id)->set('editingName', 'Ăn ngoài')
+        ->call('editCategory', $category->id)->assertSet('editingIcon', $category->icon)
+        ->set('editingName', 'Ăn ngoài')->set('editingIcon', '☕')
         ->call('renameCategory')
+        ->assertSee('☕')
         ->call('deleteCategory', $category->id);
 
     expect($user->categories()->where('name', 'Thú cưng')->value('icon'))->toBe('🐶')
@@ -489,4 +491,18 @@ test('rows show the category emoji, its initial when it has no emoji, or ? when 
     Transaction::factory()->for($user)->create();
 
     $this->actingAs($user)->get('/')->assertSeeHtml('aria-hidden="true">?</span>');
+});
+
+test('settings offers an emoji picker and an icon can be removed', function () {
+    $user = connectedUser();
+    $category = $user->categories()->first();
+
+    Livewire::actingAs($user)->test(Settings::class)
+        ->assertSee('Chọn biểu tượng')
+        ->assertSeeHtml("\$wire.newIcon = '☕'")
+        ->call('editCategory', $category->id)
+        ->set('editingIcon', '')
+        ->call('renameCategory');
+
+    expect($category->fresh()->icon)->toBeNull();
 });

@@ -23,6 +23,8 @@ class Settings extends Component
 
     public string $editingName = '';
 
+    public string $editingIcon = '';
+
     public function disconnect(): void
     {
         $account = auth()->user()->mailAccount;
@@ -61,18 +63,22 @@ class Settings extends Component
 
         $this->editingId = $category->id;
         $this->editingName = $category->name;
+        $this->editingIcon = (string) $category->icon;
     }
 
     public function renameCategory(): void
     {
-        $this->validate(['editingName' => ['required', 'string', 'max:50']], [], ['editingName' => __('tên danh mục')]);
+        $this->validate([
+            'editingName' => ['required', 'string', 'max:50'],
+            'editingIcon' => ['nullable', 'string', 'max:16'],
+        ], [], ['editingName' => __('tên danh mục')]);
 
         $category = auth()->user()->categories()->findOrFail($this->editingId);
         $this->authorize('update', $category);
 
-        $category->update(['name' => $this->editingName]);
+        $category->update(['name' => $this->editingName, 'icon' => $this->editingIcon ?: null]);
 
-        $this->reset('editingId', 'editingName');
+        $this->reset('editingId', 'editingName', 'editingIcon');
     }
 
     public function deleteCategory(int $id): void
