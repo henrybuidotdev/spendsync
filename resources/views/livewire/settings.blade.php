@@ -156,7 +156,7 @@
                 <form wire:submit="addCategory" class="mt-3 space-y-2 border-t border-slate-100 pt-3">
                     <p class="text-sm font-medium">{{ $categoryType === 'income' ? __('Add income category') : __('Add expense category') }}</p>
                     <div class="flex gap-2">
-                        <x-emoji-picker model="newIcon" :label="__('Choose an icon')" />
+                        <x-emoji-picker model="newIcon" :label="__('Choose an icon')" up />
                         <label for="new-name" class="sr-only">{{ __('Category name') }}</label>
                         <input wire:model="newName" id="new-name" type="text" maxlength="50" placeholder="{{ __('Category name') }}" class="min-h-11 min-w-0 flex-1 rounded-xl border-slate-300 text-base focus:border-emerald-500 focus:ring-emerald-500">
                         <button type="submit" class="min-h-11 shrink-0 rounded-xl bg-black px-4 text-sm font-medium text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Add') }}</button>
