@@ -66,7 +66,7 @@ class SyncMailAccount implements ShouldBeUnique, ShouldQueue
 
         $senders = $registry->senders();
         $since = $account->last_synced_at
-            ? $account->last_synced_at->copy()->subDay()
+            ? $account->last_synced_at->copy()->subDays(30) // TEMP: testing card backfill, revert to subDay()
             : now()->subDays(self::FIRST_SYNC_DAYS);
 
         try {
