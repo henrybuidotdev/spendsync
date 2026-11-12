@@ -467,6 +467,49 @@ test('reports rank spending by category with percentages and top counterparties'
         ->assertSee('Chưa có khoản chi nào trong tháng này');
 });
 
+/* Hidden transactions */
+
+test('hiding a transaction keeps it in the list but leaves it out of totals and reports', function () {
+    $user = connectedUser();
+    Transaction::factory()->for($user)->create(['amount' => 100000, 'counterparty' => 'GRAB', 'occurred_at' => '2026-11-03 03:00:00']);
+    $hidden = Transaction::factory()->for($user)->create(['amount' => 700000, 'counterparty' => 'CHUYEN NOI BO', 'occurred_at' => '2026-11-04 03:00:00']);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $hidden])
+        ->call('toggleHidden')
+        ->assertSee('Đã ẩn giao dịch.')
+        ->assertSee('Giao dịch này đang bị ẩn');
+
+    expect($hidden->fresh()->trashed())->toBeTrue();
+
+    Livewire::actingAs($user)->test(Index::class)
+        ->assertSee('CHUYEN NOI BO')
+        ->assertSee('Đã ẩn')
+        ->assertSee('100.000 ₫')
+        ->assertDontSee('800.000 ₫');
+
+    Livewire::actingAs($user)->test(Reports::class)
+        ->assertSee('100.000 ₫')
+        ->assertDontSee('CHUYEN NOI BO')
+        ->assertDontSee('700.000 ₫');
+
+    $this->actingAs($user)->get(route('transactions.show', $hidden))->assertOk()->assertSee('Hiện lại');
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => Transaction::withTrashed()->find($hidden->id)])
+        ->call('toggleHidden')
+        ->assertSee('Đã hiện lại giao dịch.')
+        ->assertSee('Ẩn giao dịch');
+
+    expect($hidden->fresh()->trashed())->toBeFalse();
+});
+
+test('users cannot hide another users transaction', function () {
+    $foreign = Transaction::factory()->create();
+
+    Livewire::actingAs(connectedUser())->test(Show::class, ['transaction' => $foreign])->assertForbidden();
+
+    expect($foreign->fresh()->trashed())->toBeFalse();
+});
+
 /* Settings */
 
 test('disconnecting deletes the app password but keeps transactions', function () {
@@ -811,6 +854,7 @@ test('delete data wipes the users data but keeps the login, other users and syst
     $own = Category::factory()->for($user)->create();
     $rawEmail = RawEmail::factory()->for($user)->create();
     Transaction::factory()->for($user)->create(['raw_email_id' => $rawEmail->id, 'category_id' => $own->id]);
+    Transaction::factory()->for($user)->create()->delete();
     CategoryRule::factory()->for($user)->create(['category_id' => $own->id]);
     $other = connectedUser();
     Transaction::factory()->for($other)->create();
@@ -822,7 +866,7 @@ test('delete data wipes the users data but keeps the login, other users and syst
         ->assertRedirect(route('connect'));
 
     expect($user->fresh())->not->toBeNull()
-        ->and($user->transactions()->count())->toBe(0)
+        ->and($user->transactions()->withTrashed()->count())->toBe(0)
         ->and($user->rawEmails()->count())->toBe(0)
         ->and($user->categoryRules()->count())->toBe(0)
         ->and($user->categories()->count())->toBe(0)

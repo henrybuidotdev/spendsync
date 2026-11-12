@@ -94,6 +94,19 @@ class Show extends Component
         $this->dispatch('note-saved');
     }
 
+    public function toggleHidden(): void
+    {
+        $this->authorize('delete', $this->transaction);
+
+        $this->transaction->trashed()
+            ? $this->transaction->restore()
+            : $this->transaction->delete();
+
+        session()->flash('visibility', $this->transaction->trashed() ?
+            __('Transaction hidden. It no longer counts in totals or reports.') :
+            __('Transaction shown again. It counts in totals and reports.'));
+    }
+
     public function toggleRaw(): void
     {
         $this->showRaw = ! $this->showRaw;

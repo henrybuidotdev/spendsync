@@ -16,7 +16,7 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('connected')->group(function () {
         Route::get('/', TransactionsIndex::class)->name('transactions');
-        Route::get('transactions/{transaction}', TransactionsShow::class)->name('transactions.show');
+        Route::get('transactions/{transaction}', TransactionsShow::class)->name('transactions.show')->withTrashed();
         Route::get('reports', Reports::class)->name('reports');
     });
 });

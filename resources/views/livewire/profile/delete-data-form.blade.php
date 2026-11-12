@@ -17,7 +17,7 @@ $deleteData = function () {
     $user = auth()->user();
 
     DB::transaction(function () use ($user) {
-        $user->transactions()->delete();
+        $user->transactions()->withTrashed()->forceDelete();
         $user->categoryRules()->delete();
         $user->categories()->delete();
         $user->rawEmails()->delete();

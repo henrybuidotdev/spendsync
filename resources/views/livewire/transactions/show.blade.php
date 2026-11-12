@@ -1,8 +1,16 @@
 @php use App\Support\Format; @endphp
 
 <div class="space-y-4">
+    <x-flash key="visibility" :dismiss-after="4000" class="fixed inset-x-4 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-30 mx-auto max-w-md ring-1 ring-emerald-200" />
 
     <a href="{{ route('transactions', ['month' => Format::local($transaction->occurred_at)->format('Y-m'), 'filter' => $backFilter]) }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">‹ {{ __('Transactions') }}</a>
+
+    @if($transaction->trashed())
+        <div class="flex items-center justify-between gap-3 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900 ring-1 ring-amber-200" role="status">
+            <p>{{ __('This transaction is hidden. It is not counted in totals or reports.') }}</p>
+            <button type="button" wire:click="toggleHidden" class="min-h-11 shrink-0 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Unhide') }}</button>
+        </div>
+    @endif
 
     <div class="rounded-2xl bg-white p-5 text-center shadow-sm">
         <x-category-icon :category="$transaction->category" class="mx-auto h-16 w-16 text-4xl" />
@@ -85,4 +93,9 @@
             @endif
         </section>
     @endif
+
+    @unless($transaction->trashed())
+        <button type="button" wire:click="toggleHidden" class="min-h-11 w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Hide transaction') }}</button>
+        <p class="-mt-2 px-1 text-center text-xs text-slate-500">{{ __('Hidden transactions stay in the list but are not counted in totals or reports.') }}</p>
+    @endunless
 </div>

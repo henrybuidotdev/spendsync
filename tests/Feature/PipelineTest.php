@@ -186,6 +186,16 @@ test('import-eml imports a folder once and parses everything', function () {
         ->and($user->transactions()->where('bank_code', 'MB')->sum('amount'))->toBe(2000000 + 150000 + 459000 + 1250000);
 });
 
+test('re-parsing the email of a hidden transaction keeps it hidden instead of duplicating it', function () {
+    $this->artisan('spendsync:import-eml', ['user' => User::factory()->create()->id, 'path' => fixturesPath().'/VCB/05_receipt_transfer.eml'])->assertSuccessful();
+    Transaction::first()->delete();
+
+    ParseRawEmail::dispatchSync(RawEmail::first());
+
+    expect(Transaction::withTrashed()->count())->toBe(1)
+        ->and(Transaction::count())->toBe(0);
+});
+
 test('import-eml fails for unknown users', function () {
     $this->artisan('spendsync:import-eml', ['user' => 'nobody@x.test', 'path' => fixturesPath()])->assertFailed();
 });

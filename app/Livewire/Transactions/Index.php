@@ -66,6 +66,7 @@ class Index extends Component
             ->first();
 
         $transactions = $monthQuery
+            ->withTrashed()
             ->with('category')
             ->when($this->filter === 'uncategorized', fn ($query) => $query->whereNull('category_id'))
             ->when($this->filter === 'in', fn ($query) => $query->where('direction', Direction::In))
@@ -81,7 +82,7 @@ class Index extends Component
             'days' => $transactions->groupBy(fn (Transaction $transaction) => Format::local($transaction->occurred_at)->toDateString()),
             'monthStart' => $this->monthStart(),
             'latestMonth' => $this->latestMonthWithData($transactions->isEmpty()),
-            'hasAnyTransactions' => $transactions->isNotEmpty() || $user->transactions()->exists(),
+            'hasAnyTransactions' => $transactions->isNotEmpty() || $user->transactions()->withTrashed()->exists(),
         ])->title(__('Transactions'));
     }
 

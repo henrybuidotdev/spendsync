@@ -57,7 +57,7 @@ class ParseRawEmail implements ShouldQueue
 
     private function storeTransaction(ParsedTransaction $result): Transaction
     {
-        return Transaction::updateOrCreate(
+        return Transaction::withTrashed()->updateOrCreate(
             ['raw_email_id' => $this->rawEmail->id],
             [
                 'user_id' => $this->rawEmail->user_id,

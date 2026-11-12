@@ -193,5 +193,12 @@
     "Borrowing": "Đi vay",
     "Investment": "Đầu tư",
     "Rule removed.": "Đã xóa quy tắc.",
-    "Rule saved and applied to :count other transactions.": "Đã lưu quy tắc và áp dụng cho :count giao dịch khác."
+    "Rule saved and applied to :count other transactions.": "Đã lưu quy tắc và áp dụng cho :count giao dịch khác.",
+    "Hidden": "Đã ẩn",
+    "Hide transaction": "Ẩn giao dịch",
+    "Unhide": "Hiện lại",
+    "This transaction is hidden. It is not counted in totals or reports.": "Giao dịch này đang bị ẩn và không được tính vào tổng hay báo cáo.",
+    "Hidden transactions stay in the list but are not counted in totals or reports.": "Giao dịch bị ẩn vẫn nằm trong danh sách nhưng không được tính vào tổng hay báo cáo.",
+    "Transaction hidden. It no longer counts in totals or reports.": "Đã ẩn giao dịch. Giao dịch này sẽ không được tính vào tổng và báo cáo.",
+    "Transaction shown again. It counts in totals and reports.": "Đã hiện lại giao dịch. Giao dịch này được tính vào tổng và báo cáo."
 }
