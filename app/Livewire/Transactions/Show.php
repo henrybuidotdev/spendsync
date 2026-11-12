@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Layout('layouts.app')]
@@ -20,6 +21,10 @@ class Show extends Component
     public string $note = '';
 
     public bool $showRaw = false;
+
+    /** The list tab this transaction was opened from, so "back" returns to it. */
+    #[Url]
+    public string $filter = 'all';
 
     public function mount(Transaction $transaction): void
     {
@@ -47,15 +52,17 @@ class Show extends Component
         session()->flash('status', $message);
     }
 
-    public function saveNote(): void
+    public function updatedNote(): void
     {
         $this->authorize('update', $this->transaction);
 
         $this->validate(['note' => ['nullable', 'string', 'max:1000']]);
 
-        $this->transaction->update(['note' => $this->note !== '' ? $this->note : null]);
+        $note = trim($this->note);
 
-        session()->flash('status', __('Đã lưu ghi chú.'));
+        $this->transaction->update(['note' => $note !== '' ? $note : null]);
+
+        $this->dispatch('note-saved');
     }
 
     public function toggleRaw(): void
@@ -92,6 +99,7 @@ class Show extends Component
             'bankName' => config("banks.{$this->transaction->bank_code}.name", $this->transaction->bank_code),
             'rawText' => $this->showRaw && $rawEmail ? $rawEmail->toParserInput()->text : null,
             'rawEmail' => $rawEmail,
+            'backFilter' => in_array($this->filter, Index::FILTERS, true) && $this->filter !== 'all' ? $this->filter : null,
         ])->title(__('Chi tiết giao dịch'));
     }
 }

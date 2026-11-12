@@ -66,7 +66,7 @@
             <ul class="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm">
                 @foreach($transactions as $transaction)
                     <li wire:key="tx-{{ $transaction->id }}">
-                        <a href="{{ route('transactions.show', $transaction) }}" wire:navigate class="flex min-h-16 items-center gap-3 px-3 py-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500">
+                        <a href="{{ route('transactions.show', [$transaction, 'filter' => $filter !== 'all' ? $filter : null]) }}" wire:navigate class="flex min-h-16 items-center gap-3 px-3 py-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500">
                             <x-category-icon :category="$transaction->category" class="h-10 w-10 text-xl" />
                             <span class="min-w-0 flex-1">
                                 <span class="block truncate font-medium">{{ $transaction->label() }}</span>

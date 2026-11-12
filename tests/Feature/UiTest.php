@@ -270,6 +270,21 @@ test('the detail page shows parsed fields and the bank name but hides the balanc
         ->assertDontSee('8.150.000 ₫');
 });
 
+test('the detail page links back to the list tab it was opened from', function () {
+    $user = connectedUser();
+    $transaction = Transaction::factory()->for($user)->create(['occurred_at' => '2026-11-12 03:00:00']);
+
+    Livewire::actingAs($user)->test(Index::class, ['month' => '2026-11'])
+        ->call('setFilter', 'uncategorized')
+        ->assertSee(route('transactions.show', [$transaction, 'filter' => 'uncategorized']), false);
+
+    $this->actingAs($user)->get(route('transactions.show', [$transaction, 'filter' => 'uncategorized']))
+        ->assertSee(route('transactions', ['month' => '2026-11', 'filter' => 'uncategorized']));
+
+    $this->actingAs($user)->get(route('transactions.show', [$transaction, 'filter' => 'bogus']))
+        ->assertSee(route('transactions', ['month' => '2026-11']).'"', false);
+});
+
 test('users cannot open or change another users transaction', function () {
     $user = connectedUser();
     $foreign = Transaction::factory()->create();
@@ -319,14 +334,21 @@ test('unticking the checkbox only categorizes this transaction', function () {
         ->and($sibling->fresh()->category_id)->toBeNull();
 });
 
-test('notes can be saved', function () {
+test('notes save automatically, trimmed, and clearing removes them', function () {
     $user = connectedUser();
     $transaction = Transaction::factory()->for($user)->create();
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
-        ->set('note', 'ăn trưa với team')
-        ->call('saveNote')
-        ->assertHasNoErrors();
+        ->set('note', '  ăn trưa với team ')
+        ->assertHasNoErrors()
+        ->assertDispatched('note-saved')
+        ->set('note', '')
+        ->assertDispatched('note-saved');
+
+    expect($transaction->fresh()->note)->toBeNull();
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
+        ->set('note', 'ăn trưa với team');
 
     expect($transaction->fresh()->note)->toBe('ăn trưa với team');
 });

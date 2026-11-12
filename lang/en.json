@@ -45,7 +45,6 @@
     "Loại": "Type",
     "Loại danh mục": "Category type",
     "Lưu": "Save",
-    "Lưu ghi chú": "Save note",
     "Lọc giao dịch": "Filter transactions",
     "Lỗi gần nhất": "Last error",
     "Mã tham chiếu": "Reference",
@@ -87,7 +86,6 @@
     "Tên danh mục": "Category name",
     "Tạo mật khẩu tên \"ThuChi\"": "Create a password named \"ThuChi\"",
     "Tất cả": "All",
-    "Ví dụ: ăn trưa với team": "e.g. team lunch",
     "Vùng nguy hiểm": "Danger Zone",
     "Vừa đồng bộ xong. Thử lại sau :seconds giây.": "Just synced. Try again in :seconds seconds.",
     "Xem email gốc": "View original email",
@@ -109,7 +107,6 @@
     "Điều hướng chính": "Main navigation",
     "Đã lưu danh mục và áp dụng cho :count giao dịch khác.": "Category saved and applied to :count other transactions.",
     "Đã lưu danh mục.": "Category saved.",
-    "Đã lưu ghi chú.": "Note saved.",
     "Đã ngắt kết nối": "Disconnected",
     "Đã ngắt kết nối Gmail và xóa mật khẩu ứng dụng. Giao dịch cũ vẫn được giữ.": "Gmail disconnected and app password deleted. Your transactions are kept.",
     "Đã xóa toàn bộ dữ liệu. Tài khoản đăng nhập vẫn được giữ.": "All data deleted. Your login was kept.",
@@ -137,5 +134,9 @@
     "Xóa email trong Gmail không xóa giao dịch trong ứng dụng.": "Deleting an email in Gmail does not delete its transaction in the app.",
     "Đang đồng bộ": "Syncing",
     "Khi đăng ký, bạn đồng ý với": "By signing up, you agree to the",
-    "Hiện mật khẩu": "Show password"
+    "Hiện mật khẩu": "Show password",
+    "Tìm danh mục": "Search categories",
+    "Không tìm thấy danh mục nào": "No categories found",
+    "Đã lưu": "Saved",
+    "+ Thêm ghi chú": "+ Add a note"
 }
