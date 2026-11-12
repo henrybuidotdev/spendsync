@@ -16,7 +16,7 @@
     "App password (16 letters)": "Mật khẩu ứng dụng (16 chữ cái)",
     "Appearance": "Giao diện",
     "Appearance & language": "Giao diện & ngôn ngữ",
-    "Apply to future transactions with": "Áp dụng cho các giao dịch kế tiếp với",
+    "Apply this category to future transactions with": "Áp dụng danh mục này cho các giao dịch kế tiếp với",
     "Are you sure you want to delete your account?": "Bạn chắc chắn muốn xóa tài khoản?",
     "Auto-categorize rules": "Quy tắc tự phân loại",
     "Balance after": "Số dư sau giao dịch",
@@ -200,5 +200,6 @@
     "This transaction is hidden. It is not counted in totals or reports.": "Giao dịch này đang bị ẩn và không được tính vào tổng hay báo cáo.",
     "Hidden transactions stay in the list but are not counted in totals or reports.": "Giao dịch bị ẩn vẫn nằm trong danh sách nhưng không được tính vào tổng hay báo cáo.",
     "Transaction hidden. It no longer counts in totals or reports.": "Đã ẩn giao dịch. Giao dịch này sẽ không được tính vào tổng và báo cáo.",
-    "Transaction shown again. It counts in totals and reports.": "Đã hiện lại giao dịch. Giao dịch này được tính vào tổng và báo cáo."
+    "Transaction shown again. It counts in totals and reports.": "Đã hiện lại giao dịch. Giao dịch này được tính vào tổng và báo cáo.",
+    "Auto-sync your spending from bank emails.": "Tự động đồng bộ chi tiêu từ email ngân hàng."
 }

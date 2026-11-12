@@ -176,7 +176,7 @@ Real client requirements:
 
 Categorization:
 - `CategoryMatcher::match(Transaction)` checks the user's rules against the normalized counterparty, then the description. Normalized means lowercased with Vietnamese accents stripped.
-- When a user sets a category in the UI, show a checkbox that is ticked by default: "Áp dụng cho các giao dịch kế tiếp với *{counterparty}*" (apply to future transactions with this counterparty). If it's ticked, create or update a rule and also apply it to that user's existing uncategorized transactions with the same counterparty.
+- When a user sets a category in the UI, show a checkbox that is ticked by default: "Áp dụng danh mục này cho các giao dịch kế tiếp với *{counterparty}*" (apply to future transactions with this counterparty). If it's ticked, create or update a rule and also apply it to that user's existing uncategorized transactions with the same counterparty.
 
 ---
 
