@@ -1,4 +1,4 @@
-<nav class="mb-6 grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1" aria-label="{{ __('Tài khoản') }}">
+<nav class="mb-6 grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1" aria-label="{{ __('Account') }}">
     @foreach(['login' => __('Log in'), 'register' => __('Register')] as $route => $label)
         <a href="{{ route($route) }}" wire:navigate
            @if(request()->routeIs($route)) aria-current="page" @endif

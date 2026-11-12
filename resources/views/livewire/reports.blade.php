@@ -1,21 +1,21 @@
 @php use App\Support\Format; @endphp
 
 <div class="space-y-4">
-    <h1 class="text-2xl font-semibold tracking-tight">{{ __('Báo cáo') }}</h1>
+    <h1 class="text-2xl font-semibold tracking-tight">{{ __('Reports') }}</h1>
 
     <x-month-switcher :month="$monthStart" />
 
     @if($total === 0)
         <div class="rounded-2xl bg-white p-6 text-center shadow-sm">
             <p class="text-4xl" aria-hidden="true">📊</p>
-            <p class="mt-2 font-semibold">{{ __('Chưa có khoản chi nào trong tháng này') }}</p>
-            <p class="mt-1 text-sm text-slate-600">{{ __('Thử chọn tháng trước, hoặc xem danh sách giao dịch.') }}</p>
-            <a href="{{ route('transactions') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem giao dịch') }}</a>
+            <p class="mt-2 font-semibold">{{ __('No spending this month') }}</p>
+            <p class="mt-1 text-sm text-slate-600">{{ __('Try the previous month, or look at your transactions.') }}</p>
+            <a href="{{ route('transactions') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('View transactions') }}</a>
         </div>
     @else
         <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="by-category">
             <div class="flex items-baseline justify-between">
-                <h2 id="by-category" class="font-semibold">{{ __('Chi theo danh mục') }}</h2>
+                <h2 id="by-category" class="font-semibold">{{ __('Spending by category') }}</h2>
                 <p class="font-semibold tabular-nums">{{ Format::money($total) }}</p>
             </div>
 
@@ -40,7 +40,7 @@
 
         @if($topCounterparties->isNotEmpty())
             <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="top-counterparties">
-                <h2 id="top-counterparties" class="font-semibold">{{ __('Chi nhiều nhất cho') }}</h2>
+                <h2 id="top-counterparties" class="font-semibold">{{ __('Top payees') }}</h2>
                 <ol class="mt-2 divide-y divide-slate-100">
                     @foreach($topCounterparties as $index => $row)
                         <li class="flex items-center gap-3 py-2.5 text-sm">

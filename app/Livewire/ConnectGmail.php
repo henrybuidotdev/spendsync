@@ -36,7 +36,7 @@ class ConnectGmail extends Component
         $key = 'connect-gmail:'.auth()->id();
 
         if (RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS)) {
-            $this->addError('appPassword', __('Bạn đã thử quá nhiều lần. Vui lòng thử lại sau :minutes phút.', [
+            $this->addError('appPassword', __('Too many attempts. Please try again in :minutes minutes.', [
                 'minutes' => ceil(RateLimiter::availableIn($key) / 60),
             ]));
 
@@ -48,7 +48,7 @@ class ConnectGmail extends Component
         $this->validate(['email' => ['required', 'email', 'max:255']]);
 
         if (! preg_match('/^[a-z]{16}$/', $password)) {
-            $this->addError('appPassword', __('Mật khẩu ứng dụng gồm đúng 16 chữ cái.'));
+            $this->addError('appPassword', __('The app password is exactly 16 letters.'));
 
             return;
         }
@@ -58,11 +58,11 @@ class ConnectGmail extends Component
         try {
             $client->connect($email, $password);
         } catch (InvalidCredentialsException) {
-            $this->addError('appPassword', __('Gmail từ chối đăng nhập. Kiểm tra lại địa chỉ Gmail và mật khẩu ứng dụng (không phải mật khẩu Gmail thường).'));
+            $this->addError('appPassword', __('Gmail rejected the sign-in. Check the Gmail address and the app password (not your normal Gmail password).'));
 
             return;
         } catch (MailboxConnectionException) {
-            $this->addError('appPassword', __('Không kết nối được tới Gmail. Vui lòng thử lại sau ít phút.'));
+            $this->addError('appPassword', __('Couldn\'t reach Gmail. Please try again in a few minutes.'));
 
             return;
         } finally {
@@ -102,6 +102,6 @@ class ConnectGmail extends Component
         return view('livewire.connect-gmail', [
             'banks' => config('banks'),
             'reconnecting' => auth()->user()->mailAccount !== null,
-        ])->title(__('Kết nối Gmail'));
+        ])->title(__('Connect Gmail'));
     }
 }

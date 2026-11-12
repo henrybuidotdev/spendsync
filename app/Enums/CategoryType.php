@@ -11,9 +11,9 @@ enum CategoryType: string
     public function label(): string
     {
         return match ($this) {
-            self::Expense => __('Khoản chi'),
-            self::Income => __('Khoản thu'),
-            self::DebtLoan => __('Vay nợ'),
+            self::Expense => __('Expense'),
+            self::Income => __('Income'),
+            self::DebtLoan => __('Debt/Loan'),
         };
     }
 }

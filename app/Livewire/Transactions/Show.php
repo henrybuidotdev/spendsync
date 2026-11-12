@@ -41,11 +41,11 @@ class Show extends Component
 
         $this->transaction->update(['category_id' => $category->id]);
 
-        $message = __('Đã lưu danh mục.');
+        $message = __('Category saved.');
 
         if ($this->applyToFuture && $this->ruleTarget() !== null) {
             $count = $matcher->backfill($matcher->remember($this->transaction, $category));
-            $message = __('Đã lưu danh mục và áp dụng cho :count giao dịch khác.', ['count' => $count]);
+            $message = __('Category saved and applied to :count other transactions.', ['count' => $count]);
         }
 
         $this->transaction->load('category');
@@ -76,7 +76,7 @@ class Show extends Component
         $transaction = $this->transaction;
 
         return match (CategoryMatcher::ruleField($transaction)) {
-            MatchField::Account => trim("{$transaction->counterparty} · ".__('STK :account', ['account' => $transaction->counterparty_account]), ' ·'),
+            MatchField::Account => trim("{$transaction->counterparty} · ".__('Acct :account', ['account' => $transaction->counterparty_account]), ' ·'),
             MatchField::Counterparty => $transaction->counterparty,
             MatchField::Description => $transaction->description,
         };
@@ -99,6 +99,6 @@ class Show extends Component
             'rawText' => $this->showRaw && $rawEmail ? $rawEmail->toParserInput()->text : null,
             'rawEmail' => $rawEmail,
             'backFilter' => in_array($this->filter, Index::FILTERS, true) && $this->filter !== 'all' ? $this->filter : null,
-        ])->title(__('Chi tiết giao dịch'));
+        ])->title(__('Transaction details'));
     }
 }

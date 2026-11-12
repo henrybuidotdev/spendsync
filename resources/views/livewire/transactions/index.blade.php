@@ -5,23 +5,23 @@
 
     @if($account?->status === \App\Enums\MailAccountStatus::NeedsReconnect)
         <a href="{{ route('connect') }}" wire:navigate class="block rounded-2xl bg-red-600 p-4 text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2">
-            <p class="font-semibold">⚠️ {{ __('Mất kết nối Gmail') }}</p>
-            <p class="text-sm text-red-50">{{ __('Mật khẩu ứng dụng không còn hợp lệ. Chạm để kết nối lại.') }}</p>
+            <p class="font-semibold">⚠️ {{ __('Gmail disconnected') }}</p>
+            <p class="text-sm text-red-50">{{ __('The app password is no longer valid. Tap to reconnect.') }}</p>
         </a>
     @endif
 
     <div class="flex items-center justify-between gap-2">
-        <h1 class="text-2xl font-semibold tracking-tight">{{ __('Giao dịch') }}</h1>
+        <h1 class="text-2xl font-semibold tracking-tight">{{ __('Transactions') }}</h1>
         @if($account?->status === \App\Enums\MailAccountStatus::Active)
             @if($account->isSyncing())
                 <button type="button" disabled wire:poll.3s role="status"
                         class="inline-flex min-h-11 cursor-not-allowed items-center text-sm font-medium text-slate-500">
-                    {{ __('Đang đồng bộ') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                    {{ __('Syncing') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
                 </button>
             @else
                 <button type="button" wire:click="syncNow" wire:loading.attr="disabled"
                         class="inline-flex min-h-11 items-center gap-1 rounded text-sm font-medium text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
-                    ↻ {{ __('Đồng bộ ngay') }}
+                    ↻ {{ __('Sync now') }}
                 </button>
             @endif
         @endif
@@ -30,27 +30,27 @@
     <x-month-switcher :month="$monthStart" />
 
     <section class="px-1" aria-labelledby="spent-heading">
-        <h2 id="spent-heading" class="text-xs font-medium uppercase tracking-widest text-slate-500">{{ __('Đã chi') }}</h2>
+        <h2 id="spent-heading" class="text-xs font-medium uppercase tracking-widest text-slate-500">{{ __('Spent') }}</h2>
         <p class="mt-1 whitespace-nowrap text-4xl font-normal tracking-tight tabular-nums">{{ \Illuminate\Support\Str::beforeLast(Format::money($spent), ' ') }}<span class="text-slate-400"> ₫</span></p>
 
         <dl class="mt-3 grid grid-cols-3 gap-2 text-sm">
             <div>
-                <dt class="text-xs text-slate-500">{{ __('Thu') }}</dt>
+                <dt class="text-xs text-slate-500">{{ __('Total income') }}</dt>
                 <dd class="whitespace-nowrap font-medium tabular-nums text-emerald-600">{{ Format::money($income, signed: true) }}</dd>
             </div>
             <div>
-                <dt class="text-xs text-slate-500">{{ __('Chi') }}</dt>
+                <dt class="text-xs text-slate-500">{{ __('Total spent') }}</dt>
                 <dd class="whitespace-nowrap font-medium tabular-nums">{{ Format::money($spent) }}</dd>
             </div>
             <div>
-                <dt class="text-xs text-slate-500">{{ __('Chênh lệch') }}</dt>
+                <dt class="text-xs text-slate-500">{{ __('Net') }}</dt>
                 <dd @class(['whitespace-nowrap font-medium tabular-nums', 'text-emerald-600' => $income >= $spent, 'text-red-600' => $income < $spent])>{{ Format::money($income - $spent, signed: true) }}</dd>
             </div>
         </dl>
     </section>
 
-    <div class="flex gap-1 overflow-x-auto rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Lọc giao dịch') }}">
-        @foreach(['all' => __('Tất cả'), 'uncategorized' => __('Chưa phân loại'), 'in' => __('Tiền vào'), 'out' => __('Tiền ra')] as $value => $label)
+    <div class="flex gap-1 overflow-x-auto rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Filter transactions') }}">
+        @foreach(['all' => __('All'), 'uncategorized' => __('Unknown'), 'in' => __('Money in'), 'out' => __('Money out')] as $value => $label)
             <button type="button" wire:click="setFilter('{{ $value }}')" aria-pressed="{{ $filter === $value ? 'true' : 'false' }}"
                     @class(['min-h-11 flex-1 shrink-0 whitespace-nowrap rounded-full px-3 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => $filter === $value, 'text-slate-600 hover:text-slate-900' => $filter !== $value])>
                 {{ $label }}
@@ -75,7 +75,7 @@
                                     @if($transaction->category)
                                         <span class="truncate">{{ $transaction->category->name }}</span>
                                     @else
-                                        <span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-800">{{ __('Chưa phân loại') }}</span>
+                                        <span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-800">{{ __('Unknown') }}</span>
                                     @endif
                                 </span>
                             </span>
@@ -89,18 +89,18 @@
         <div class="rounded-2xl bg-white p-6 text-center shadow-sm">
             <p class="text-4xl" aria-hidden="true">{{ $hasAnyTransactions ? '🗓️' : '📭' }}</p>
             @if($hasAnyTransactions)
-                <p class="mt-2 font-semibold">{{ __('Không có giao dịch nào ở đây') }}</p>
-                <p class="mt-1 text-sm text-slate-600">{{ __('Thử chọn tháng khác hoặc bỏ bộ lọc.') }}</p>
+                <p class="mt-2 font-semibold">{{ __('Nothing here') }}</p>
+                <p class="mt-1 text-sm text-slate-600">{{ __('Try another month or clear the filter.') }}</p>
                 @if($latestMonth)
-                    <button type="button" wire:click="$set('month', '{{ $latestMonth }}')" class="mt-3 min-h-11 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem tháng :month', ['month' => \Carbon\CarbonImmutable::createFromFormat('!Y-m', $latestMonth)->format('m/Y')]) }}</button>
+                    <button type="button" wire:click="$set('month', '{{ $latestMonth }}')" class="mt-3 min-h-11 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Go to :month', ['month' => \Carbon\CarbonImmutable::createFromFormat('!Y-m', $latestMonth)->format('m/Y')]) }}</button>
                 @elseif($filter !== 'all')
-                    <button type="button" wire:click="setFilter('all')" class="mt-3 min-h-11 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem tất cả') }}</button>
+                    <button type="button" wire:click="setFilter('all')" class="mt-3 min-h-11 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Show all') }}</button>
                 @endif
             @else
-                <p class="mt-2 font-semibold">{{ __('Chưa có giao dịch nào') }}</p>
-                <p class="mt-1 text-sm text-slate-600">{{ __('Khi ngân hàng gửi email biến động số dư, giao dịch sẽ tự hiện ở đây. Lần đồng bộ đầu lấy 90 ngày gần nhất.') }}</p>
+                <p class="mt-2 font-semibold">{{ __('No transactions yet') }}</p>
+                <p class="mt-1 text-sm text-slate-600">{{ __('When your bank emails a balance change, the transaction shows up here. The first sync looks back 90 days.') }}</p>
                 @if(! $account)
-                    <a href="{{ route('connect') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white">{{ __('Kết nối Gmail') }}</a>
+                    <a href="{{ route('connect') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white">{{ __('Connect Gmail') }}</a>
                 @endif
             @endif
         </div>

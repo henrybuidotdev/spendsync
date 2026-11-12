@@ -2,7 +2,7 @@
 
 <div class="space-y-4">
 
-    <a href="{{ route('transactions', ['month' => Format::local($transaction->occurred_at)->format('Y-m'), 'filter' => $backFilter]) }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">‹ {{ __('Giao dịch') }}</a>
+    <a href="{{ route('transactions', ['month' => Format::local($transaction->occurred_at)->format('Y-m'), 'filter' => $backFilter]) }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">‹ {{ __('Transactions') }}</a>
 
     <div class="rounded-2xl bg-white p-5 text-center shadow-sm">
         <x-category-icon :category="$transaction->category" class="mx-auto h-16 w-16 text-4xl" />
@@ -11,12 +11,12 @@
         <p class="mt-1 text-sm text-slate-500">{{ ucfirst(Format::local($transaction->occurred_at)->translatedFormat('l, d/m/Y · H:i')) }}</p>
 
         <div class="relative mt-4 text-left">
-            <label for="note" class="sr-only">{{ __('Ghi chú') }}</label>
+            <label for="note" class="sr-only">{{ __('Note') }}</label>
             <input type="text" id="note" wire:model.live.debounce.1000ms="note" maxlength="1000" autocomplete="off"
-                   placeholder="{{ __('+ Thêm ghi chú') }}"
+                   placeholder="{{ __('+ Add a note') }}"
                    class="block min-h-11 w-full rounded-xl border-transparent bg-transparent px-20 text-center text-base text-slate-600 placeholder:text-slate-400 hover:bg-slate-50 focus:border-slate-200 focus:bg-white focus:ring-0">
             <x-action-message on="note-saved" class="pointer-events-none absolute inset-y-0 right-3 flex items-center gap-1 text-sm font-medium text-emerald-700">
-                <span aria-hidden="true">✓</span> {{ __('Đã lưu') }}
+                <span aria-hidden="true">✓</span> {{ __('Saved') }}
             </x-action-message>
         </div>
         @error('note') <p class="mt-1 text-left text-sm text-red-600">{{ $message }}</p> @enderror
@@ -24,14 +24,14 @@
 
     <dl class="divide-y divide-slate-100 rounded-2xl bg-white px-4 text-sm shadow-sm">
         @foreach([
-            __('Ngân hàng') => "{$bankName} ({$transaction->bank_code})",
-            __('Loại') => $transaction->isIncome() ? __('Tiền vào') : __('Tiền ra'),
-            __('Số tiền gốc') => $transaction->currency ? Format::foreign($transaction->original_amount, $transaction->currency).($transaction->amount_estimated ? ' · '.__('quy đổi ước tính') : '') : null,
-            __('Người nhận / gửi') => $transaction->counterparty,
-            __('Số tài khoản') => $transaction->counterparty_account,
-            __('Nội dung') => $transaction->description,
-            // __('Số dư sau giao dịch') => $transaction->balance_after !== null ? Format::money($transaction->balance_after) : null,
-            __('Mã tham chiếu') => $transaction->reference,
+            __('Bank') => "{$bankName} ({$transaction->bank_code})",
+            __('Type') => $transaction->isIncome() ? __('Money in') : __('Money out'),
+            __('Original amount') => $transaction->currency ? Format::foreign($transaction->original_amount, $transaction->currency).($transaction->amount_estimated ? ' · '.__('estimated conversion') : '') : null,
+            __('Counterparty') => $transaction->counterparty,
+            __('Account number') => $transaction->counterparty_account,
+            __('Description') => $transaction->description,
+            // __('Balance after') => $transaction->balance_after !== null ? Format::money($transaction->balance_after) : null,
+            __('Reference') => $transaction->reference,
         ] as $label => $value)
             <div class="flex justify-between gap-4 py-3">
                 <dt class="shrink-0 text-slate-500">{{ $label }}</dt>
@@ -42,9 +42,9 @@
 
     <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="category-heading"
              x-data="{ tab: @js($defaultTab) }">
-        <h2 id="category-heading" class="font-semibold">{{ __('Danh mục') }}</h2>
+        <h2 id="category-heading" class="font-semibold">{{ __('Category') }}</h2>
 
-        <div class="mt-4 grid grid-cols-3 gap-1 rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Loại danh mục') }}">
+        <div class="mt-4 grid grid-cols-3 gap-1 rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Category type') }}">
             @foreach(\App\Enums\CategoryType::cases() as $case)
                 <button type="button" x-on:click="tab = @js($case->value)" x-bind:aria-pressed="tab === @js($case->value)"
                         class="min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
@@ -67,7 +67,7 @@
         @if($this->ruleTarget())
             <label class="mt-5 flex min-h-11 cursor-pointer items-start gap-3 text-sm">
                 <input type="checkbox" wire:model="applyToFuture" class="mt-0.5 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
-                <span>{{ __('Áp dụng cho các giao dịch sau với') }} <em class="font-semibold not-italic">{{ \Illuminate\Support\Str::limit($this->ruleTarget(), 60) }}</em></span>
+                <span>{{ __('Apply to future transactions with') }} <em class="font-semibold not-italic">{{ \Illuminate\Support\Str::limit($this->ruleTarget(), 60) }}</em></span>
             </label>
         @endif
 
@@ -77,7 +77,7 @@
     @if($rawEmail)
         <section class="rounded-2xl bg-white p-4 shadow-sm">
             <button type="button" wire:click="toggleRaw" aria-expanded="{{ $showRaw ? 'true' : 'false' }}" class="flex min-h-11 w-full items-center justify-between font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
-                {{ __('Xem email gốc') }} <span aria-hidden="true">{{ $showRaw ? '▴' : '▾' }}</span>
+                {{ __('View original email') }} <span aria-hidden="true">{{ $showRaw ? '▴' : '▾' }}</span>
             </button>
             @if($showRaw)
                 <p class="mt-2 text-xs text-slate-500">{{ $rawEmail->subject }} · {{ Format::local($rawEmail->received_at)->format('d/m/Y H:i') }}</p>

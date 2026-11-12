@@ -31,7 +31,7 @@ class Reports extends Component
             ->toBase()
             ->get()
             ->map(fn ($row) => (object) [
-                'name' => $categories->get($row->category_id)?->name ?? __('Chưa phân loại'),
+                'name' => $categories->get($row->category_id)?->name ?? __('Unknown'),
                 'category' => $categories->get($row->category_id),
                 'total' => (int) $row->total,
                 'count' => (int) $row->count,
@@ -53,6 +53,6 @@ class Reports extends Component
             'byCategory' => $byCategory,
             'total' => $total,
             'topCounterparties' => $topCounterparties,
-        ])->title(__('Báo cáo'));
+        ])->title(__('Reports'));
     }
 }

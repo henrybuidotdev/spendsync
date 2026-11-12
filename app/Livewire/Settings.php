@@ -47,7 +47,7 @@ class Settings extends Component
 
         $account->update(['app_password' => null, 'status' => MailAccountStatus::Disabled, 'last_error' => null]);
 
-        session()->flash('status', __('Đã ngắt kết nối Gmail và xóa mật khẩu ứng dụng. Giao dịch cũ vẫn được giữ.'));
+        session()->flash('status', __('Gmail disconnected and app password deleted. Your transactions are kept.'));
     }
 
     public function showCategoryType(string $type): void
@@ -62,7 +62,7 @@ class Settings extends Component
             'newName' => ['required', 'string', 'max:50'],
             'newIcon' => ['nullable', 'string', 'max:16'],
             'categoryType' => ['required', Rule::enum(CategoryType::class)],
-        ], [], ['newName' => __('tên danh mục')]);
+        ], [], ['newName' => __('category name')]);
 
         auth()->user()->categories()->create([
             'name' => $validated['newName'],
@@ -87,7 +87,7 @@ class Settings extends Component
         $this->validate([
             'editingName' => ['required', 'string', 'max:50'],
             'editingIcon' => ['nullable', 'string', 'max:16'],
-        ], [], ['editingName' => __('tên danh mục')]);
+        ], [], ['editingName' => __('category name')]);
 
         $category = auth()->user()->categories()->findOrFail($this->editingId);
         $this->authorize('update', $category);
@@ -173,11 +173,11 @@ class Settings extends Component
     private function sectionTitle(): string
     {
         return match ($this->section) {
-            'gmail' => __('Tài khoản Gmail'),
-            'categories' => __('Danh mục'),
-            'rules' => __('Quy tắc tự phân loại'),
-            'appearance' => __('Giao diện & ngôn ngữ'),
-            default => __('Cài đặt'),
+            'gmail' => __('Gmail account'),
+            'categories' => __('Category'),
+            'rules' => __('Auto-categorize rules'),
+            'appearance' => __('Appearance & language'),
+            default => __('Settings'),
         };
     }
 }

@@ -2,7 +2,7 @@
 
 @php
     $groups = [
-        __('Chi tiêu') => [
+        __('Spending') => [
             '🍜', '🍚', '🥖', '🍱', '🍲', '🍕', '☕', '🧋', '🍺', '🍰', '🛒', '🥬',
             '🛵', '🚗', '🚕', '⛽', '🅿️', '🚌', '✈️', '🏨', '🏖️', '🧳',
             '🛍️', '👕', '👟', '👜', '💄', '💇', '💍', '⌚',
@@ -11,7 +11,7 @@
             '💊', '🏥', '🦷', '👓', '💉', '📚', '🎓', '✏️', '👶', '🍼', '🧸', '🐶', '🐱',
             '🏧', '💳', '🔁', '📦',
         ],
-        __('Thu nhập') => [
+        __('Earnings') => [
             '💰', '💵', '💸', '🪙', '🏦', '🧧', '💼', '👔', '💻', '🧑‍💻', '🧑‍🏫', '🏆',
             '🎖️', '📈', '📊', '💹', '🐷', '💎', '🔑', '🏡', '🏷️', '🤝', '🚚', '🌾',
             '↩️', '🎉', '➕',
@@ -40,6 +40,6 @@
         </div>
         @endforeach
         <button type="button" @click="$wire.{{ $model }} = ''; open = false"
-                class="mt-1 min-h-11 w-full rounded-lg text-sm text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Không dùng biểu tượng') }}</button>
+                class="mt-1 min-h-11 w-full rounded-lg text-sm text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('No icon') }}</button>
     </div>
 </div>

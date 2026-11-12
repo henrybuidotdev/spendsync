@@ -43,7 +43,7 @@ class Index extends Component
         $key = 'sync-now:'.auth()->id();
 
         if (RateLimiter::tooManyAttempts($key, 1)) {
-            session()->flash('status', __('Vừa đồng bộ xong. Thử lại sau :seconds giây.', ['seconds' => RateLimiter::availableIn($key)]));
+            session()->flash('status', __('Just synced. Try again in :seconds seconds.', ['seconds' => RateLimiter::availableIn($key)]));
 
             return;
         }
@@ -82,7 +82,7 @@ class Index extends Component
             'monthStart' => $this->monthStart(),
             'latestMonth' => $this->latestMonthWithData($transactions->isEmpty()),
             'hasAnyTransactions' => $transactions->isNotEmpty() || $user->transactions()->exists(),
-        ])->title(__('Giao dịch'));
+        ])->title(__('Transactions'));
     }
 
     private function latestMonthWithData(bool $currentIsEmpty): ?string
