@@ -5,10 +5,19 @@ use Illuminate\Support\Facades\Session;
 
 use function Livewire\Volt\form;
 use function Livewire\Volt\layout;
+use function Livewire\Volt\mount;
 
 layout('layouts.guest');
 
 form(LoginForm::class);
+
+// TEMP demo prefill (local only) — remove before launch.
+mount(function () {
+    if (app()->isLocal()) {
+        $this->form->email = 'demo@thuchi.test';
+        $this->form->password = 'password';
+    }
+});
 
 $login = function () {
     $this->validate();
