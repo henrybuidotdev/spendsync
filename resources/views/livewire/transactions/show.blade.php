@@ -19,7 +19,7 @@
             __('Người nhận / gửi') => $transaction->counterparty,
             __('Số tài khoản') => $transaction->counterparty_account,
             __('Nội dung') => $transaction->description,
-            __('Số dư sau giao dịch') => $transaction->balance_after !== null ? Format::money($transaction->balance_after) : null,
+            // __('Số dư sau giao dịch') => $transaction->balance_after !== null ? Format::money($transaction->balance_after) : null,
             __('Mã tham chiếu') => $transaction->reference,
         ] as $label => $value)
             <div class="flex justify-between gap-4 py-3">
