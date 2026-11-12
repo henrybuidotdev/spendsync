@@ -41,7 +41,7 @@
             @endif
 
             <div class="mt-3 flex flex-wrap gap-2">
-                <a href="{{ route('connect') }}" wire:navigate class="inline-flex min-h-11 items-center rounded-xl bg-emerald-600 px-4 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Kết nối lại') }}</a>
+                <a href="{{ route('connect') }}" wire:navigate class="inline-flex min-h-11 items-center rounded-xl bg-black px-4 text-sm font-medium text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Kết nối lại') }}</a>
                 @if($account->status !== MailAccountStatus::Disabled)
                     <button type="button" wire:click="disconnect" wire:confirm="{{ __('Ngắt kết nối Gmail? Mật khẩu ứng dụng sẽ bị xóa, giao dịch cũ vẫn được giữ.') }}"
                             class="min-h-11 rounded-xl bg-white px-4 text-sm font-medium text-red-600 ring-1 ring-red-200 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">{{ __('Ngắt kết nối') }}</button>
@@ -49,7 +49,7 @@
             </div>
         @else
             <p class="mt-2 text-sm text-slate-600">{{ __('Chưa kết nối Gmail.') }}</p>
-            <a href="{{ route('connect') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-emerald-600 px-4 text-sm font-medium text-white">{{ __('Kết nối Gmail') }}</a>
+            <a href="{{ route('connect') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 text-sm font-medium text-white">{{ __('Kết nối Gmail') }}</a>
         @endif
     </section>
 
@@ -71,7 +71,7 @@
                             <x-emoji-picker model="editingIcon" :label="__('Chọn biểu tượng')" />
                             <label for="editing-name" class="sr-only">{{ __('Tên danh mục') }}</label>
                             <input wire:model="editingName" id="editing-name" type="text" maxlength="50" class="min-h-11 min-w-0 flex-1 rounded-xl border-slate-300 text-base focus:border-emerald-500 focus:ring-emerald-500">
-                            <button type="submit" class="min-h-11 rounded-xl bg-emerald-600 px-3 text-sm font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Lưu') }}</button>
+                            <button type="submit" class="min-h-11 rounded-xl bg-black px-3 text-sm font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Lưu') }}</button>
                         </form>
                     @else
                         <x-category-icon :category="$category" class="h-8 w-8 text-lg" />
@@ -97,7 +97,7 @@
                 <x-emoji-picker model="newIcon" :label="__('Chọn biểu tượng')" />
                 <label for="new-name" class="sr-only">{{ __('Tên danh mục') }}</label>
                 <input wire:model="newName" id="new-name" type="text" maxlength="50" placeholder="{{ __('Tên danh mục') }}" class="min-h-11 min-w-0 flex-1 rounded-xl border-slate-300 text-base focus:border-emerald-500 focus:ring-emerald-500">
-                <button type="submit" class="min-h-11 shrink-0 rounded-xl bg-emerald-600 px-4 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Thêm') }}</button>
+                <button type="submit" class="min-h-11 shrink-0 rounded-xl bg-black px-4 text-sm font-medium text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Thêm') }}</button>
             </div>
             @error('newName') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
         </form>
@@ -124,7 +124,32 @@
         <div class="mt-2 grid grid-cols-2 gap-2" role="group">
             @foreach(['vi' => 'Tiếng Việt', 'en' => 'English'] as $code => $label)
                 <button type="button" wire:click="setLocale('{{ $code }}')" aria-pressed="{{ app()->getLocale() === $code ? 'true' : 'false' }}"
-                        @class(['min-h-11 rounded-xl text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-emerald-600 text-white' => app()->getLocale() === $code, 'bg-slate-50 ring-1 ring-slate-200 hover:bg-slate-100' => app()->getLocale() !== $code])>{{ $label }}</button>
+                        @class(['min-h-11 rounded-xl text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-black text-white' => app()->getLocale() === $code, 'bg-slate-50 ring-1 ring-slate-200 hover:bg-slate-100' => app()->getLocale() !== $code])>{{ $label }}</button>
+            @endforeach
+        </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="theme-heading"
+             x-data="{
+                 theme: document.documentElement.dataset.theme ?? 'system',
+                 setTheme(theme) {
+                     this.theme = theme;
+
+                     try {
+                         theme === 'system' ? localStorage.removeItem('theme') : localStorage.setItem('theme', theme);
+                     } catch (e) {}
+
+                     theme === 'system'
+                         ? delete document.documentElement.dataset.theme
+                         : document.documentElement.dataset.theme = theme;
+                 },
+             }">
+        <h2 id="theme-heading" class="font-semibold">{{ __('Giao diện') }}</h2>
+        <div class="mt-2 grid grid-cols-3 gap-2" role="group">
+            @foreach(['light' => __('Sáng'), 'dark' => __('Tối'), 'system' => __('Theo hệ thống')] as $value => $label)
+                <button type="button" x-on:click="setTheme('{{ $value }}')" x-bind:aria-pressed="theme === '{{ $value }}'"
+                        class="min-h-11 rounded-xl text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                        x-bind:class="theme === '{{ $value }}' ? 'bg-black text-white' : 'bg-slate-50 ring-1 ring-slate-200 hover:bg-slate-100'">{{ $label }}</button>
             @endforeach
         </div>
     </section>

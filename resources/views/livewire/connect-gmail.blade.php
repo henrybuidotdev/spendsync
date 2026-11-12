@@ -14,7 +14,7 @@
             [__('Dán vào ô bên dưới'), __('Có hay không có dấu cách đều được.'), null, null, '📋'],
         ] as $index => [$heading, $body, $url, $linkText, $icon])
             <li class="flex gap-3 rounded-2xl bg-white p-4 shadow-sm">
-                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 font-bold text-white" aria-hidden="true">{{ $index + 1 }}</span>
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black font-bold text-white" aria-hidden="true">{{ $index + 1 }}</span>
                 <div class="min-w-0">
                     <p class="font-semibold"><span aria-hidden="true">{{ $icon }}</span> {{ $heading }}</p>
                     <p class="mt-0.5 text-sm text-slate-600">{{ $body }}</p>
@@ -42,7 +42,7 @@
         </div>
 
         <button type="submit" wire:loading.attr="disabled"
-                class="flex min-h-12 w-full items-center justify-center rounded-xl bg-emerald-600 px-4 font-semibold text-white hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-60">
+                class="flex min-h-12 w-full items-center justify-center rounded-xl bg-black px-4 font-semibold text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:opacity-60">
             <span wire:loading.remove wire:target="connect">{{ __('Kết nối') }}</span>
             <span class="hidden" wire:loading.inline wire:target="connect">{{ __('Đang kiểm tra…') }}</span>
         </button>

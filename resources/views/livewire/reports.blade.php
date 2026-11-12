@@ -10,7 +10,7 @@
             <p class="text-4xl" aria-hidden="true">📊</p>
             <p class="mt-2 font-semibold">{{ __('Chưa có khoản chi nào trong tháng này') }}</p>
             <p class="mt-1 text-sm text-slate-600">{{ __('Thử chọn tháng trước, hoặc xem danh sách giao dịch.') }}</p>
-            <a href="{{ route('transactions') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-emerald-600 px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem giao dịch') }}</a>
+            <a href="{{ route('transactions') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem giao dịch') }}</a>
         </div>
     @else
         <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="by-category">

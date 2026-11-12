@@ -44,10 +44,10 @@
         </div>
     </dl>
 
-    <div class="-mx-4 flex gap-2 overflow-x-auto px-4" role="group" aria-label="{{ __('Lọc giao dịch') }}">
+    <div class="-mx-4 flex gap-2 overflow-x-auto px-4 py-2" role="group" aria-label="{{ __('Lọc giao dịch') }}">
         @foreach(['all' => __('Tất cả'), 'uncategorized' => __('Chưa phân loại'), 'in' => __('Tiền vào'), 'out' => __('Tiền ra')] as $value => $label)
             <button type="button" wire:click="setFilter('{{ $value }}')" aria-pressed="{{ $filter === $value ? 'true' : 'false' }}"
-                    @class(['min-h-11 shrink-0 rounded-full px-4 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-emerald-600 text-white' => $filter === $value, 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-100' => $filter !== $value])>
+                    @class(['min-h-11 shrink-0 rounded-full px-4 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-black text-white' => $filter === $value, 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-100' => $filter !== $value])>
                 {{ $label }}
             </button>
         @endforeach
@@ -87,15 +87,15 @@
                 <p class="mt-2 font-semibold">{{ __('Không có giao dịch nào ở đây') }}</p>
                 <p class="mt-1 text-sm text-slate-600">{{ __('Thử chọn tháng khác hoặc bỏ bộ lọc.') }}</p>
                 @if($latestMonth)
-                    <button type="button" wire:click="$set('month', '{{ $latestMonth }}')" class="mt-3 min-h-11 rounded-xl bg-emerald-600 px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem tháng :month', ['month' => \Carbon\CarbonImmutable::createFromFormat('!Y-m', $latestMonth)->format('m/Y')]) }}</button>
+                    <button type="button" wire:click="$set('month', '{{ $latestMonth }}')" class="mt-3 min-h-11 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem tháng :month', ['month' => \Carbon\CarbonImmutable::createFromFormat('!Y-m', $latestMonth)->format('m/Y')]) }}</button>
                 @elseif($filter !== 'all')
-                    <button type="button" wire:click="setFilter('all')" class="mt-3 min-h-11 rounded-xl bg-emerald-600 px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem tất cả') }}</button>
+                    <button type="button" wire:click="setFilter('all')" class="mt-3 min-h-11 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Xem tất cả') }}</button>
                 @endif
             @else
                 <p class="mt-2 font-semibold">{{ __('Chưa có giao dịch nào') }}</p>
                 <p class="mt-1 text-sm text-slate-600">{{ __('Khi ngân hàng gửi email biến động số dư, giao dịch sẽ tự hiện ở đây. Lần đồng bộ đầu lấy 30 ngày gần nhất.') }}</p>
                 @if(! $account)
-                    <a href="{{ route('connect') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-emerald-600 px-4 font-medium text-white">{{ __('Kết nối Gmail') }}</a>
+                    <a href="{{ route('connect') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white">{{ __('Kết nối Gmail') }}</a>
                 @endif
             @endif
         </div>

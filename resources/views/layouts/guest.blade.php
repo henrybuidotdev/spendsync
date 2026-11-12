@@ -3,7 +3,7 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="bg-slate-100 font-sans text-slate-900 antialiased">
+    <body class="bg-slate-50 font-sans text-slate-900 antialiased">
         <div class="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-8">
             <a href="/" class="mb-6 flex items-center justify-center gap-2 text-2xl font-bold text-emerald-700" wire:navigate>
                 <img src="/icon.svg" alt="" class="h-10 w-10">
