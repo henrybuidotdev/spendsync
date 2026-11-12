@@ -1,5 +1,5 @@
-// Caches static build assets only. Pages and data always come from the network.
-const CACHE = 'thuchi-static-v1';
+// Caches hashed build assets only (their URLs change with their content). Pages, data and icons always come from the network.
+const CACHE = 'thuchi-static-v2';
 
 self.addEventListener('install', () => self.skipWaiting());
 
@@ -15,7 +15,7 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     const isStatic = event.request.method === 'GET'
         && url.origin === self.location.origin
-        && (url.pathname.startsWith('/build/') || url.pathname === '/icon.svg');
+        && url.pathname.startsWith('/build/');
 
     if (!isStatic) {
         return;

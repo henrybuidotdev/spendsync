@@ -1,6 +1,6 @@
 {
-    "name": "ThuChi Auto",
-    "short_name": "ThuChi",
+    "name": "BeanPulse",
+    "short_name": "BeanPulse",
     "description": "Tự động ghi chép thu chi từ email ngân hàng",
     "lang": "vi",
     "start_url": "/",
