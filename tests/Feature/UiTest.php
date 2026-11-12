@@ -506,3 +506,18 @@ test('settings offers an emoji picker and an icon can be removed', function () {
 
     expect($category->fresh()->icon)->toBeNull();
 });
+
+test('the emoji picker offers spending and income groups', function () {
+    $user = connectedUser();
+
+    Livewire::actingAs($user)->test(Settings::class)
+        ->assertSee('Chi tiêu')
+        ->assertSee('Thu nhập')
+        ->assertSeeHtml("\$wire.newIcon = '🧧'")
+        ->assertSeeHtml("\$wire.newIcon = '🥖'")
+        ->set('newName', 'Lì xì')->set('newIcon', '🧧')->set('newType', 'income')
+        ->call('addCategory')
+        ->assertHasNoErrors();
+
+    expect($user->categories()->where('name', 'Lì xì')->value('icon'))->toBe('🧧');
+});
