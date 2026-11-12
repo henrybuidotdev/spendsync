@@ -16,6 +16,7 @@ use App\Models\MailAccount;
 use App\Models\RawEmail;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Parsing\ParserRegistry;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
@@ -215,7 +216,7 @@ test('sync now runs a sync at most once per minute', function () {
     app()->instance(MailboxClient::class, $fake);
     $user = connectedUser();
 
-    $component = Livewire::actingAs($user)->test(Index::class)->call('syncNow')->assertSee('Đang đồng bộ');
+    $component = Livewire::actingAs($user)->test(Index::class)->call('syncNow')->assertDontSee('Đang đồng bộ');
     $component->call('syncNow')->assertSee('Vừa đồng bộ xong');
 
     expect($fake->searches)->toHaveCount(1);
@@ -444,4 +445,31 @@ test('an empty month offers a jump to the latest month with data', function () {
         ->assertSee('Xem tháng 08/2026')
         ->set('month', '2026-08')
         ->assertSee('CU');
+});
+
+test('the syncing banner shows only while a user-started sync is pending and polls', function () {
+    Queue::fake();
+    $user = connectedUser();
+    $account = $user->mailAccount;
+
+    $this->actingAs($user)->get('/')->assertDontSee('Đang đồng bộ');
+
+    $account->queueSync();
+
+    $this->actingAs($user)->get('/')->assertSee('Đang đồng bộ')->assertSee('wire:poll.3s', false);
+
+    app()->instance(MailboxClient::class, new FakeMailboxClient);
+    (new SyncMailAccount($account))->handle(app(MailboxClient::class), app(ParserRegistry::class));
+
+    $this->actingAs($user)->get('/')->assertDontSee('Đang đồng bộ');
+});
+
+test('the syncing flag clears even when the sync fails', function () {
+    $account = MailAccount::factory()->create();
+    $account->queueSync();
+    app()->instance(MailboxClient::class, new FakeMailboxClient(failAuth: true));
+
+    SyncMailAccount::dispatchSync($account);
+
+    expect($account->isSyncing())->toBeFalse();
 });

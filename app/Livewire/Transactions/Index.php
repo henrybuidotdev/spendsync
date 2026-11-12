@@ -4,7 +4,6 @@ namespace App\Livewire\Transactions;
 
 use App\Enums\Direction;
 use App\Enums\MailAccountStatus;
-use App\Jobs\SyncMailAccount;
 use App\Livewire\Concerns\WithMonth;
 use App\Models\Transaction;
 use App\Support\Format;
@@ -46,8 +45,7 @@ class Index extends Component
         }
 
         RateLimiter::hit($key, 60);
-        SyncMailAccount::dispatch($account);
-        session()->flash('syncing', true);
+        $account->queueSync();
     }
 
     public function render()

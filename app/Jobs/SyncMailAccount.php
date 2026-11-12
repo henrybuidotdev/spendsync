@@ -35,6 +35,15 @@ class SyncMailAccount implements ShouldBeUnique, ShouldQueue
 
     public function handle(MailboxClient $client, ParserRegistry $registry): void
     {
+        try {
+            $this->sync($client, $registry);
+        } finally {
+            $this->account->finishSyncing();
+        }
+    }
+
+    private function sync(MailboxClient $client, ParserRegistry $registry): void
+    {
         $account = $this->account->fresh();
 
         if (! $account?->isActive() || blank($account->app_password)) {

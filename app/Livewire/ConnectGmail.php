@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Enums\MailAccountStatus;
-use App\Jobs\SyncMailAccount;
 use App\Mail\Inbox\InvalidCredentialsException;
 use App\Mail\Inbox\MailboxClient;
 use App\Mail\Inbox\MailboxConnectionException;
@@ -73,9 +72,8 @@ class ConnectGmail extends Component
         $account = $this->storeAccount($email, $password);
 
         RateLimiter::clear($key);
-        SyncMailAccount::dispatch($account);
+        $account->queueSync();
 
-        session()->flash('syncing', true);
         $this->redirectRoute('transactions', navigate: true);
     }
 

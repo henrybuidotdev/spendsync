@@ -10,8 +10,8 @@
         </a>
     @endif
 
-    @if(session('syncing'))
-        <div role="status" class="flex items-center gap-2 rounded-2xl bg-sky-50 p-4 text-sm text-sky-800">
+    @if($account?->isSyncing())
+        <div wire:poll.3s role="status" class="flex items-center gap-2 rounded-2xl bg-sky-50 p-4 text-sm text-sky-800">
             <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" stroke-dasharray="40 20"/></svg>
             {{ __('Đang đồng bộ… Giao dịch mới sẽ hiện sau ít phút.') }}
         </div>
