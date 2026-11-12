@@ -16,6 +16,7 @@
         @foreach([
             __('Ngân hàng') => "{$bankName} ({$transaction->bank_code})",
             __('Loại') => $transaction->isIncome() ? __('Tiền vào') : __('Tiền ra'),
+            __('Số tiền gốc') => $transaction->currency ? Format::foreign($transaction->original_amount, $transaction->currency).($transaction->amount_estimated ? ' · '.__('quy đổi ước tính') : '') : null,
             __('Người nhận / gửi') => $transaction->counterparty,
             __('Số tài khoản') => $transaction->counterparty_account,
             __('Nội dung') => $transaction->description,

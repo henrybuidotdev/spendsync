@@ -6,5 +6,8 @@
     "counterparty_account": null,
     "description": "Thanh toán đơn hàng Shopee 261110ABC",
     "reference": null,
-    "occurred_at": "2026-11-10T21:10:44+07:00"
+    "occurred_at": "2026-11-10T21:10:44+07:00",
+    "currency": null,
+    "original_amount": null,
+    "amount_estimated": false
 }

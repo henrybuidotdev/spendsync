@@ -6,5 +6,8 @@
     "counterparty_account": null,
     "description": "CONG TY TNHH CONG NGHE ABC TRA LUONG THANG 10/2026",
     "reference": null,
-    "occurred_at": "2026-11-05T09:30:00+07:00"
+    "occurred_at": "2026-11-05T09:30:00+07:00",
+    "currency": null,
+    "original_amount": null,
+    "amount_estimated": false
 }

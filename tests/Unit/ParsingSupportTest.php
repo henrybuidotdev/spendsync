@@ -80,3 +80,18 @@ test('text normalizer folds Vietnamese diacritics for matching', function (strin
     ["Nguye\u{0302}\u{0303}n", 'nguyen'],
     ['ơ ư ă â ê ô', 'o u a a e o'],
 ]);
+
+test('money parser detects currency and returns minor units for foreign amounts', function (string $input, ?array $expected) {
+    expect(MoneyParser::parseWithCurrency($input))->toBe($expected);
+})->with([
+    ['12.50 USD', ['amount' => 1250, 'currency' => 'USD']],
+    ['USD 1,234.56', ['amount' => 123456, 'currency' => 'USD']],
+    ['$9.99', ['amount' => 999, 'currency' => 'USD']],
+    ['-20 USD', ['amount' => -2000, 'currency' => 'USD']],
+    ['12.50 USD (325,000 VND)', ['amount' => 1250, 'currency' => 'USD']],
+    ['15,00 EUR', ['amount' => 1500, 'currency' => 'EUR']],
+    ['1.250.000 VND', ['amount' => 1250000, 'currency' => 'VND']],
+    ['500.000đ', ['amount' => 500000, 'currency' => 'VND']],
+    ['-35,000', ['amount' => -35000, 'currency' => 'VND']],
+    ['abc', null],
+]);

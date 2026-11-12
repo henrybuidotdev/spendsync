@@ -6,5 +6,8 @@
     "counterparty_account": null,
     "description": "HOAN TIEN BAO HIEM SUC KHOE",
     "reference": null,
-    "occurred_at": "2026-11-01T08:00:00+07:00"
+    "occurred_at": "2026-11-01T08:00:00+07:00",
+    "currency": null,
+    "original_amount": null,
+    "amount_estimated": false
 }

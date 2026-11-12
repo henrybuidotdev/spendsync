@@ -4,8 +4,11 @@ namespace App\Parsing\Banks;
 
 use App\Parsing\ParsedEmailInput;
 use App\Parsing\ParsedTransaction;
+use App\Parsing\Support\TextNormalizer;
 
 /**
+ * Card alerts ("Thông báo giao dịch thẻ") come from a separate sender and use the same stacked layout.
+ *
  * Receipts ("Biên lai chuyển tiền qua tài khoản", "Biên lai thanh toán") are built from real redacted samples:
  * stacked "Vietnamese label / English label / value" lines, always money leaving the user's account.
  *
@@ -22,6 +25,10 @@ class VietcombankParser extends AbstractBankParser
     {
         if ($this->isNonTransaction($input)) {
             return null;
+        }
+
+        if (str_contains($input->text, "Số tiền\nTransaction Amount\n")) {
+            return $this->parseCardTransaction($input);
         }
 
         if (str_contains($input->text, "Số tiền\nAmount\n")) {
@@ -47,6 +54,25 @@ class VietcombankParser extends AbstractBankParser
         );
     }
 
+    /** Card alerts ("Thông báo giao dịch thẻ"), often in a foreign currency with no VND figure; only successful ones count. */
+    private function parseCardTransaction(ParsedEmailInput $input): ?ParsedTransaction
+    {
+        $text = $input->text;
+        $status = TextNormalizer::fold((string) $this->blockField($text, 'Tình trạng giao dịch', 'Status of Transaction'));
+
+        if (! str_starts_with($status, 'thanh cong')) {
+            return null;
+        }
+
+        return $this->transaction(
+            input: $input,
+            amount: $this->blockField($text, 'Số tiền', 'Transaction Amount'),
+            directionHint: 'ghi nợ',
+            counterparty: $this->blockField($text, 'Sử dụng tại', 'At'),
+            time: $this->blockField($text, 'Ngày, giờ giao dịch', 'Trans. Date, Time'),
+        );
+    }
+
     private function parseBalanceNotification(ParsedEmailInput $input): ?ParsedTransaction
     {
         $text = $input->text;
@@ -65,6 +91,7 @@ class VietcombankParser extends AbstractBankParser
             description: $this->field($text, 'Nội dung chuyển tiền|Nội dung'),
             reference: $this->field($text, 'Số tham chiếu|Mã giao dịch'),
             time: $this->field($text, 'Thời gian giao dịch|Thời gian|Ngày giao dịch'),
+            convertedAmount: $this->field($text, 'Số tiền quy đổi'),
         );
     }
 }

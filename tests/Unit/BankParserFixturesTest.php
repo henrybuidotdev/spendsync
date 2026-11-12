@@ -108,7 +108,7 @@ test('vietcombank receipts with a blank amount throw amount_missing', function (
 test('receipt credit accounts keep letters and digits, and anything with other characters is dropped', function (string $account, ?string $expected) {
     $text = "Biên lai thanh toán\nTài khoản hưởng\nCredit Account\n{$account}\nSố tiền\nAmount\n100,000 VND";
 
-    $result = app(\App\Parsing\Banks\VietcombankParser::class)
+    $result = app(VietcombankParser::class)
         ->parse(ParsedEmailInput::make('VCB <info@vietcombank.com.vn>', 'Biên lai', null, $text, CarbonImmutable::parse('2026-11-12')));
 
     expect($result->counterpartyAccount)->toBe($expected);
@@ -119,3 +119,32 @@ test('receipt credit accounts keep letters and digits, and anything with other c
     ['MBVCB.123', null],
     ['GRAB*123', null],
 ]);
+
+test('a foreign amount uses the VND the bank charged when the email states it', function () {
+    $result = (new VietcombankParser)->parse(input("Số tiền: -12.50 USD\nSố tiền quy đổi: 330,000 VND\nNội dung: NETFLIX.COM"));
+
+    expect($result->amount)->toBe(330000)
+        ->and($result->currency)->toBe('USD')
+        ->and($result->originalAmount)->toBe(1250)
+        ->and($result->amountEstimated)->toBeFalse();
+});
+
+test('a foreign amount without a stated VND figure is estimated at the configured rate', function () {
+    config(['services.fx.usd_vnd' => 26000]);
+
+    $result = (new VietcombankParser)->parse(input("Số tiền: -12.50 USD\nNội dung: NETFLIX.COM"));
+
+    expect($result->amount)->toBe(325000)
+        ->and($result->direction->value)->toBe('out')
+        ->and($result->amountEstimated)->toBeTrue();
+});
+
+test('a foreign currency with no rate and no stated VND figure is rejected, never saved as VND', function () {
+    (new VietcombankParser)->parse(input("Số tiền: -15.00 EUR\nNội dung: SPOTIFY"));
+})->throws(UnparseableEmailException::class, 'currency_unsupported');
+
+test('a card alert that did not succeed is not a transaction', function () {
+    $text = "Số tiền\nTransaction Amount\n22.22 USD\nSử dụng tại\nAt\nSHOP\nTình trạng giao dịch\nStatus of Transaction\nKhông thành công";
+
+    expect((new VietcombankParser)->parse(input($text)))->toBeNull();
+});

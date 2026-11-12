@@ -13,6 +13,7 @@ return [
         'name' => 'Vietcombank',
         'senders' => [
             'vcbdigibank@info.vietcombank.com.vn', // verified with real receipts
+            'info@info.vietcombank.com.vn', // verified with a real card alert
         ],
         'parser' => VietcombankParser::class,
     ],

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'raw_email_id', 'bank_code', 'direction', 'amount', 'balance_after', 'counterparty', 'counterparty_account', 'description', 'reference', 'occurred_at', 'category_id', 'note'])]
+#[Fillable(['user_id', 'raw_email_id', 'bank_code', 'direction', 'amount', 'currency', 'original_amount', 'amount_estimated', 'balance_after', 'counterparty', 'counterparty_account', 'description', 'reference', 'occurred_at', 'category_id', 'note'])]
 class Transaction extends Model
 {
     use HasFactory;
@@ -18,6 +18,8 @@ class Transaction extends Model
         return [
             'direction' => Direction::class,
             'amount' => 'integer',
+            'original_amount' => 'integer',
+            'amount_estimated' => 'boolean',
             'balance_after' => 'integer',
             'occurred_at' => 'datetime',
         ];

@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'fx' => [
+        'usd_vnd' => env('FX_USD_VND', 26000),
+    ],
+
 ];

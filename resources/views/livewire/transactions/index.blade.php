@@ -79,7 +79,7 @@
                                     @endif
                                 </span>
                             </span>
-                            <x-amount :transaction="$transaction" class="text-sm" />
+                            <x-amount :transaction="$transaction" class="text-right text-sm" />
                         </a>
                     </li>
                 @endforeach

@@ -64,11 +64,20 @@ abstract class AbstractBankParser implements BankEmailParser
         ?string $description = null,
         ?string $reference = null,
         ?string $time = null,
+        ?string $convertedAmount = null,
     ): ParsedTransaction {
-        $signedAmount = $amount === null ? null : MoneyParser::parse($amount);
+        $money = $amount === null ? null : MoneyParser::parseWithCurrency($amount);
 
-        if (! $signedAmount) {
+        if (! $money || ! $money['amount']) {
             throw new UnparseableEmailException('amount_missing');
+        }
+
+        $signedAmount = $money['amount'];
+        $foreign = null;
+
+        if ($money['currency'] !== 'VND') {
+            $foreign = $this->toVnd($money['currency'], abs($signedAmount), $convertedAmount);
+            $signedAmount = $foreign['vnd'];
         }
 
         $direction = $this->directionFromSign($amount) ?? $this->directionFromKeywords((string) $directionHint);
@@ -89,7 +98,35 @@ abstract class AbstractBankParser implements BankEmailParser
             description: $this->clean($description),
             reference: $this->clean($reference),
             occurredAt: $occurredAt,
+            currency: $foreign ? $money['currency'] : null,
+            originalAmount: $foreign ? abs($money['amount']) : null,
+            amountEstimated: $foreign['estimated'] ?? false,
         );
+    }
+
+    /**
+     * VND the bank charged when the email states it, otherwise an estimate at the configured rate.
+     *
+     * @return array{
+     *     vnd: int,
+     *     estimated: bool
+     * }
+     */
+    private function toVnd(string $currency, int $minorAmount, ?string $convertedAmount): array
+    {
+        $charged = $convertedAmount === null ? null : MoneyParser::parse($convertedAmount);
+
+        if ($charged) {
+            return ['vnd' => abs($charged), 'estimated' => false];
+        }
+
+        $rate = config('services.fx.'.strtolower($currency).'_vnd');
+
+        if (! $rate) {
+            throw new UnparseableEmailException('currency_unsupported');
+        }
+
+        return ['vnd' => (int) round($minorAmount * $rate / 100), 'estimated' => true];
     }
 
     protected function directionFromSign(string $amount): ?Direction

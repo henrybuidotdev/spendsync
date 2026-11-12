@@ -19,6 +19,12 @@ class Format
         return ($amount < 0 ? '−' : '+').$formatted;
     }
 
+    /** 1250, "USD" -> "12,50 USD" (amount in minor units). */
+    public static function foreign(int $minorAmount, string $currency): string
+    {
+        return number_format($minorAmount / 100, 2, ',', '.')." {$currency}";
+    }
+
     public static function local(?CarbonInterface $date): ?CarbonInterface
     {
         return $date?->copy()->setTimezone(config('app.display_timezone'))->locale(app()->getLocale());
