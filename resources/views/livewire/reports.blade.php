@@ -21,14 +21,14 @@
 
             <div class="mt-3 flex h-2.5 gap-0.5 overflow-hidden rounded-full" role="presentation">
                 @foreach($byCategory as $row)
-                    <div class="h-full" style="width: {{ 100 * $row->total / $total }}%; background-color: rgb(var(--c-chart-{{ $loop->index % 8 + 1 }}))"></div>
+                    <div class="h-full" style="width: {{ 100 * $row->total / $total }}%; background-color: rgb(var(--c-chart-{{ $row->category?->color ?? 8 }}))"></div>
                 @endforeach
             </div>
 
             <ol class="mt-2 divide-y divide-slate-100">
                 @foreach($byCategory as $row)
                     <li class="flex items-center gap-2 py-2.5 text-sm">
-                        <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color: rgb(var(--c-chart-{{ $loop->index % 8 + 1 }}))" aria-hidden="true"></span>
+                        <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color: rgb(var(--c-chart-{{ $row->category?->color ?? 8 }}))" aria-hidden="true"></span>
                         <x-category-icon :category="$row->category" class="h-7 w-7 text-base" />
                         <span class="min-w-0 flex-1 truncate">{{ $row->name }} <span class="text-slate-400">· {{ $row->count }}</span></span>
                         <span class="shrink-0 tabular-nums text-slate-500">{{ round(100 * $row->total / $total, 1) }}%</span>

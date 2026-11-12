@@ -50,6 +50,12 @@ class Category extends Model
         return Attribute::get(fn () => $this->isSystem() ? __($this->name) : $this->name);
     }
 
+    /** One of the 8 chart colors, fixed per category so icons and reports match. */
+    protected function color(): Attribute
+    {
+        return Attribute::get(fn () => $this->id % 8 + 1);
+    }
+
     public function isSystem(): bool
     {
         return $this->user_id === null;
