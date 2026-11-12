@@ -22,24 +22,6 @@
         @error('note') <p class="mt-1 text-left text-sm text-red-600">{{ $message }}</p> @enderror
     </div>
 
-    <dl class="divide-y divide-slate-100 rounded-2xl bg-white px-4 text-sm shadow-sm">
-        @foreach([
-            __('Bank') => "{$bankName} ({$transaction->bank_code})",
-            __('Type') => $transaction->isIncome() ? __('Money in') : __('Money out'),
-            __('Original amount') => $transaction->currency ? Format::foreign($transaction->original_amount, $transaction->currency).($transaction->amount_estimated ? ' · '.__('estimated conversion') : '') : null,
-            __('Counterparty') => $transaction->counterparty,
-            __('Account number') => $transaction->counterparty_account,
-            __('Description') => $transaction->description,
-            // __('Balance after') => $transaction->balance_after !== null ? Format::money($transaction->balance_after) : null,
-            __('Reference') => $transaction->reference,
-        ] as $label => $value)
-            <div class="flex justify-between gap-4 py-3">
-                <dt class="shrink-0 text-slate-500">{{ $label }}</dt>
-                <dd class="min-w-0 break-words text-right font-medium">{{ $value ?? '—' }}</dd>
-            </div>
-        @endforeach
-    </dl>
-
     <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="category-heading"
              x-data="{ tab: @js($defaultTab) }">
         <h2 id="category-heading" class="font-semibold">{{ __('Category') }}</h2>
@@ -73,6 +55,24 @@
 
         <x-flash class="mt-4" :dismiss-after="4000" />
     </section>
+
+    <dl class="divide-y divide-slate-100 rounded-2xl bg-white px-4 text-sm shadow-sm">
+        @foreach([
+            __('Bank') => "{$bankName} ({$transaction->bank_code})",
+            __('Type') => $transaction->isIncome() ? __('Money in') : __('Money out'),
+            __('Original amount') => $transaction->currency ? Format::foreign($transaction->original_amount, $transaction->currency).($transaction->amount_estimated ? ' · '.__('estimated conversion') : '') : null,
+            __('Counterparty') => $transaction->counterparty,
+            __('Account number') => $transaction->counterparty_account,
+            __('Description') => $transaction->description,
+            // __('Balance after') => $transaction->balance_after !== null ? Format::money($transaction->balance_after) : null,
+            __('Reference') => $transaction->reference,
+        ] as $label => $value)
+            <div class="flex justify-between gap-4 py-3">
+                <dt class="shrink-0 text-slate-500">{{ $label }}</dt>
+                <dd class="min-w-0 break-words text-right font-medium">{{ $value ?? '—' }}</dd>
+            </div>
+        @endforeach
+    </dl>
 
     @if($rawEmail)
         <section class="rounded-2xl bg-white p-4 shadow-sm">
