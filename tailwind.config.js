@@ -95,11 +95,10 @@ export default {
                 sky: color('blue'),
                 blue: color('blue'),
             },
-            boxShadow: {
-                sm: '0 1px 2px 0 rgb(0 0 0 / 0.04), 0 2px 8px -2px rgb(0 0 0 / 0.06)',
-            },
+            // No soft drop shadows: every shadow-* is a 1px hairline (composes with ring-* like any shadow).
+            boxShadow: Object.fromEntries(['sm', 'DEFAULT', 'md', 'lg', 'xl', '2xl'].map((k) => [k, '0 0 0 1px rgb(var(--c-neutral-200))'])),
             fontFamily: {
-                sans: ['Inter', ...defaultTheme.fontFamily.sans],
+                sans: ['Be Vietnam Pro', ...defaultTheme.fontFamily.sans],
             },
         },
     },

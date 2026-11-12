@@ -4,7 +4,7 @@
 <meta name="theme-color" content="#F7F7F6" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0C0C0C" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.bunny.net">
-<link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.bunny.net/css?family=be-vietnam-pro:400,500,600,700&display=swap" rel="stylesheet">
 <script>
     // Runs before paint so the saved theme never flashes; wire:navigate resets <html> attributes, so re-apply after each visit.
     window.appTheme = @js(($theme ?? \App\Enums\Theme::System)->value);

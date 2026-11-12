@@ -59,7 +59,7 @@
         <p class="text-sm font-medium text-slate-600">{{ __('Supported banks') }}</p>
         <ul class="mt-2 flex flex-wrap gap-2">
             @foreach($banks as $code => $bank)
-                <li class="rounded-full bg-white px-3 py-1.5 text-sm font-semibold shadow-sm ring-1 ring-slate-200">
+                <li class="rounded-full bg-white px-3 py-1.5 text-sm font-semibold ring-1 ring-slate-200">
                     <span class="text-emerald-700">{{ $code }}</span> · {{ $bank['name'] }}
                 </li>
             @endforeach

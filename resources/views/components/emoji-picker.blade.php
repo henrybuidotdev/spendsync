@@ -27,7 +27,7 @@
 
     <div x-show="open" x-cloak @click.outside="open = false" x-transition.opacity
          role="listbox" aria-label="{{ $label }}"
-         class="absolute left-0 z-30 mt-2 max-h-80 w-[17.5rem] overflow-y-auto overscroll-contain rounded-2xl bg-white p-2 shadow-lg ring-1 ring-slate-200">
+         class="absolute left-0 z-30 mt-2 max-h-80 w-[17.5rem] overflow-y-auto overscroll-contain rounded-2xl bg-white p-2 ring-1 ring-slate-200">
         @foreach($groups as $group => $choices)
         <p class="sticky top-0 bg-white px-1 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ $group }}</p>
         <div class="mb-1 grid grid-cols-6 gap-1">

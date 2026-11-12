@@ -4,7 +4,7 @@
     <x-flash />
 
     @if($account?->status === \App\Enums\MailAccountStatus::NeedsReconnect)
-        <a href="{{ route('connect') }}" wire:navigate class="block rounded-2xl bg-red-600 p-4 text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2">
+        <a href="{{ route('connect') }}" wire:navigate class="block rounded-2xl bg-red-600 p-4 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2">
             <p class="font-semibold">⚠️ {{ __('Gmail disconnected') }}</p>
             <p class="text-sm text-red-50">{{ __('The app password is no longer valid. Tap to reconnect.') }}</p>
         </a>

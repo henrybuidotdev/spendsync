@@ -10,7 +10,7 @@
             <livewire:profile.update-password-form />
         </div>
 
-        <section class="divide-y divide-red-100 rounded-2xl border border-red-200 bg-white p-4 shadow-sm" aria-labelledby="danger-heading">
+        <section class="divide-y divide-red-100 rounded-2xl border border-red-200 bg-white p-4" aria-labelledby="danger-heading">
             <h2 id="danger-heading" class="pb-3 font-semibold text-red-700">⚠️ {{ __('Danger Zone') }}</h2>
 
             <div class="py-4">
