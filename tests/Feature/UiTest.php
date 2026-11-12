@@ -588,7 +588,7 @@ test('deleting all data removes the user and everything they own', function () {
     }
 
     expect(DB::table('categories')->whereNotNull('user_id')->count())->toBe(0)
-        ->and(DB::table('categories')->whereNull('user_id')->count())->toBe(21);
+        ->and(DB::table('categories')->whereNull('user_id')->count())->toBe(22);
 });
 
 test('every main page renders for a populated account', function () {
@@ -684,7 +684,7 @@ test('the emoji picker offers spending and income groups', function () {
 
     expect($user->availableCategories()->where('name', 'Lì xì')->value('icon'))->toBe('🧧')
         ->and($user->availableCategories()->where('type', 'income')->ordered()->pluck('name')->all())
-        ->toBe(['Salary', 'Gifts', 'Sales', 'Lì xì', 'Other income']);
+        ->toBe(['Salary', 'Gifts', 'Sales', 'Refund', 'Lì xì', 'Other income']);
 });
 
 test('system categories are locked in settings and cannot be edited or deleted', function () {
@@ -829,7 +829,7 @@ test('delete data wipes the users data but keeps the login, other users and syst
         ->and($user->mailAccounts()->count())->toBe(0)
         ->and($other->transactions()->count())->toBe(1)
         ->and($other->mailAccounts()->count())->toBe(1)
-        ->and(Category::system()->count())->toBe(21);
+        ->and(Category::system()->count())->toBe(22);
 
     $this->actingAs($user)->get('/')->assertRedirect('/connect');
 });
