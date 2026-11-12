@@ -312,7 +312,7 @@ test('choosing a category with the checkbox creates a rule and backfills', funct
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
         ->assertSet('applyToFuture', true)
-        ->assertSee('Áp dụng cho các giao dịch sau với')
+        ->assertSee('Áp dụng cho các giao dịch kế tiếp với')
         ->call('setCategory', $food->id)
         ->assertSee('Đã lưu danh mục và áp dụng cho 1 giao dịch khác.');
 
