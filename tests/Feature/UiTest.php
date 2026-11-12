@@ -473,3 +473,15 @@ test('the syncing flag clears even when the sync fails', function () {
 
     expect($account->isSyncing())->toBeFalse();
 });
+
+test('rows show the category emoji, or a visible placeholder when uncategorized', function () {
+    $user = connectedUser();
+    $food = $user->categories()->where('name', 'Ăn uống')->first();
+    Transaction::factory()->for($user)->create(['category_id' => $food->id]);
+    Transaction::factory()->for($user)->create();
+
+    $this->actingAs($user)->get('/')
+        ->assertSee('🍜')
+        ->assertSeeHtml('text-amber-700')
+        ->assertSeeHtml('aria-hidden="true">?</span>');
+});

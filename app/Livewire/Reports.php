@@ -32,7 +32,7 @@ class Reports extends Component
             ->get()
             ->map(fn ($row) => (object) [
                 'name' => $categories->get($row->category_id)?->name ?? __('Chưa phân loại'),
-                'icon' => $categories->get($row->category_id)?->icon ?? '❔',
+                'icon' => $categories->get($row->category_id)?->icon,
                 'total' => (int) $row->total,
                 'count' => (int) $row->count,
             ]);

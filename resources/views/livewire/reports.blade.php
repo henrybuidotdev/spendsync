@@ -24,7 +24,7 @@
                     @php($percent = round(100 * $row->total / $total, 1))
                     <li>
                         <div class="flex items-center justify-between gap-2 text-sm">
-                            <span class="min-w-0 truncate"><span aria-hidden="true">{{ $row->icon }}</span> {{ $row->name }} <span class="text-slate-400">· {{ $row->count }}</span></span>
+                            <span class="flex min-w-0 items-center gap-2"><x-category-icon :icon="$row->icon" class="h-7 w-7 text-base" /><span class="truncate">{{ $row->name }} <span class="text-slate-400">· {{ $row->count }}</span></span></span>
                             <span class="shrink-0 tabular-nums"><span class="font-semibold">{{ Format::money($row->total) }}</span> <span class="text-slate-500">{{ $percent }}%</span></span>
                         </div>
                         <div class="mt-1 h-2.5 overflow-hidden rounded-full bg-slate-100" role="presentation">

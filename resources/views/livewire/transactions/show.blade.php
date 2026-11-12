@@ -6,7 +6,7 @@
     <a href="{{ route('transactions', ['month' => Format::local($transaction->occurred_at)->format('Y-m')]) }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">‹ {{ __('Giao dịch') }}</a>
 
     <div class="rounded-2xl bg-white p-5 text-center shadow-sm">
-        <p class="text-4xl" aria-hidden="true">{{ $transaction->category?->icon ?? '❔' }}</p>
+        <x-category-icon :icon="$transaction->category?->icon" class="mx-auto h-16 w-16 text-4xl" />
         <p class="mt-2 break-words font-semibold">{{ $transaction->label() }}</p>
         <x-amount :transaction="$transaction" class="mt-1 block text-3xl" />
         <p class="mt-1 text-sm text-slate-500">{{ ucfirst(Format::local($transaction->occurred_at)->translatedFormat('l, d/m/Y · H:i')) }}</p>
