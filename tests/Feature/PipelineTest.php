@@ -193,7 +193,7 @@ test('reparse --failed fixes emails after a parser fix and keeps the category', 
     $user = User::factory()->create();
     $this->artisan('thuchi:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/TCB']);
     $transaction = $user->transactions()->first();
-    $transaction->update(['category_id' => $user->categories()->first()->id, 'amount' => 1]);
+    $transaction->update(['category_id' => $user->availableCategories()->first()->id, 'amount' => 1]);
     $user->rawEmails()->first()->update(['parse_error' => 'old_bug', 'parsed_at' => null]);
 
     $this->artisan('thuchi:reparse', ['--failed' => true])
@@ -206,7 +206,7 @@ test('reparse --failed fixes emails after a parser fix and keeps the category', 
     $this->artisan('thuchi:reparse', ['--bank' => 'tcb'])->expectsOutputToContain('Reparsed 4 emails');
 
     expect($transaction->fresh()->amount)->not->toBe(1)
-        ->and($transaction->fresh()->category_id)->toBe($user->categories()->first()->id);
+        ->and($transaction->fresh()->category_id)->toBe($user->availableCategories()->first()->id);
 });
 
 test('parse-stats shows 100% for the fixtures', function () {
@@ -243,7 +243,7 @@ test('the scheduler queues a sync for each active account every five minutes', f
 
 test('parsed transactions get categorized by existing rules', function () {
     $user = User::factory()->create();
-    $food = $user->categories()->where('name', 'Ăn uống')->first();
+    $food = $user->availableCategories()->where('name', 'Ăn uống')->first();
     CategoryRule::create(['user_id' => $user->id, 'match_field' => MatchField::Description, 'match_value' => 'highlands coffee', 'category_id' => $food->id]);
 
     $this->artisan('thuchi:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/VCB']);

@@ -22,7 +22,7 @@ class Reports extends Component
             ->where('occurred_at', '>=', $start)
             ->where('occurred_at', '<', $end);
 
-        $categories = $user->categories()->get()->keyBy('id');
+        $categories = $user->availableCategories()->get()->keyBy('id');
 
         $byCategory = (clone $spending)
             ->selectRaw('category_id, sum(amount) as total, count(*) as count')

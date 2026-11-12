@@ -81,6 +81,7 @@ Gmail ──IMAP SEARCH FROM+SINCE──▶ SyncMailAccount ──firstOrCreate(
 - `app/Mail/Inbox`: the `MailboxClient` interface, `WebklexGmailClient` (real) and `FakeMailboxClient` (tests).
 - `app/Parsing`: the parser interface, DTOs, `ParserRegistry`, and `Support/{Money,Date,Text}` helpers. Bank parsers live in `Banks/`.
 - `app/Jobs`: `SyncMailAccount` (unique per account, 120s timeout, 2 tries) and `ParseRawEmail`.
+- Categories: 12 shared system defaults (`user_id` NULL, read-only) plus each user's own. Use `$user->availableCategories()` to list what a user can pick.
 - `app/Categorization/CategoryMatcher.php`: counterparty rules match the whole accent-stripped name. Description rules match a substring. Counterparty rules are checked first.
 - Times are stored in UTC and shown in `Asia/Ho_Chi_Minh` (`APP_TIMEZONE`, used as `config('app.display_timezone')`).
 

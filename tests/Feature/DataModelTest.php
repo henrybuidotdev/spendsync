@@ -7,12 +7,33 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
-test('registering a user seeds the default Vietnamese categories', function () {
+test('every user shares the 12 Vietnamese system categories without private copies', function () {
     $user = User::factory()->create();
 
-    expect($user->categories()->count())->toBe(12)
-        ->and($user->categories()->where('type', 'income')->pluck('name')->all())->toBe(['Lương', 'Thu khác'])
-        ->and($user->categories()->where('name', 'Ăn uống')->value('icon'))->toBe('🍜');
+    expect($user->categories()->count())->toBe(0)
+        ->and(Category::system()->count())->toBe(12)
+        ->and($user->availableCategories()->count())->toBe(12)
+        ->and($user->availableCategories()->where('type', 'income')->pluck('name')->all())->toBe(['Lương', 'Thu khác'])
+        ->and($user->availableCategories()->where('name', 'Ăn uống')->value('icon'))->toBe('🍜');
+});
+
+test('users see system categories and their own, never another users', function () {
+    $user = User::factory()->create();
+    $own = Category::factory()->for($user)->create(['name' => 'Cà phê']);
+    $foreign = Category::factory()->create(['name' => 'Bí mật']);
+
+    $names = $user->availableCategories()->pluck('name');
+
+    expect($names)->toHaveCount(13)->toContain('Cà phê')->not->toContain('Bí mật');
+});
+
+test('nobody can update or delete a system category, but everyone can view it', function () {
+    $user = User::factory()->create();
+    $system = Category::system()->first();
+
+    expect($user->can('view', $system))->toBeTrue()
+        ->and($user->can('update', $system))->toBeFalse()
+        ->and($user->can('delete', $system))->toBeFalse();
 });
 
 test('app password is encrypted at rest and hidden from serialization', function () {
@@ -34,7 +55,7 @@ test('category rule match values are stored lowercased and accent-stripped', fun
 
 test('deleting a category leaves its transactions uncategorized', function () {
     $user = User::factory()->create();
-    $category = $user->categories()->first();
+    $category = Category::factory()->for($user)->create();
     $transaction = Transaction::factory()->for($user)->create(['category_id' => $category->id]);
 
     $category->delete();
@@ -47,7 +68,7 @@ test('user A cannot view, update or delete user B records', function (string $cl
     $userB = User::factory()->create();
 
     $record = match ($class) {
-        Category::class => $userB->categories()->first(),
+        Category::class => Category::factory()->for($userB)->create(),
         default => $class::factory()->for($userB)->create(),
     };
 

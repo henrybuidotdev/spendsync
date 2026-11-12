@@ -121,7 +121,12 @@ class Settings extends Component
 
         return view('livewire.settings', [
             'account' => $user->mailAccount,
-            'categories' => $user->categories()->withCount('transactions')->orderBy('type')->orderBy('id')->get(),
+            'categories' => $user->availableCategories()
+                ->withCount(['transactions' => fn ($query) => $query->where('user_id', $user->id)])
+                ->orderBy('type')
+                ->orderByRaw('user_id is null desc')
+                ->orderBy('id')
+                ->get(),
             'rules' => $user->categoryRules()->with('category')->latest()->get(),
         ])->title(__('Cài đặt'));
     }

@@ -29,7 +29,7 @@ class Show extends Component
     {
         $this->authorize('update', $this->transaction);
 
-        $category = auth()->user()->categories()->findOrFail($categoryId);
+        $category = auth()->user()->availableCategories()->findOrFail($categoryId);
 
         $this->transaction->update(['category_id' => $category->id]);
 
@@ -71,7 +71,7 @@ class Show extends Component
         $rawEmail = $this->transaction->rawEmail;
 
         return view('livewire.transactions.show', [
-            'categories' => auth()->user()->categories()->orderBy('type')->orderBy('id')->get(),
+            'categories' => auth()->user()->availableCategories()->orderBy('type')->orderByRaw('user_id is null desc')->orderBy('id')->get(),
             'bankName' => config("banks.{$this->transaction->bank_code}.name", $this->transaction->bank_code),
             'rawText' => $this->showRaw && $rawEmail ? $rawEmail->toParserInput()->text : null,
             'rawEmail' => $rawEmail,

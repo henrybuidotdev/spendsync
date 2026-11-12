@@ -11,6 +11,7 @@ use App\Livewire\Transactions\Index;
 use App\Livewire\Transactions\Show;
 use App\Mail\Inbox\FakeMailboxClient;
 use App\Mail\Inbox\MailboxClient;
+use App\Models\Category;
 use App\Models\CategoryRule;
 use App\Models\MailAccount;
 use App\Models\RawEmail;
@@ -173,7 +174,7 @@ test('month boundaries follow Vietnam time', function () {
 
 test('filters narrow the list', function () {
     $user = connectedUser();
-    $category = $user->categories()->first();
+    $category = $user->availableCategories()->first();
     Transaction::factory()->for($user)->create(['counterparty' => 'RA CO DANH MUC', 'category_id' => $category->id]);
     Transaction::factory()->for($user)->create(['counterparty' => 'RA CHUA PHAN LOAI']);
     Transaction::factory()->for($user)->income()->create(['counterparty' => 'VAO']);
@@ -196,7 +197,7 @@ test('the list never shows another users transactions', function () {
 
 test('the list query count does not grow with the number of transactions', function () {
     $user = connectedUser();
-    $categories = $user->categories;
+    $categories = $user->availableCategories()->get();
     Transaction::factory()->for($user)->count(3)->create(['category_id' => $categories[0]->id]);
 
     DB::enableQueryLog();
@@ -262,7 +263,7 @@ test('users cannot open or change another users transaction', function () {
 test('users cannot assign another users category', function () {
     $user = connectedUser();
     $transaction = Transaction::factory()->for($user)->create();
-    $foreignCategory = User::factory()->create()->categories()->first();
+    $foreignCategory = Category::factory()->create();
 
     expect(fn () => Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])->call('setCategory', $foreignCategory->id))
         ->toThrow(ModelNotFoundException::class);
@@ -272,7 +273,7 @@ test('users cannot assign another users category', function () {
 
 test('choosing a category with the checkbox creates a rule and backfills', function () {
     $user = connectedUser();
-    $food = $user->categories()->where('name', 'Ăn uống')->first();
+    $food = $user->availableCategories()->where('name', 'Ăn uống')->first();
     $transaction = Transaction::factory()->for($user)->create(['counterparty' => 'BÚN BÒ HUẾ']);
     $sibling = Transaction::factory()->for($user)->create(['counterparty' => 'bun bo hue']);
 
@@ -295,7 +296,7 @@ test('unticking the checkbox only categorizes this transaction', function () {
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
         ->set('applyToFuture', false)
-        ->call('setCategory', $user->categories()->first()->id);
+        ->call('setCategory', $user->availableCategories()->first()->id);
 
     expect(CategoryRule::count())->toBe(0)
         ->and($sibling->fresh()->category_id)->toBeNull();
@@ -333,7 +334,7 @@ test('the original email is shown as escaped text only', function () {
 
 test('reports rank spending by category with percentages and top counterparties', function () {
     $user = connectedUser();
-    $food = $user->categories()->where('name', 'Ăn uống')->first();
+    $food = $user->availableCategories()->where('name', 'Ăn uống')->first();
     Transaction::factory()->for($user)->create(['amount' => 300000, 'category_id' => $food->id, 'counterparty' => 'QUAN AN', 'occurred_at' => '2026-11-02 03:00:00']);
     Transaction::factory()->for($user)->create(['amount' => 100000, 'counterparty' => 'GRAB', 'occurred_at' => '2026-11-03 03:00:00']);
     Transaction::factory()->for($user)->income()->create(['amount' => 9000000, 'occurred_at' => '2026-11-04 03:00:00']);
@@ -365,7 +366,7 @@ test('disconnecting deletes the app password but keeps transactions', function (
 
 test('categories can be added, renamed and deleted', function () {
     $user = connectedUser();
-    $category = $user->categories()->first();
+    $category = Category::factory()->for($user)->create(['icon' => '🐱']);
     $transaction = Transaction::factory()->for($user)->create(['category_id' => $category->id]);
 
     Livewire::actingAs($user)->test(Settings::class)
@@ -377,7 +378,7 @@ test('categories can be added, renamed and deleted', function () {
         ->assertSee('☕')
         ->call('deleteCategory', $category->id);
 
-    expect($user->categories()->where('name', 'Thú cưng')->value('icon'))->toBe('🐶')
+    expect($user->availableCategories()->where('name', 'Thú cưng')->value('icon'))->toBe('🐶')
         ->and($category->fresh())->toBeNull()
         ->and($transaction->fresh()->category_id)->toBeNull();
 });
@@ -385,7 +386,7 @@ test('categories can be added, renamed and deleted', function () {
 test('settings cannot touch another users categories or rules', function () {
     $user = connectedUser();
     $other = User::factory()->create();
-    $foreignCategory = $other->categories()->first();
+    $foreignCategory = Category::factory()->for($other)->create();
     $foreignRule = CategoryRule::factory()->for($other)->create(['category_id' => $foreignCategory->id]);
 
     foreach ([['deleteCategory', $foreignCategory->id], ['editCategory', $foreignCategory->id], ['deleteRule', $foreignRule->id]] as [$method, $id]) {
@@ -398,7 +399,7 @@ test('settings cannot touch another users categories or rules', function () {
 
 test('rules are listed and can be deleted', function () {
     $user = connectedUser();
-    $rule = CategoryRule::factory()->for($user)->create(['match_value' => 'Grab', 'category_id' => $user->categories()->first()->id]);
+    $rule = CategoryRule::factory()->for($user)->create(['match_value' => 'Grab', 'category_id' => $user->availableCategories()->first()->id]);
 
     Livewire::actingAs($user)->test(Settings::class)
         ->assertSee('grab')
@@ -419,15 +420,18 @@ test('deleting all data removes the user and everything they own', function () {
     $user = connectedUser();
     $rawEmail = RawEmail::factory()->for($user)->create();
     Transaction::factory()->for($user)->create(['raw_email_id' => $rawEmail->id]);
-    CategoryRule::factory()->for($user)->create(['category_id' => $user->categories()->first()->id]);
+    CategoryRule::factory()->for($user)->create(['category_id' => $user->availableCategories()->first()->id]);
 
     Volt::actingAs($user)->test('profile.delete-user-form')
         ->set('password', 'password')
         ->call('deleteUser');
 
-    foreach (['users', 'mail_accounts', 'raw_emails', 'transactions', 'categories', 'category_rules'] as $table) {
+    foreach (['users', 'mail_accounts', 'raw_emails', 'transactions', 'category_rules'] as $table) {
         expect(DB::table($table)->count())->toBe(0, $table);
     }
+
+    expect(DB::table('categories')->whereNotNull('user_id')->count())->toBe(0)
+        ->and(DB::table('categories')->whereNull('user_id')->count())->toBe(12);
 });
 
 test('every main page renders for a populated account', function () {
@@ -478,8 +482,8 @@ test('the syncing flag clears even when the sync fails', function () {
 
 test('rows show the category emoji, its initial when it has no emoji, or ? when uncategorized', function () {
     $user = connectedUser();
-    $food = $user->categories()->where('name', 'Ăn uống')->first();
-    $coffee = $user->categories()->create(['name' => 'cà phê', 'icon' => null, 'type' => 'expense']);
+    $food = $user->availableCategories()->where('name', 'Ăn uống')->first();
+    $coffee = $user->availableCategories()->create(['name' => 'cà phê', 'icon' => null, 'type' => 'expense']);
     Transaction::factory()->for($user)->create(['category_id' => $food->id]);
     Transaction::factory()->for($user)->create(['category_id' => $coffee->id]);
 
@@ -495,7 +499,7 @@ test('rows show the category emoji, its initial when it has no emoji, or ? when 
 
 test('settings offers an emoji picker and an icon can be removed', function () {
     $user = connectedUser();
-    $category = $user->categories()->first();
+    $category = Category::factory()->for($user)->create(['icon' => '🐱']);
 
     Livewire::actingAs($user)->test(Settings::class)
         ->assertSee('Chọn biểu tượng')
@@ -519,5 +523,32 @@ test('the emoji picker offers spending and income groups', function () {
         ->call('addCategory')
         ->assertHasNoErrors();
 
-    expect($user->categories()->where('name', 'Lì xì')->value('icon'))->toBe('🧧');
+    expect($user->availableCategories()->where('name', 'Lì xì')->value('icon'))->toBe('🧧');
+});
+
+test('system categories are locked in settings and cannot be edited or deleted', function () {
+    $user = connectedUser();
+    $system = Category::system()->where('name', 'Ăn uống')->first();
+
+    Livewire::actingAs($user)->test(Settings::class)
+        ->assertSee('Mặc định')
+        ->assertDontSeeHtml("editCategory({$system->id})")
+        ->assertDontSeeHtml("deleteCategory({$system->id})");
+
+    foreach (['editCategory', 'deleteCategory'] as $method) {
+        expect(fn () => Livewire::actingAs($user)->test(Settings::class)->call($method, $system->id))
+            ->toThrow(ModelNotFoundException::class);
+    }
+
+    expect($system->fresh()->name)->toBe('Ăn uống');
+});
+
+test('settings counts only the current users transactions for a system category', function () {
+    $user = connectedUser();
+    $food = Category::system()->where('name', 'Ăn uống')->first();
+    Transaction::factory()->for($user)->create(['category_id' => $food->id]);
+    Transaction::factory()->count(5)->create(['category_id' => $food->id]);
+
+    Livewire::actingAs($user)->test(Settings::class)
+        ->assertViewHas('categories', fn ($categories) => $categories->firstWhere('id', $food->id)->transactions_count === 1);
 });

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\MatchField;
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
@@ -35,7 +36,7 @@ class DemoSeeder extends Seeder
             $user->categoryRules()->create([
                 'match_field' => MatchField::from($field),
                 'match_value' => $value,
-                'category_id' => $user->categories()->where('name', $categoryName)->value('id'),
+                'category_id' => Category::system()->where('name', $categoryName)->value('id'),
             ]);
         }
 

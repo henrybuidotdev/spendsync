@@ -8,8 +8,8 @@ use App\Models\User;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
-    $this->food = $this->user->categories()->where('name', 'Ăn uống')->first();
-    $this->bills = $this->user->categories()->where('name', 'Hóa đơn')->first();
+    $this->food = $this->user->availableCategories()->where('name', 'Ăn uống')->first();
+    $this->bills = $this->user->availableCategories()->where('name', 'Hóa đơn')->first();
     $this->matcher = app(CategoryMatcher::class);
 });
 
@@ -46,7 +46,7 @@ test('counterparty rules win over description rules', function () {
 
 test('other users rules never apply', function () {
     $other = User::factory()->create();
-    rule($other, MatchField::Counterparty, 'shopee', $other->categories()->first()->id);
+    rule($other, MatchField::Counterparty, 'shopee', $other->availableCategories()->first()->id);
     $transaction = Transaction::factory()->for($this->user)->create(['counterparty' => 'Shopee']);
 
     expect($this->matcher->apply($transaction))->toBeFalse()

@@ -72,8 +72,12 @@
                             {{ $category->name }}
                             <span class="text-xs text-slate-400">· {{ $category->type->value === 'income' ? __('Thu') : __('Chi') }} · {{ $category->transactions_count }}</span>
                         </span>
+                        @if($category->isSystem())
+                            <span class="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500" title="{{ __('Danh mục mặc định, không thể sửa hoặc xóa') }}">🔒 {{ __('Mặc định') }}</span>
+                        @else
                         <button type="button" wire:click="editCategory({{ $category->id }})" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="{{ __('Sửa :name', ['name' => $category->name]) }}">✏️</button>
                         <button type="button" wire:click="deleteCategory({{ $category->id }})" wire:confirm="{{ __('Xóa danh mục này? Các giao dịch của nó sẽ thành chưa phân loại.') }}" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="{{ __('Xóa :name', ['name' => $category->name]) }}">🗑️</button>
+                        @endif
                     @endif
                 </li>
             @endforeach

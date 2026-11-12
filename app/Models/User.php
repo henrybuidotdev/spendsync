@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use App\Enums\CategoryType;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -21,41 +21,12 @@ class User extends Authenticatable
 
     use Notifiable;
 
-    public const DEFAULT_CATEGORIES = [
-        ['Ăn uống', '🍜', CategoryType::Expense],
-        ['Đi lại', '🛵', CategoryType::Expense],
-        ['Mua sắm', '🛍️', CategoryType::Expense],
-        ['Hóa đơn', '🧾', CategoryType::Expense],
-        ['Nhà cửa', '🏠', CategoryType::Expense],
-        ['Giải trí', '🎮', CategoryType::Expense],
-        ['Sức khỏe', '💊', CategoryType::Expense],
-        ['Giáo dục', '📚', CategoryType::Expense],
-        ['Chuyển khoản', '🔁', CategoryType::Expense],
-        ['Khác', '📦', CategoryType::Expense],
-        ['Lương', '💰', CategoryType::Income],
-        ['Thu khác', '➕', CategoryType::Income],
-    ];
-
-    protected static function booted(): void
-    {
-        static::created(fn (User $user) => $user->seedDefaultCategories());
-    }
-
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    public function seedDefaultCategories(): void
-    {
-        $this->categories()->createMany(array_map(fn (array $category) => [
-            'name' => $category[0],
-            'icon' => $category[1],
-            'type' => $category[2],
-        ], self::DEFAULT_CATEGORIES));
     }
 
     public function mailAccount(): HasOne
@@ -78,9 +49,16 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
+    /** Categories this user created (editable). See availableCategories() for everything they can use. */
     public function categories(): HasMany
     {
         return $this->hasMany(Category::class);
+    }
+
+    /** @return Builder<Category> */
+    public function availableCategories(): Builder
+    {
+        return Category::availableTo($this);
     }
 
     public function categoryRules(): HasMany
