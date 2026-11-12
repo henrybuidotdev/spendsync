@@ -34,9 +34,6 @@
                     <x-icon name="chevron-right" class="h-4 w-4 text-slate-400" />
                 </a>
             @endforeach
-        </nav>
-
-        <nav class="divide-y divide-slate-200 border-y border-slate-200" aria-label="{{ __('Account') }}">
             <a href="{{ route('profile') }}" wire:navigate class="{{ $rowClass }}">
                 <x-icon name="user" class="h-5 w-5 text-slate-500" />
                 <span class="min-w-0 flex-1 truncate font-medium">{{ __('Profile & password') }}</span>
@@ -189,9 +186,9 @@
             @case('appearance')
             <section aria-labelledby="language-heading">
                 <h2 id="language-heading" class="font-semibold">{{ __('Language') }}</h2>
-                <div class="tabs mt-2" role="group" aria-labelledby="language-heading">
+                <div class="segmented mt-2" role="group" aria-labelledby="language-heading">
                     @foreach(\App\Enums\Locale::cases() as $locale)
-                        <button type="button" wire:click="setLocale('{{ $locale->value }}')" aria-pressed="{{ app()->getLocale() === $locale->value ? 'true' : 'false' }}" class="tab">{{ $locale->label() }}</button>
+                        <button type="button" wire:click="setLocale('{{ $locale->value }}')" aria-pressed="{{ app()->getLocale() === $locale->value ? 'true' : 'false' }}" class="segment">{{ $locale->label() }}</button>
                     @endforeach
                 </div>
             </section>
@@ -210,9 +207,9 @@
                          },
                      }">
                 <h2 id="theme-heading" class="font-semibold">{{ __('Appearance') }}</h2>
-                <div class="tabs mt-2" role="group" aria-labelledby="theme-heading">
+                <div class="segmented mt-2" role="group" aria-labelledby="theme-heading">
                     @foreach(['light' => __('Light'), 'dark' => __('Dark'), 'system' => __('System')] as $value => $label)
-                        <button type="button" x-on:click="setTheme('{{ $value }}')" x-bind:aria-pressed="theme === '{{ $value }}'" class="tab">{{ $label }}</button>
+                        <button type="button" x-on:click="setTheme('{{ $value }}')" x-bind:aria-pressed="theme === '{{ $value }}'" class="segment">{{ $label }}</button>
                     @endforeach
                 </div>
             </section>
