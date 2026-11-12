@@ -59,7 +59,7 @@
         <ul class="mt-2 divide-y divide-slate-100">
             @foreach($categories as $category)
                 <li class="flex min-h-14 items-center gap-2 py-1" wire:key="category-{{ $category->id }}">
-                    <span class="w-7 text-center text-xl" aria-hidden="true">{{ $category->icon ?? '📦' }}</span>
+                    <x-category-icon :category="$category" class="h-8 w-8 text-lg" />
                     @if($editingId === $category->id)
                         <form wire:submit="renameCategory" class="flex min-w-0 flex-1 gap-2">
                             <label for="editing-name" class="sr-only">{{ __('Tên danh mục') }}</label>

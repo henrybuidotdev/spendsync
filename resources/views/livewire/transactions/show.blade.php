@@ -6,7 +6,7 @@
     <a href="{{ route('transactions', ['month' => Format::local($transaction->occurred_at)->format('Y-m')]) }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">‹ {{ __('Giao dịch') }}</a>
 
     <div class="rounded-2xl bg-white p-5 text-center shadow-sm">
-        <x-category-icon :icon="$transaction->category?->icon" class="mx-auto h-16 w-16 text-4xl" />
+        <x-category-icon :category="$transaction->category" class="mx-auto h-16 w-16 text-4xl" />
         <p class="mt-2 break-words font-semibold">{{ $transaction->label() }}</p>
         <x-amount :transaction="$transaction" class="mt-1 block text-3xl" />
         <p class="mt-1 text-sm text-slate-500">{{ ucfirst(Format::local($transaction->occurred_at)->translatedFormat('l, d/m/Y · H:i')) }}</p>
@@ -36,7 +36,7 @@
                 <button type="button" wire:click="setCategory({{ $category->id }})" wire:key="cat-{{ $category->id }}"
                         aria-pressed="{{ $transaction->category_id === $category->id ? 'true' : 'false' }}"
                         @class(['flex min-h-16 flex-col items-center justify-center rounded-xl p-2 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-emerald-600 text-white' => $transaction->category_id === $category->id, 'bg-slate-50 ring-1 ring-slate-200 hover:bg-emerald-50' => $transaction->category_id !== $category->id])>
-                    <span class="text-xl" aria-hidden="true">{{ $category->icon ?? '📦' }}</span>
+                    <x-category-icon :category="$category" class="h-8 w-8 text-xl" />
                     <span class="mt-1 line-clamp-2 text-center">{{ $category->name }}</span>
                 </button>
             @endforeach
