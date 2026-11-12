@@ -24,3 +24,19 @@ test('new users can register', function () {
 
     $this->assertAuthenticated();
 });
+
+test('first-time visitors see Vietnamese', function () {
+    $this->get('/login')->assertSee('lang="vi"', false)->assertSee('Đăng nhập');
+});
+
+test('a new account starts in Vietnamese even if the browser last used English', function () {
+    Volt::test('pages.auth.register')
+        ->set('name', 'Test User')
+        ->set('email', 'test@example.com')
+        ->set('password', 'password')
+        ->call('register');
+
+    $this->withCookie('locale', 'en')->get('/connect')
+        ->assertSee('<html lang="vi">', false)
+        ->assertCookie('locale', 'vi');
+});
