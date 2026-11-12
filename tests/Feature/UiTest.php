@@ -167,6 +167,19 @@ test('the list shows month totals, formatted amounts and day groups', function (
         ->assertDontSee('TRAN THI BICH');
 });
 
+test('each day group shows the net total of its visible transactions', function () {
+    $user = connectedUser();
+    Transaction::factory()->for($user)->create(['amount' => 120000, 'occurred_at' => '2026-11-10 03:00:00']);
+    Transaction::factory()->for($user)->create(['amount' => 30000, 'occurred_at' => '2026-11-10 04:00:00']);
+    Transaction::factory()->for($user)->create(['amount' => 555000, 'occurred_at' => '2026-11-10 05:00:00'])->delete();
+    Transaction::factory()->for($user)->income()->create(['amount' => 2000000, 'occurred_at' => '2026-11-11 03:00:00']);
+    Transaction::factory()->for($user)->create(['amount' => 500000, 'occurred_at' => '2026-11-11 04:00:00']);
+
+    Livewire::actingAs($user)->test(Index::class)
+        ->assertSee('−150.000 ₫')
+        ->assertSee('+1.500.000 ₫');
+});
+
 test('month boundaries follow Vietnam time', function () {
     $user = connectedUser();
     Transaction::factory()->for($user)->create(['counterparty' => 'DAU THANG', 'occurred_at' => '2026-10-31 17:30:00']);

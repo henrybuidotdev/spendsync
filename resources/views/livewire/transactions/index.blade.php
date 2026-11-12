@@ -60,8 +60,10 @@
 
     @forelse($days as $date => $transactions)
         <section wire:key="day-{{ $date }}">
-            <h2 class="mb-1 px-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                {{ ucfirst(Format::local($transactions->first()->occurred_at)->translatedFormat('l, d/m')) }}
+            @php($dayTotal = $transactions->reject->trashed()->sum->signedAmount())
+            <h2 class="mb-1 flex items-baseline justify-between gap-2 px-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <span>{{ ucfirst(Format::local($transactions->first()->occurred_at)->translatedFormat('l, d/m')) }}</span>
+                <span @class(['whitespace-nowrap font-num normal-case tracking-normal', 'text-emerald-600' => $dayTotal > 0])>{{ Format::money($dayTotal, signed: true) }}</span>
             </h2>
             <ul class="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm">
                 @foreach($transactions as $transaction)
