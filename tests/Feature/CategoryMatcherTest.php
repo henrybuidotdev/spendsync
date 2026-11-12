@@ -44,6 +44,26 @@ test('counterparty rules win over description rules', function () {
     expect($this->matcher->match($transaction)->category_id)->toBe($this->food->id);
 });
 
+test('account rules win over name rules and match even when the name differs', function () {
+    rule($this->user, MatchField::Counterparty, 'quan an nhat', $this->bills->id);
+    rule($this->user, MatchField::Account, '0451000555666', $this->food->id);
+
+    $sameAccountRenamed = Transaction::factory()->for($this->user)->create(['counterparty' => 'QUAN AN NHAT', 'counterparty_account' => '0451000555666']);
+    $otherName = Transaction::factory()->for($this->user)->create(['counterparty' => 'NHAT FOOD CO', 'counterparty_account' => '0451000555666']);
+
+    expect($this->matcher->match($sameAccountRenamed)->category_id)->toBe($this->food->id)
+        ->and($this->matcher->match($otherName)->category_id)->toBe($this->food->id);
+});
+
+test('remember prefers the account number over the name', function () {
+    $transaction = Transaction::factory()->for($this->user)->create(['counterparty' => 'TRAN THI BICH', 'counterparty_account' => '5600000003']);
+
+    $rule = $this->matcher->remember($transaction, $this->food);
+
+    expect($rule->match_field)->toBe(MatchField::Account)
+        ->and($rule->match_value)->toBe('5600000003');
+});
+
 test('other users rules never apply', function () {
     $other = User::factory()->create();
     rule($other, MatchField::Counterparty, 'shopee', $other->availableCategories()->first()->id);

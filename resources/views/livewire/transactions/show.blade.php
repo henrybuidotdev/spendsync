@@ -17,6 +17,7 @@
             __('Ngân hàng') => "{$bankName} ({$transaction->bank_code})",
             __('Loại') => $transaction->isIncome() ? __('Tiền vào') : __('Tiền ra'),
             __('Người nhận / gửi') => $transaction->counterparty,
+            __('Số tài khoản') => $transaction->counterparty_account,
             __('Nội dung') => $transaction->description,
             __('Số dư sau giao dịch') => $transaction->balance_after !== null ? Format::money($transaction->balance_after) : null,
             __('Mã tham chiếu') => $transaction->reference,

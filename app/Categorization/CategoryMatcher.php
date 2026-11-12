@@ -10,8 +10,8 @@ use App\Parsing\Support\TextNormalizer;
 use Illuminate\Support\Collection;
 
 /**
- * Counterparty rules match the whole normalized counterparty; description rules match a normalized substring.
- * Counterparty rules are checked first. A rule only applies when its category type fits the direction
+ * Account rules match the counterparty's account number, counterparty rules the whole normalized name, and
+ * description rules a normalized substring, checked in that order (most stable identifier first). A rule only applies when its category type fits the direction
  * (expense for money out, income for money in).
  */
 class CategoryMatcher
@@ -36,11 +36,15 @@ class CategoryMatcher
         return true;
     }
 
-    /** Creates or updates the rule that maps this transaction's counterparty (or description) to the category. */
+    /** Creates or updates the rule mapping this transaction's account number (or name, or description) to the category. */
     public function remember(Transaction $transaction, Category $category): CategoryRule
     {
-        $field = filled($transaction->counterparty) ? MatchField::Counterparty : MatchField::Description;
-        $value = $field === MatchField::Counterparty ? $transaction->counterparty : $transaction->description;
+        $field = self::ruleField($transaction);
+        $value = match ($field) {
+            MatchField::Account => $transaction->counterparty_account,
+            MatchField::Counterparty => $transaction->counterparty,
+            MatchField::Description => $transaction->description,
+        };
 
         return CategoryRule::updateOrCreate(
             [
@@ -52,6 +56,19 @@ class CategoryMatcher
         );
     }
 
+    public static function ruleField(Transaction $transaction): MatchField
+    {
+        if (filled($transaction->counterparty_account)) {
+            return MatchField::Account;
+        }
+
+        if (filled($transaction->counterparty)) {
+            return MatchField::Counterparty;
+        }
+
+        return MatchField::Description;
+    }
+
     /**
      * Applies a rule to the user's existing uncategorized transactions. Returns how many were updated.
      * ponytail: filters in PHP because SQL can't strip Vietnamese accents; fine for one user's history.
@@ -60,7 +77,7 @@ class CategoryMatcher
     {
         $ids = Transaction::where('user_id', $rule->user_id)
             ->whereNull('category_id')
-            ->get(['id', 'user_id', 'direction', 'counterparty', 'description'])
+            ->get(['id', 'user_id', 'direction', 'counterparty', 'counterparty_account', 'description'])
             ->filter(fn (Transaction $transaction) => $this->matches($rule, $transaction))
             ->pluck('id');
 
@@ -74,8 +91,15 @@ class CategoryMatcher
     /** @param Collection<int, CategoryRule> $rules */
     private function firstMatching(Collection $rules, Transaction $transaction): ?CategoryRule
     {
-        return $rules->first(fn (CategoryRule $rule) => $rule->match_field === MatchField::Counterparty && $this->matches($rule, $transaction))
-            ?? $rules->first(fn (CategoryRule $rule) => $rule->match_field === MatchField::Description && $this->matches($rule, $transaction));
+        foreach (MatchField::cases() as $field) {
+            $rule = $rules->first(fn (CategoryRule $rule) => $rule->match_field === $field && $this->matches($rule, $transaction));
+
+            if ($rule !== null) {
+                return $rule;
+            }
+        }
+
+        return null;
     }
 
     private function matches(CategoryRule $rule, Transaction $transaction): bool
@@ -86,6 +110,10 @@ class CategoryMatcher
 
         if ($rule->category->type !== $transaction->direction->categoryType()) {
             return false;
+        }
+
+        if ($rule->match_field === MatchField::Account) {
+            return TextNormalizer::fold($transaction->counterparty_account) === $rule->match_value;
         }
 
         if ($rule->match_field === MatchField::Counterparty) {

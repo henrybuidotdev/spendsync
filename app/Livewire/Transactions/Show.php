@@ -3,6 +3,7 @@
 namespace App\Livewire\Transactions;
 
 use App\Categorization\CategoryMatcher;
+use App\Enums\MatchField;
 use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder;
@@ -62,10 +63,16 @@ class Show extends Component
         $this->showRaw = ! $this->showRaw;
     }
 
-    /** The counterparty (or, without one, the description) a rule would be created for. */
+    /** What a rule would be created for: the account number (with the name), else the name, else the description. */
     public function ruleTarget(): ?string
     {
-        return $this->transaction->counterparty ?: $this->transaction->description;
+        $transaction = $this->transaction;
+
+        return match (CategoryMatcher::ruleField($transaction)) {
+            MatchField::Account => trim("{$transaction->counterparty} · ".__('STK :account', ['account' => $transaction->counterparty_account]), ' ·'),
+            MatchField::Counterparty => $transaction->counterparty,
+            MatchField::Description => $transaction->description,
+        };
     }
 
     /** @return Builder<Category> */

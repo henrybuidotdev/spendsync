@@ -66,6 +66,7 @@ class ParseRawEmail implements ShouldQueue
                 'amount' => $result->amount,
                 'balance_after' => $result->balanceAfter,
                 'counterparty' => $result->counterparty,
+                'counterparty_account' => $result->counterpartyAccount,
                 'description' => $result->description,
                 'reference' => $result->reference,
                 'occurred_at' => $result->occurredAt->utc(),

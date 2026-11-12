@@ -60,6 +60,7 @@ abstract class AbstractBankParser implements BankEmailParser
         ?string $directionHint = null,
         ?string $balance = null,
         ?string $counterparty = null,
+        ?string $counterpartyAccount = null,
         ?string $description = null,
         ?string $reference = null,
         ?string $time = null,
@@ -84,6 +85,7 @@ abstract class AbstractBankParser implements BankEmailParser
             amount: abs($signedAmount),
             balanceAfter: $balance === null ? null : MoneyParser::parse($balance),
             counterparty: $this->clean($counterparty),
+            counterpartyAccount: $this->accountNumber($counterpartyAccount),
             description: $this->clean($description),
             reference: $this->clean($reference),
             occurredAt: $occurredAt,
@@ -112,6 +114,14 @@ abstract class AbstractBankParser implements BankEmailParser
         }
 
         return null;
+    }
+
+    /** Account numbers are letters and digits only; anything with other characters (".", "*", …) isn't one. */
+    private function accountNumber(?string $value): ?string
+    {
+        $value = preg_replace('/\s+/u', '', (string) $value);
+
+        return preg_match('/^[A-Za-z0-9]+$/', $value) ? strtoupper($value) : null;
     }
 
     private function clean(?string $value): ?string

@@ -40,6 +40,7 @@ class VietcombankParser extends AbstractBankParser
             amount: $this->blockField($text, 'Số tiền', 'Amount'),
             directionHint: 'ghi nợ',
             counterparty: $this->blockField($text, 'Tên người hưởng', 'Beneficiary Name'),
+            counterpartyAccount: $this->blockField($text, 'Tài khoản người hưởng|Tài khoản hưởng', 'Credit Account'),
             description: $this->blockField($text, 'Nội dung chuyển tiền|Nội dung thanh toán', 'Details of Payment'),
             reference: $this->blockField($text, 'Số lệnh giao dịch', 'Order Number'),
             time: $this->blockField($text, 'Ngày, giờ giao dịch', 'Trans. Date, Time'),

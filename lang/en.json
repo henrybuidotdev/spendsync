@@ -125,5 +125,8 @@
     "Sáng": "Light",
     "Tối": "Dark",
     "Theo hệ thống": "System",
-    "Đã chi": "Spent"
+    "Đã chi": "Spent",
+    "Số tài khoản là": "Account number is",
+    "Số tài khoản": "Account number",
+    "STK :account": "Acct :account"
 }

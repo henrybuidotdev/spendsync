@@ -3,6 +3,7 @@
     "amount": 1250000,
     "balance_after": 10954678,
     "counterparty": null,
+    "counterparty_account": null,
     "description": "HOAN TIEN BAO HIEM SUC KHOE",
     "reference": null,
     "occurred_at": "2026-11-01T08:00:00+07:00"

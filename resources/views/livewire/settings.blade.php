@@ -108,7 +108,11 @@
         @forelse($rules as $rule)
             <div class="flex min-h-14 items-center gap-2 border-b border-slate-100 py-1 last:border-0" wire:key="rule-{{ $rule->id }}">
                 <p class="min-w-0 flex-1 text-sm">
-                    <span class="text-slate-500">{{ $rule->match_field->value === 'counterparty' ? __('Người nhận/gửi là') : __('Nội dung có') }}</span>
+                    <span class="text-slate-500">{{ match($rule->match_field) {
+                        \App\Enums\MatchField::Account => __('Số tài khoản là'),
+                        \App\Enums\MatchField::Counterparty => __('Người nhận/gửi là'),
+                        \App\Enums\MatchField::Description => __('Nội dung có'),
+                    } }}</span>
                     <span class="break-words font-medium">“{{ $rule->match_value }}”</span>
                     → {{ $rule->category->icon }} {{ $rule->category->name }}
                 </p>

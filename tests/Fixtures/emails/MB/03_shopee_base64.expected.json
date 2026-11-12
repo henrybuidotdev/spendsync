@@ -3,6 +3,7 @@
     "amount": 459000,
     "balance_after": 10495678,
     "counterparty": "CONG TY TNHH SHOPEE",
+    "counterparty_account": null,
     "description": "Thanh toán đơn hàng Shopee 261110ABC",
     "reference": null,
     "occurred_at": "2026-11-10T21:10:44+07:00"

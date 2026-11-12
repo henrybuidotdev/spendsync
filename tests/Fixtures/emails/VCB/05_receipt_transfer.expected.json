@@ -3,6 +3,7 @@
     "amount": 480000,
     "balance_after": null,
     "counterparty": "TRAN THI BICH",
+    "counterparty_account": "5600000003",
     "description": "NGUYEN VAN AN chuyen tien",
     "reference": "16500000002",
     "occurred_at": "2026-10-15T19:09:00+07:00"

@@ -104,3 +104,18 @@ test('vietcombank receipts read the amount block, not the fee block', function (
 test('vietcombank receipts with a blank amount throw amount_missing', function () {
     (new VietcombankParser)->parse(input("Số tiền\nAmount\n*** VND\nSố tiền phí\nCharge Amount\n0 VND"));
 })->throws(UnparseableEmailException::class, 'amount_missing');
+
+test('receipt credit accounts keep letters and digits, and anything with other characters is dropped', function (string $account, ?string $expected) {
+    $text = "Biên lai thanh toán\nTài khoản hưởng\nCredit Account\n{$account}\nSố tiền\nAmount\n100,000 VND";
+
+    $result = app(\App\Parsing\Banks\VietcombankParser::class)
+        ->parse(ParsedEmailInput::make('VCB <info@vietcombank.com.vn>', 'Biên lai', null, $text, CarbonImmutable::parse('2026-11-12')));
+
+    expect($result->counterpartyAccount)->toBe($expected);
+})->with([
+    ['0451000555666', '0451000555666'],
+    ['VQRQA1B2C3 ', 'VQRQA1B2C3'],
+    ['abc123', 'ABC123'],
+    ['MBVCB.123', null],
+    ['GRAB*123', null],
+]);
