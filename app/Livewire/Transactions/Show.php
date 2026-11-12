@@ -3,7 +3,9 @@
 namespace App\Livewire\Transactions;
 
 use App\Categorization\CategoryMatcher;
+use App\Models\Category;
 use App\Models\Transaction;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -29,7 +31,7 @@ class Show extends Component
     {
         $this->authorize('update', $this->transaction);
 
-        $category = auth()->user()->availableCategories()->findOrFail($categoryId);
+        $category = $this->selectableCategories()->findOrFail($categoryId);
 
         $this->transaction->update(['category_id' => $category->id]);
 
@@ -66,12 +68,20 @@ class Show extends Component
         return $this->transaction->counterparty ?: $this->transaction->description;
     }
 
+    /** @return Builder<Category> */
+    private function selectableCategories(): Builder
+    {
+        return auth()->user()
+            ->availableCategories()
+            ->where('type', $this->transaction->direction->categoryType());
+    }
+
     public function render()
     {
         $rawEmail = $this->transaction->rawEmail;
 
         return view('livewire.transactions.show', [
-            'categories' => auth()->user()->availableCategories()->orderBy('type')->orderByRaw('user_id is null desc')->orderBy('id')->get(),
+            'categories' => $this->selectableCategories()->orderByRaw('user_id is null desc')->orderBy('id')->get(),
             'bankName' => config("banks.{$this->transaction->bank_code}.name", $this->transaction->bank_code),
             'rawText' => $this->showRaw && $rawEmail ? $rawEmail->toParserInput()->text : null,
             'rawEmail' => $rawEmail,

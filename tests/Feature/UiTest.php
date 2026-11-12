@@ -552,3 +552,33 @@ test('settings counts only the current users transactions for a system category'
     Livewire::actingAs($user)->test(Settings::class)
         ->assertViewHas('categories', fn ($categories) => $categories->firstWhere('id', $food->id)->transactions_count === 1);
 });
+
+test('the category picker only offers categories matching the transaction direction', function () {
+    $user = connectedUser();
+    $mine = $user->categories()->create(['name' => 'Lì xì', 'icon' => '🧧', 'type' => 'income']);
+    $out = Transaction::factory()->for($user)->create();
+    $in = Transaction::factory()->for($user)->income()->create();
+    $food = Category::system()->where('name', 'Ăn uống')->first();
+    $salary = Category::system()->where('name', 'Lương')->first();
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $out])
+        ->assertSeeHtml("setCategory({$food->id})")
+        ->assertDontSeeHtml("setCategory({$salary->id})")
+        ->assertDontSeeHtml("setCategory({$mine->id})");
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $in])
+        ->assertSeeHtml("setCategory({$salary->id})")
+        ->assertSeeHtml("setCategory({$mine->id})")
+        ->assertDontSeeHtml("setCategory({$food->id})");
+});
+
+test('a category of the wrong kind cannot be assigned', function () {
+    $user = connectedUser();
+    $out = Transaction::factory()->for($user)->create();
+    $salary = Category::system()->where('name', 'Lương')->first();
+
+    expect(fn () => Livewire::actingAs($user)->test(Show::class, ['transaction' => $out])->call('setCategory', $salary->id))
+        ->toThrow(ModelNotFoundException::class);
+
+    expect($out->fresh()->category_id)->toBeNull();
+});

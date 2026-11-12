@@ -87,3 +87,14 @@ test('backfill only touches the owners uncategorized matching transactions', fun
         ->and($different->fresh()->category_id)->toBeNull()
         ->and($otherUser->fresh()->category_id)->toBeNull();
 });
+
+test('rules never assign a category of the wrong kind', function () {
+    $rule = rule($this->user, MatchField::Description, 'grab', $this->food->id);
+    $payment = Transaction::factory()->for($this->user)->create(['description' => 'GRAB FOOD']);
+    $refund = Transaction::factory()->for($this->user)->income()->create(['description' => 'GRAB HOAN TIEN']);
+
+    expect($this->matcher->match($payment)?->category_id)->toBe($this->food->id)
+        ->and($this->matcher->match($refund))->toBeNull()
+        ->and($this->matcher->backfill($rule))->toBe(1)
+        ->and($refund->fresh()->category_id)->toBeNull();
+});

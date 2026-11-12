@@ -11,13 +11,14 @@ use Illuminate\Support\Collection;
 
 /**
  * Counterparty rules match the whole normalized counterparty; description rules match a normalized substring.
- * Counterparty rules are checked first.
+ * Counterparty rules are checked first. A rule only applies when its category type fits the direction
+ * (expense for money out, income for money in).
  */
 class CategoryMatcher
 {
     public function match(Transaction $transaction): ?CategoryRule
     {
-        $rules = CategoryRule::where('user_id', $transaction->user_id)->get();
+        $rules = CategoryRule::with('category')->where('user_id', $transaction->user_id)->get();
 
         return $this->firstMatching($rules, $transaction);
     }
@@ -59,7 +60,7 @@ class CategoryMatcher
     {
         $ids = Transaction::where('user_id', $rule->user_id)
             ->whereNull('category_id')
-            ->get(['id', 'user_id', 'counterparty', 'description'])
+            ->get(['id', 'user_id', 'direction', 'counterparty', 'description'])
             ->filter(fn (Transaction $transaction) => $this->matches($rule, $transaction))
             ->pluck('id');
 
@@ -80,6 +81,10 @@ class CategoryMatcher
     private function matches(CategoryRule $rule, Transaction $transaction): bool
     {
         if ($rule->match_value === '') {
+            return false;
+        }
+
+        if ($rule->category->type !== $transaction->direction->categoryType()) {
             return false;
         }
 
