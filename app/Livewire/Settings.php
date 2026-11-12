@@ -6,15 +6,20 @@ use App\Enums\CategoryType;
 use App\Enums\MailAccountStatus;
 use App\Http\Middleware\SetLocale;
 use App\Livewire\Actions\Logout;
-use App\Models\MailAccount;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 #[Layout('layouts.app')]
 class Settings extends Component
 {
+    public const SECTIONS = ['gmail', 'categories', 'rules', 'appearance'];
+
+    /** Null shows the settings menu; otherwise one of SECTIONS (from the route). */
+    #[Locked]
+    public ?string $section = null;
+
     public string $newName = '';
 
     public string $newIcon = '';
@@ -28,7 +33,6 @@ class Settings extends Component
 
     public string $editingIcon = '';
 
-    public string $deleteDataPassword = '';
 
     public function disconnect(): void
     {
@@ -108,32 +112,6 @@ class Settings extends Component
         $rule->delete();
     }
 
-    /** Wipes everything except the login itself; the user starts over at /connect. */
-    public function deleteData(): void
-    {
-        $this->validate(
-            ['deleteDataPassword' => ['required', 'string', 'current_password']],
-            [],
-            ['deleteDataPassword' => __('mật khẩu')],
-        );
-
-        $user = auth()->user();
-
-        DB::transaction(function () use ($user) {
-            $user->transactions()->delete();
-            $user->categoryRules()->delete();
-            $user->categories()->delete();
-            $user->rawEmails()->delete();
-            $user->mailAccounts()->each(fn (MailAccount $account) => $account->finishSyncing());
-            $user->mailAccounts()->delete();
-        });
-
-        $this->reset('deleteDataPassword');
-
-        session()->flash('status', __('Đã xóa toàn bộ dữ liệu. Tài khoản đăng nhập vẫn được giữ.'));
-        $this->redirectRoute('connect', navigate: true);
-    }
-
     public function setLocale(string $locale): void
     {
         if (! in_array($locale, SetLocale::LOCALES, true)) {
@@ -142,7 +120,7 @@ class Settings extends Component
 
         session()->put('locale', $locale);
 
-        $this->redirectRoute('settings');
+        $this->redirectRoute('settings', 'appearance');
     }
 
     public function logout(Logout $logout): void
@@ -155,16 +133,31 @@ class Settings extends Component
     public function render()
     {
         $user = auth()->user();
+        $title = $this->sectionTitle();
 
         return view('livewire.settings', [
+            'title' => $title,
             'account' => $user->mailAccount,
-            'categories' => $user->availableCategories()
+            'categoryCount' => $this->section === null ? $user->availableCategories()->count() : null,
+            'ruleCount' => $this->section === null ? $user->categoryRules()->count() : null,
+            'categories' => $this->section !== 'categories' ? collect() : $user->availableCategories()
                 ->where('type', $this->categoryType)
                 ->withCount(['transactions' => fn ($query) => $query->where('user_id', $user->id)])
                 ->orderByRaw('user_id is null desc')
                 ->orderBy('id')
                 ->get(),
-            'rules' => $user->categoryRules()->with('category')->latest()->get(),
-        ])->title(__('Cài đặt'));
+            'rules' => $this->section !== 'rules' ? collect() : $user->categoryRules()->with('category')->latest()->get(),
+        ])->title($title);
+    }
+
+    private function sectionTitle(): string
+    {
+        return match ($this->section) {
+            'gmail' => __('Tài khoản Gmail'),
+            'categories' => __('Danh mục'),
+            'rules' => __('Quy tắc tự phân loại'),
+            'appearance' => __('Giao diện & ngôn ngữ'),
+            default => __('Cài đặt'),
+        };
     }
 }

@@ -243,7 +243,7 @@ test('a brand-new connected user sees a friendly empty state', function () {
 
 /* Transaction detail */
 
-test('the detail page shows parsed fields and the bank name', function () {
+test('the detail page shows parsed fields and the bank name but hides the balance', function () {
     $user = connectedUser();
     $transaction = Transaction::factory()->for($user)->create(['bank_code' => 'TCB', 'reference' => 'FT123', 'balance_after' => 8150000]);
 
@@ -251,7 +251,7 @@ test('the detail page shows parsed fields and the bank name', function () {
         ->assertOk()
         ->assertSee('Techcombank')
         ->assertSee('FT123')
-        ->assertSee('8.150.000 ₫');
+        ->assertDontSee('8.150.000 ₫');
 });
 
 test('users cannot open or change another users transaction', function () {
@@ -370,7 +370,7 @@ test('categories can be added, renamed and deleted', function () {
     $category = Category::factory()->for($user)->create(['icon' => '🐱']);
     $transaction = Transaction::factory()->for($user)->create(['category_id' => $category->id]);
 
-    Livewire::actingAs($user)->test(Settings::class)
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'categories'])
         ->set('newName', 'Thú cưng')->set('newIcon', '🐶')
         ->call('addCategory')->assertHasNoErrors()
         ->call('editCategory', $category->id)->assertSet('editingIcon', $category->icon)
@@ -402,7 +402,7 @@ test('rules are listed and can be deleted', function () {
     $user = connectedUser();
     $rule = CategoryRule::factory()->for($user)->create(['match_value' => 'Grab', 'category_id' => $user->availableCategories()->first()->id]);
 
-    Livewire::actingAs($user)->test(Settings::class)
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'rules'])
         ->assertSee('grab')
         ->call('deleteRule', $rule->id);
 
@@ -412,7 +412,7 @@ test('rules are listed and can be deleted', function () {
 test('the language switch changes the UI to English', function () {
     $user = connectedUser();
 
-    Livewire::actingAs($user)->test(Settings::class)->call('setLocale', 'en')->assertRedirect(route('settings'));
+    Livewire::actingAs($user)->test(Settings::class)->call('setLocale', 'en')->assertRedirect(route('settings', 'appearance'));
 
     $this->actingAs($user)->withSession(['locale' => 'en'])->get('/')->assertSee('Transactions')->assertSee('Sync now');
 });
@@ -502,7 +502,7 @@ test('settings offers an emoji picker and an icon can be removed', function () {
     $user = connectedUser();
     $category = Category::factory()->for($user)->create(['icon' => '🐱']);
 
-    Livewire::actingAs($user)->test(Settings::class)
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'categories'])
         ->assertSee('Chọn biểu tượng')
         ->assertSeeHtml("\$wire.newIcon = '☕'")
         ->call('editCategory', $category->id)
@@ -515,7 +515,7 @@ test('settings offers an emoji picker and an icon can be removed', function () {
 test('the emoji picker offers spending and income groups', function () {
     $user = connectedUser();
 
-    Livewire::actingAs($user)->test(Settings::class)
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'categories'])
         ->assertSee('Chi tiêu')
         ->assertSee('Thu nhập')
         ->assertSeeHtml("\$wire.newIcon = '🧧'")
@@ -532,13 +532,13 @@ test('system categories are locked in settings and cannot be edited or deleted',
     $user = connectedUser();
     $system = Category::system()->where('name', 'Ăn uống')->first();
 
-    Livewire::actingAs($user)->test(Settings::class)
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'categories'])
         ->assertSee('Mặc định')
         ->assertDontSeeHtml("editCategory({$system->id})")
         ->assertDontSeeHtml("deleteCategory({$system->id})");
 
     foreach (['editCategory', 'deleteCategory'] as $method) {
-        expect(fn () => Livewire::actingAs($user)->test(Settings::class)->call($method, $system->id))
+        expect(fn () => Livewire::actingAs($user)->test(Settings::class, ['section' => 'categories'])->call($method, $system->id))
             ->toThrow(ModelNotFoundException::class);
     }
 
@@ -551,7 +551,7 @@ test('settings counts only the current users transactions for a system category'
     Transaction::factory()->for($user)->create(['category_id' => $food->id]);
     Transaction::factory()->count(5)->create(['category_id' => $food->id]);
 
-    Livewire::actingAs($user)->test(Settings::class)
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'categories'])
         ->assertViewHas('categories', fn ($categories) => $categories->firstWhere('id', $food->id)->transactions_count === 1);
 });
 
@@ -588,7 +588,7 @@ test('a category of the wrong kind cannot be assigned', function () {
 test('settings lists one category type at a time and adds new categories as that type', function () {
     $user = connectedUser();
 
-    $component = Livewire::actingAs($user)->test(Settings::class)
+    $component = Livewire::actingAs($user)->test(Settings::class, ['section' => 'categories'])
         ->assertSet('categoryType', 'expense')
         ->assertSee('Ăn uống')
         ->assertDontSee('Lương')
@@ -609,8 +609,8 @@ test('settings lists one category type at a time and adds new categories as that
     $component->call('showCategoryType', 'nonsense')->assertSet('categoryType', 'expense');
 });
 
-test('the danger zone offers delete data and delete account separately', function () {
-    $this->actingAs(connectedUser())->get('/settings')
+test('the danger zone on the profile page offers delete data and delete account separately', function () {
+    $this->actingAs(connectedUser())->get('/profile')
         ->assertSee('Vùng nguy hiểm')
         ->assertSee('Xóa dữ liệu')
         ->assertSee('Xóa tài khoản')
@@ -621,10 +621,10 @@ test('delete data needs the login password and keeps everything on a wrong one',
     $user = connectedUser();
     Transaction::factory()->for($user)->create();
 
-    Livewire::actingAs($user)->test(Settings::class)
-        ->set('deleteDataPassword', 'wrong-password')
+    Volt::actingAs($user)->test('profile.delete-data-form')
+        ->set('password', 'wrong-password')
         ->call('deleteData')
-        ->assertHasErrors('deleteDataPassword');
+        ->assertHasErrors('password');
 
     expect($user->transactions()->count())->toBe(1)
         ->and($user->mailAccounts()->count())->toBe(1);
@@ -639,8 +639,8 @@ test('delete data wipes the users data but keeps the login, other users and syst
     $other = connectedUser();
     Transaction::factory()->for($other)->create();
 
-    Livewire::actingAs($user)->test(Settings::class)
-        ->set('deleteDataPassword', 'password')
+    Volt::actingAs($user)->test('profile.delete-data-form')
+        ->set('password', 'password')
         ->call('deleteData')
         ->assertHasNoErrors()
         ->assertRedirect(route('connect'));
@@ -661,4 +661,21 @@ test('delete data wipes the users data but keeps the login, other users and syst
 test('sync and parse jobs are configured to drop themselves when their model was deleted', function () {
     expect((new SyncMailAccount(MailAccount::factory()->make()))->deleteWhenMissingModels)->toBeTrue()
         ->and((new ParseRawEmail(RawEmail::factory()->make()))->deleteWhenMissingModels)->toBeTrue();
+});
+
+test('settings opens as a short menu and each part has its own page', function () {
+    $user = connectedUser();
+
+    $this->actingAs($user)->get('/settings')
+        ->assertOk()
+        ->assertSee(route('settings', 'categories'))
+        ->assertSee(route('settings', 'rules'))
+        ->assertDontSee('Thêm khoản chi')
+        ->assertDontSee('Xóa dữ liệu');
+
+    foreach (Settings::SECTIONS as $section) {
+        $this->actingAs($user)->get("/settings/{$section}")->assertOk()->assertSee(route('settings'));
+    }
+
+    $this->actingAs($user)->get('/settings/nope')->assertNotFound();
 });

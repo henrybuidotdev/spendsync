@@ -11,7 +11,7 @@ Route::view('privacy', 'privacy')->name('privacy');
 
 Route::middleware('auth')->group(function () {
     Route::get('connect', ConnectGmail::class)->name('connect');
-    Route::get('settings', Settings::class)->name('settings');
+    Route::get('settings/{section?}', Settings::class)->whereIn('section', Settings::SECTIONS)->name('settings');
     Route::view('profile', 'profile')->name('profile');
 
     Route::middleware('connected')->group(function () {
