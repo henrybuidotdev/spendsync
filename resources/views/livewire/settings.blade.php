@@ -12,38 +12,38 @@
 
         @php
             $rows = [
-                ['gmail', '✉️', __('Gmail'), match ($account?->status) {
+                ['gmail', 'mail', __('Gmail'), match ($account?->status) {
                     MailAccountStatus::Active => __('Active'),
                     MailAccountStatus::NeedsReconnect => __('Needs reconnect'),
                     MailAccountStatus::Disabled => __('Disconnected'),
                     null => __('Not connected'),
                 }],
-                ['categories', '🏷️', __('Category'), $categoryCount],
-                ['rules', '⚡', __('Auto-categorize rules'), $ruleCount],
-                ['appearance', '🎨', __('Appearance & language'), app()->getLocale() === 'en' ? 'English' : 'Tiếng Việt'],
+                ['categories', 'tag', __('Category'), $categoryCount],
+                ['rules', 'zap', __('Auto-categorize rules'), $ruleCount],
+                ['appearance', 'contrast', __('Appearance & language'), app()->getLocale() === 'en' ? 'English' : 'Tiếng Việt'],
             ];
-            $rowClass = 'flex min-h-14 w-full items-center gap-3 px-4 text-left hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500';
+            $rowClass = 'flex min-h-14 w-full items-center gap-3 px-1 text-left hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500';
         @endphp
 
-        <nav class="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm" aria-label="{{ __('Settings') }}">
+        <nav class="divide-y divide-slate-200 border-y border-slate-200" aria-label="{{ __('Settings') }}">
             @foreach($rows as [$key, $icon, $label, $detail])
                 <a href="{{ route('settings', $key) }}" wire:navigate class="{{ $rowClass }}">
-                    <span class="w-6 text-center text-lg" aria-hidden="true">{{ $icon }}</span>
+                    <x-icon :name="$icon" class="h-5 w-5 text-slate-500" />
                     <span class="min-w-0 flex-1 truncate font-medium">{{ $label }}</span>
                     <span @class(['shrink-0 text-sm', 'text-red-600' => $key === 'gmail' && $account?->status === MailAccountStatus::NeedsReconnect, 'text-slate-500' => ! ($key === 'gmail' && $account?->status === MailAccountStatus::NeedsReconnect)])>{{ $detail }}</span>
-                    <span class="text-slate-400" aria-hidden="true">›</span>
+                    <x-icon name="chevron-right" class="h-4 w-4 text-slate-400" />
                 </a>
             @endforeach
         </nav>
 
-        <nav class="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm" aria-label="{{ __('Account') }}">
+        <nav class="divide-y divide-slate-200 border-y border-slate-200" aria-label="{{ __('Account') }}">
             <a href="{{ route('profile') }}" wire:navigate class="{{ $rowClass }}">
-                <span class="w-6 text-center text-lg" aria-hidden="true">👤</span>
+                <x-icon name="user" class="h-5 w-5 text-slate-500" />
                 <span class="min-w-0 flex-1 truncate font-medium">{{ __('Profile & password') }}</span>
-                <span class="text-slate-400" aria-hidden="true">›</span>
+                <x-icon name="chevron-right" class="h-4 w-4 text-slate-400" />
             </a>
             <button type="button" wire:click="logout" class="{{ $rowClass }}">
-                <span class="w-6 text-center text-lg" aria-hidden="true">🚪</span>
+                <x-icon name="log-out" class="h-5 w-5 text-slate-500" />
                 <span class="min-w-0 flex-1 truncate font-medium">{{ __('Log out') }}</span>
             </button>
         </nav>
@@ -52,13 +52,13 @@
             <a href="{{ route('privacy') }}" wire:navigate class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Privacy') }}</a>
         </p>
     @else
-        <a href="{{ route('settings') }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">‹ {{ __('Settings') }}</a>
+        <a href="{{ route('settings') }}" wire:navigate class="-ml-1 inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"><x-icon name="chevron-left" class="h-4 w-4" /> {{ __('Settings') }}</a>
 
         <h1 id="page-heading" class="text-2xl font-semibold tracking-tight">{{ $title }}</h1>
 
         @switch($section)
             @case('gmail')
-            <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="page-heading">
+            <section aria-labelledby="page-heading">
 
                 @if($account)
                     <p class="mt-2 break-all font-medium">{{ $account->email }}</p>
@@ -102,7 +102,7 @@
                 @endif
             </section>
 
-            <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="sync-heading">
+            <section class="border-t border-slate-200 pt-5" aria-labelledby="sync-heading">
                 <h2 id="sync-heading" class="font-semibold">{{ __('How syncing works') }}</h2>
                 <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
                     <li>{{ __('Syncs automatically every hour. You can tap "Sync now" on the transactions page any time.') }}</li>
@@ -114,17 +114,15 @@
                 @break
 
             @case('categories')
-            <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="page-heading">
+            <section aria-labelledby="page-heading">
 
-                <div class="mt-3 grid grid-cols-3 gap-1 rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Category type') }}">
+                <div class="tabs mt-3" role="group" aria-label="{{ __('Category type') }}">
                     @foreach(\App\Enums\CategoryType::cases() as $case)
-                        @php($type = $case->value)
-                        <button type="button" wire:click="showCategoryType('{{ $type }}')" aria-pressed="{{ $categoryType === $type ? 'true' : 'false' }}"
-                                @class(['min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => $categoryType === $type, 'text-slate-600 hover:text-slate-900' => $categoryType !== $type])>{{ $case->label() }}</button>
+                        <button type="button" wire:click="showCategoryType('{{ $case->value }}')" aria-pressed="{{ $categoryType === $case->value ? 'true' : 'false' }}" class="tab">{{ $case->label() }}</button>
                     @endforeach
                 </div>
 
-                <ul class="mt-2 divide-y divide-slate-100">
+                <ul class="mt-2 divide-y divide-slate-200">
                     @foreach($categories as $category)
                         <li class="flex min-h-14 items-center gap-2 py-1" wire:key="category-{{ $category->id }}">
                             @if($editingId === $category->id)
@@ -141,10 +139,10 @@
                                     <span class="text-xs text-slate-400">· {{ $category->transactions_count }}</span>
                                 </span>
                                 @if($category->isSystem())
-                                    <span class="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500" title="{{ __('Default category, cannot be edited or deleted') }}">🔒 {{ __('Default') }}</span>
+                                    <span class="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500" title="{{ __('Default category, cannot be edited or deleted') }}"><x-icon name="lock" class="h-3 w-3" /> {{ __('Default') }}</span>
                                 @else
-                                <button type="button" wire:click="editCategory({{ $category->id }})" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="{{ __('Edit :name', ['name' => $category->label]) }}">✏️</button>
-                                <button type="button" wire:click="deleteCategory({{ $category->id }})" wire:confirm="{{ __('Delete this category? Its transactions become uncategorized.') }}" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="{{ __('Delete :name', ['name' => $category->label]) }}">🗑️</button>
+                                <button type="button" wire:click="editCategory({{ $category->id }})" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="{{ __('Edit :name', ['name' => $category->label]) }}"><x-icon name="pencil" class="mx-auto h-4 w-4" /></button>
+                                <button type="button" wire:click="deleteCategory({{ $category->id }})" wire:confirm="{{ __('Delete this category? Its transactions become uncategorized.') }}" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="{{ __('Delete :name', ['name' => $category->label]) }}"><x-icon name="trash" class="mx-auto h-4 w-4" /></button>
                                 @endif
                             @endif
                         </li>
@@ -153,7 +151,7 @@
                 @error('editingName') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
 
                 @if($categoryType !== 'debt_loan')
-                <form wire:submit="addCategory" class="mt-3 space-y-2 border-t border-slate-100 pt-3">
+                <form wire:submit="addCategory" class="mt-3 space-y-2 border-t border-slate-200 pt-3">
                     <p class="text-sm font-medium">{{ $categoryType === 'income' ? __('Add income category') : __('Add expense category') }}</p>
                     <div class="flex gap-2">
                         <x-emoji-picker model="newIcon" :label="__('Choose an icon')" up />
@@ -168,9 +166,9 @@
                 @break
 
             @case('rules')
-            <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="page-heading">
+            <section aria-labelledby="page-heading">
                 @forelse($rules as $rule)
-                    <div class="flex min-h-14 items-center gap-2 border-b border-slate-100 py-1 last:border-0" wire:key="rule-{{ $rule->id }}">
+                    <div class="flex min-h-14 items-center gap-2 border-b border-slate-200 py-1 last:border-0" wire:key="rule-{{ $rule->id }}">
                         <p class="min-w-0 flex-1 text-sm">
                             <span class="text-slate-500">{{ match($rule->match_field) {
                                 \App\Enums\MatchField::Account => __('Account number is'),
@@ -180,7 +178,7 @@
                             <span class="break-words font-medium">“{{ $rule->match_value }}”</span>
                             → {{ $rule->category->icon }} {{ $rule->category->label }}
                         </p>
-                        <button type="button" wire:click="deleteRule({{ $rule->id }})" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="{{ __('Delete rule') }}">🗑️</button>
+                        <button type="button" wire:click="deleteRule({{ $rule->id }})" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="{{ __('Delete rule') }}"><x-icon name="trash" class="mx-auto h-4 w-4" /></button>
                     </div>
                 @empty
                     <p class="mt-2 text-sm text-slate-600">{{ __('No rules yet. When you pick a category for a transaction, the app remembers it for next time.') }}</p>
@@ -189,17 +187,16 @@
                 @break
 
             @case('appearance')
-            <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="language-heading">
+            <section aria-labelledby="language-heading">
                 <h2 id="language-heading" class="font-semibold">{{ __('Language') }}</h2>
-                <div class="mt-2 grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1" role="group">
+                <div class="tabs mt-2" role="group" aria-labelledby="language-heading">
                     @foreach(\App\Enums\Locale::cases() as $locale)
-                        <button type="button" wire:click="setLocale('{{ $locale->value }}')" aria-pressed="{{ app()->getLocale() === $locale->value ? 'true' : 'false' }}"
-                                @class(['min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => app()->getLocale() === $locale->value, 'text-slate-600 hover:text-slate-900' => app()->getLocale() !== $locale->value])>{{ $locale->label() }}</button>
+                        <button type="button" wire:click="setLocale('{{ $locale->value }}')" aria-pressed="{{ app()->getLocale() === $locale->value ? 'true' : 'false' }}" class="tab">{{ $locale->label() }}</button>
                     @endforeach
                 </div>
             </section>
 
-            <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="theme-heading"
+            <section class="border-t border-slate-200 pt-5" aria-labelledby="theme-heading"
                      x-data="{
                          theme: window.appTheme,
                          setTheme(theme) {
@@ -213,11 +210,9 @@
                          },
                      }">
                 <h2 id="theme-heading" class="font-semibold">{{ __('Appearance') }}</h2>
-                <div class="mt-2 grid grid-cols-3 gap-1 rounded-full bg-slate-100 p-1" role="group">
+                <div class="tabs mt-2" role="group" aria-labelledby="theme-heading">
                     @foreach(['light' => __('Light'), 'dark' => __('Dark'), 'system' => __('System')] as $value => $label)
-                        <button type="button" x-on:click="setTheme('{{ $value }}')" x-bind:aria-pressed="theme === '{{ $value }}'"
-                                class="min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-                                x-bind:class="theme === '{{ $value }}' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'">{{ $label }}</button>
+                        <button type="button" x-on:click="setTheme('{{ $value }}')" x-bind:aria-pressed="theme === '{{ $value }}'" class="tab">{{ $label }}</button>
                     @endforeach
                 </div>
             </section>

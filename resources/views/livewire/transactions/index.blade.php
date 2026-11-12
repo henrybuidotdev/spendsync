@@ -5,7 +5,7 @@
 
     @if($account?->status === \App\Enums\MailAccountStatus::NeedsReconnect)
         <a href="{{ route('connect') }}" wire:navigate class="block rounded-2xl bg-red-600 p-4 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2">
-            <p class="font-semibold">⚠️ {{ __('Gmail disconnected') }}</p>
+            <p class="flex items-center gap-2 font-semibold"><x-icon name="alert" class="h-4 w-4" /> {{ __('Gmail disconnected') }}</p>
             <p class="text-sm text-red-50">{{ __('The app password is no longer valid. Tap to reconnect.') }}</p>
         </a>
     @endif
@@ -21,7 +21,7 @@
             @else
                 <button type="button" wire:click="syncNow" wire:loading.attr="disabled"
                         class="inline-flex items-center gap-1 rounded text-sm font-medium text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
-                    ↻ {{ __('Sync now') }}
+                    <x-icon name="refresh" class="h-4 w-4" /> {{ __('Sync now') }}
                 </button>
             @endif
         @endif
@@ -49,12 +49,9 @@
         </dl>
     </section>
 
-    <div class="flex gap-1 overflow-x-auto rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Filter transactions') }}">
+    <div class="tabs" role="group" aria-label="{{ __('Filter transactions') }}">
         @foreach(['all' => __('All'), 'in' => __('Money in'), 'out' => __('Money out'), 'uncategorized' => __('Uncategorized')] as $value => $label)
-            <button type="button" wire:click="setFilter('{{ $value }}')" aria-pressed="{{ $filter === $value ? 'true' : 'false' }}"
-                    @class(['min-h-11 flex-1 shrink-0 whitespace-nowrap rounded-full px-3 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => $filter === $value, 'text-slate-600 hover:text-slate-900' => $filter !== $value])>
-                {{ $label }}
-            </button>
+            <button type="button" wire:click="setFilter('{{ $value }}')" aria-pressed="{{ $filter === $value ? 'true' : 'false' }}" class="tab">{{ $label }}</button>
         @endforeach
     </div>
 
@@ -65,10 +62,10 @@
                 <span>{{ ucfirst(Format::local($transactions->first()->occurred_at)->translatedFormat('l, d/m')) }}</span>
                 <span @class(['whitespace-nowrap font-num normal-case tracking-normal', 'text-emerald-600' => $dayTotal > 0])>{{ Format::money($dayTotal, signed: true) }}</span>
             </h2>
-            <ul class="divide-y divide-slate-100 overflow-hidden rounded-2xl bg-white shadow-sm">
+            <ul class="divide-y divide-slate-200 border-y border-slate-200">
                 @foreach($transactions as $transaction)
                     <li wire:key="tx-{{ $transaction->id }}">
-                        <a href="{{ route('transactions.show', [$transaction, 'filter' => $filter !== 'all' ? $filter : null]) }}" wire:navigate @class(['flex min-h-16 items-center gap-3 px-3 py-2 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500', 'opacity-50' => $transaction->trashed()])>
+                        <a href="{{ route('transactions.show', [$transaction, 'filter' => $filter !== 'all' ? $filter : null]) }}" wire:navigate @class(['flex min-h-16 items-center gap-3 px-1 py-2 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500', 'opacity-50' => $transaction->trashed()])>
                             <x-category-icon :category="$transaction->category" class="h-10 w-10 text-xl" />
                             <span class="min-w-0 flex-1">
                                 <span class="block truncate font-medium">{{ $transaction->label() }}</span>
@@ -91,10 +88,9 @@
             </ul>
         </section>
     @empty
-        <div class="rounded-2xl bg-white p-6 text-center shadow-sm">
-            <p class="text-4xl" aria-hidden="true">{{ $hasAnyTransactions ? '🗓️' : '📭' }}</p>
+        <div class="border-y border-slate-200 px-1 py-8 text-center">
             @if($hasAnyTransactions)
-                <p class="mt-2 font-semibold">{{ __('Nothing here') }}</p>
+                <p class="font-semibold">{{ __('Nothing here') }}</p>
                 <p class="mt-1 text-sm text-slate-600">{{ __('Try another month or clear the filter.') }}</p>
                 @if($latestMonth)
                     <button type="button" wire:click="$set('month', '{{ $latestMonth }}')" class="mt-3 min-h-11 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Go to :month', ['month' => \Carbon\CarbonImmutable::createFromFormat('!Y-m', $latestMonth)->format('m/Y')]) }}</button>
@@ -102,7 +98,7 @@
                     <button type="button" wire:click="setFilter('all')" class="mt-3 min-h-11 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Show all') }}</button>
                 @endif
             @else
-                <p class="mt-2 font-semibold">{{ __('No transactions yet') }}</p>
+                <p class="font-semibold">{{ __('No transactions yet') }}</p>
                 <p class="mt-1 text-sm text-slate-600">{{ __('When your bank emails a balance change, the transaction shows up here. The first sync looks back 90 days.') }}</p>
                 @if(! $account)
                     <a href="{{ route('connect') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white">{{ __('Connect Gmail') }}</a>

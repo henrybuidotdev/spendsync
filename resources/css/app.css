@@ -28,3 +28,19 @@
         animation: none;
     }
 }
+
+/* Underline tabs. The selected tab is marked by aria-pressed (buttons) or aria-current (links), so markup needs no conditional classes. */
+@layer components {
+    .tabs {
+        @apply flex overflow-x-auto shadow-[inset_0_-1px_0_rgb(var(--c-neutral-200))];
+    }
+
+    .tab {
+        @apply flex min-h-11 flex-1 shrink-0 items-center justify-center whitespace-nowrap border-b-2 border-transparent px-3 text-sm font-medium text-slate-500 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500;
+    }
+
+    .tab[aria-pressed="true"],
+    .tab[aria-current="page"] {
+        @apply border-black text-slate-900;
+    }
+}
