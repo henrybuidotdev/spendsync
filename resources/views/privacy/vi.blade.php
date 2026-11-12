@@ -8,7 +8,7 @@
         ],
         'Chúng tôi lưu gì' => [
             'Địa chỉ Gmail và mật khẩu ứng dụng của bạn. Mật khẩu ứng dụng được mã hóa và không bao giờ được hiển thị hay ghi vào nhật ký.',
-            'Nội dung các email ngân hàng đó và giao dịch đọc được từ chúng: số tiền, thời gian, người nhận/gửi, nội dung chuyển khoản, số dư.',
+            'Nội dung các email ngân hàng đó và giao dịch đọc được từ chúng: số tiền, thời gian, người nhận/gửi, nội dung chuyển khoản. Chúng tôi không đọc số dư tài khoản.',
             'Danh mục, quy tắc và ghi chú do bạn tạo.',
             'Chúng tôi không bán hay chia sẻ dữ liệu của bạn với ai.',
         ],
@@ -26,7 +26,7 @@
         <p class="text-slate-600">Ngắn gọn, dễ hiểu: chúng tôi đọc gì, lưu gì và cách bạn xóa hết.</p>
     </x-slot:intro>
 
-    <p class="text-sm">
+    {{-- <p class="text-sm">
         <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">Thu hồi mật khẩu ứng dụng tại Google ↗</a>
-    </p>
+    </p> --}}
 </x-privacy-layout>

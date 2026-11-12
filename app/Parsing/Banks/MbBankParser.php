@@ -34,7 +34,6 @@ class MbBankParser extends AbstractBankParser
         return $this->transaction(
             input: $input,
             amount: $amount,
-            balance: $this->field($text, 'Số dư khả dụng|Số dư|SD'),
             counterparty: $this->field($text, 'Tên đối ứng|Tên TK đối ứng'),
             description: $this->field($text, 'Nội dung|ND'),
             reference: $this->field($text, 'Mã giao dịch|Số tham chiếu'),

@@ -1,7 +1,6 @@
 {
     "direction": "in",
     "amount": 3000000,
-    "balance_after": 8500000,
     "counterparty": "LE VAN CUONG",
     "counterparty_account": null,
     "description": "LE VAN CUONG chuyen tien tra no",

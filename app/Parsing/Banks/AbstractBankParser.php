@@ -59,7 +59,6 @@ abstract class AbstractBankParser implements BankEmailParser
         ParsedEmailInput $input,
         ?string $amount,
         ?string $directionHint = null,
-        ?string $balance = null,
         ?string $counterparty = null,
         ?string $counterpartyAccount = null,
         ?string $description = null,
@@ -93,7 +92,6 @@ abstract class AbstractBankParser implements BankEmailParser
         return new ParsedTransaction(
             direction: $direction,
             amount: abs($signedAmount),
-            balanceAfter: $balance === null ? null : MoneyParser::parse($balance),
             counterparty: $this->clean($counterparty),
             counterpartyAccount: $this->accountNumber($counterpartyAccount),
             description: $this->clean($description),

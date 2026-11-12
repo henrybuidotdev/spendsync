@@ -32,7 +32,6 @@ class TechcombankParser extends AbstractBankParser
             input: $input,
             amount: $amount,
             directionHint: $this->field($text, 'Loại giao dịch(?:\s*\/\s*Transaction type)?'),
-            balance: $this->field($text, 'Số dư(?:\s*\/\s*Balance)?'),
             counterparty: $this->field($text, '(?:Người nhận|Người chuyển)(?:\s*\/\s*(?:Beneficiary|Remitter))?'),
             description: $this->field($text, 'Nội dung(?:\s*\/\s*Description)?'),
             reference: $this->field($text, 'Mã giao dịch(?:\s*\/\s*Reference)?'),

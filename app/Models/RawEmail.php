@@ -4,8 +4,10 @@ namespace App\Models;
 
 use App\Mail\Inbox\FetchedMessage;
 use App\Parsing\ParsedEmailInput;
+use App\Parsing\Support\BalanceRedactor;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +26,17 @@ class RawEmail extends Model
             'received_at' => 'datetime',
             'parsed_at' => 'datetime',
         ];
+    }
+
+    /** The account balance is masked on the way in, so it is never stored. */
+    protected function bodyHtml(): Attribute
+    {
+        return Attribute::set(fn (?string $value) => BalanceRedactor::redact($value));
+    }
+
+    protected function bodyText(): Attribute
+    {
+        return Attribute::set(fn (?string $value) => BalanceRedactor::redact($value));
     }
 
     public function user(): BelongsTo

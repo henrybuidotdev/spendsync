@@ -273,15 +273,14 @@ test('a brand-new connected user sees a friendly empty state', function () {
 
 /* Transaction detail */
 
-test('the detail page shows parsed fields and the bank name but hides the balance', function () {
+test('the detail page shows parsed fields and the bank name', function () {
     $user = connectedUser();
-    $transaction = Transaction::factory()->for($user)->create(['bank_code' => 'TCB', 'reference' => 'FT123', 'balance_after' => 8150000]);
+    $transaction = Transaction::factory()->for($user)->create(['bank_code' => 'TCB', 'reference' => 'FT123']);
 
     $this->actingAs($user)->get(route('transactions.show', $transaction))
         ->assertOk()
         ->assertSee('Techcombank')
-        ->assertSee('FT123')
-        ->assertDontSee('8.150.000 ₫');
+        ->assertSee('FT123');
 });
 
 test('the detail page links back to the list tab it was opened from', function () {

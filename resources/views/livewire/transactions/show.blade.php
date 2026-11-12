@@ -70,7 +70,6 @@
             __('Counterparty') => $transaction->counterparty,
             __('Account number') => $transaction->counterparty_account,
             __('Description') => $transaction->description,
-            // __('Balance after') => $transaction->balance_after !== null ? Format::money($transaction->balance_after) : null,
             __('Reference') => $transaction->reference,
         ] as $label => $value)
             <div class="flex justify-between gap-4 py-3">

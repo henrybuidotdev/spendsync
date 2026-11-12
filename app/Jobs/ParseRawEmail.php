@@ -67,7 +67,6 @@ class ParseRawEmail implements ShouldQueue
                 'currency' => $result->currency,
                 'original_amount' => $result->originalAmount,
                 'amount_estimated' => $result->amountEstimated,
-                'balance_after' => $result->balanceAfter,
                 'counterparty' => $result->counterparty,
                 'counterparty_account' => $result->counterpartyAccount,
                 'description' => $result->description,

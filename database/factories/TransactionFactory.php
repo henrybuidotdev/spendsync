@@ -15,7 +15,6 @@ class TransactionFactory extends Factory
             'bank_code' => 'VCB',
             'direction' => Direction::Out,
             'amount' => fake()->numberBetween(10, 2000) * 1000,
-            'balance_after' => fake()->numberBetween(1000, 50000) * 1000,
             'counterparty' => fake()->company(),
             'description' => fake()->sentence(4),
             'occurred_at' => now()->subMinutes(fake()->numberBetween(1, 10000)),

@@ -19,7 +19,7 @@ You are building a complete, working MVP from an empty directory. You will work 
 
 ## 1. Product summary
 
-Vietnamese users connect their Gmail with a **Google app password**. Every 5 minutes the app fetches **only** emails from supported bank senders, parses each transaction (amount, direction, counterparty/beneficiary, date-time, balance, description), and shows the transactions in a mobile-first web app where users can categorize them and see monthly totals.
+Vietnamese users connect their Gmail with a **Google app password**. Every 5 minutes the app fetches **only** emails from supported bank senders, parses each transaction (amount, direction, counterparty/beneficiary, date-time, description; never the account balance), and shows the transactions in a mobile-first web app where users can categorize them and see monthly totals.
 
 The MVP has to answer two questions:
 - Will users finish connecting Gmail?
@@ -71,7 +71,6 @@ transactions
   bank_code STRING,
   direction ENUM('in','out'),
   amount BIGINT UNSIGNED            -- VND, integer, always positive
-  balance_after BIGINT NULLABLE,
   counterparty STRING NULLABLE,     -- beneficiary/sender name if present
   description TEXT NULLABLE,        -- transfer content (nội dung)
   reference STRING NULLABLE,        -- bank transaction ref if present
@@ -104,7 +103,7 @@ app/Parsing/
      public function supports(string $from, string $subject): bool;
      public function parse(ParsedEmailInput $input): ?ParsedTransaction; // null = not a transaction email
   ParsedEmailInput.php         DTO: from, subject, html, text (normalized), receivedAt
-  ParsedTransaction.php        DTO: direction, amount, balanceAfter, counterparty, description, reference, occurredAt
+  ParsedTransaction.php        DTO: direction, amount, counterparty, description, reference, occurredAt
   ParserRegistry.php           holds all parsers; senders(); findFor($from,$subject)
   Support/MoneyParser.php      "1,250,000 VND", "-1.250.000 VND", "+500,000đ", "1.250.000,00" -> int
   Support/DateParser.php       "12/11/2026 14:03:21", "12-11-2026 14:03", "14:03 12/11/2026" -> Carbon (Asia/Ho_Chi_Minh)

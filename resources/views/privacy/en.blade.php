@@ -8,7 +8,7 @@
         ],
         'What we store' => [
             'Your Gmail address and app password. The app password is encrypted and is never shown or written to logs.',
-            'The content of those bank emails and the transactions read from them: amount, time, recipient/sender, transfer description, balance.',
+            'The content of those bank emails and the transactions read from them: amount, time, recipient/sender, transfer description. We do not read your account balance.',
             'Categories, rules and notes you create.',
             'We do not sell or share your data with anyone.',
         ],
@@ -26,7 +26,7 @@
         <p class="text-slate-600">Short and plain: what we read, what we store, and how you delete it all.</p>
     </x-slot:intro>
 
-    <p class="text-sm">
+    {{-- <p class="text-sm">
         <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">Revoke the app password at Google ↗</a>
-    </p>
+    </p> --}}
 </x-privacy-layout>

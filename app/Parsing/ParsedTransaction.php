@@ -10,7 +10,6 @@ class ParsedTransaction
     public function __construct(
         public readonly Direction $direction,
         public readonly int $amount,
-        public readonly ?int $balanceAfter,
         public readonly ?string $counterparty,
         public readonly ?string $counterpartyAccount,
         public readonly ?string $description,
@@ -27,7 +26,6 @@ class ParsedTransaction
         return [
             'direction' => $this->direction->value,
             'amount' => $this->amount,
-            'balance_after' => $this->balanceAfter,
             'counterparty' => $this->counterparty,
             'counterparty_account' => $this->counterpartyAccount,
             'description' => $this->description,

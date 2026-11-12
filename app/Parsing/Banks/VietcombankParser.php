@@ -102,7 +102,6 @@ class VietcombankParser extends AbstractBankParser
             input: $input,
             amount: $amount,
             directionHint: $this->field($text, 'Loại giao dịch'),
-            balance: $this->field($text, 'Số dư cuối|Số dư sau giao dịch|Số dư'),
             counterparty: $this->field($text, 'Tên người hưởng|Người hưởng|Tên người chuyển|Người chuyển'),
             description: $this->field($text, 'Nội dung chuyển tiền|Nội dung'),
             reference: $this->field($text, 'Số tham chiếu|Mã giao dịch'),
