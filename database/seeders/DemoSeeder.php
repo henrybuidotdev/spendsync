@@ -14,12 +14,12 @@ class DemoSeeder extends Seeder
     public const EMAIL = 'demo@spendsync.test';
 
     private const RULES = [
-        ['counterparty', 'CONG TY TNHH CONG NGHE ABC', 'Lương'],
-        ['counterparty', 'CONG TY TNHH SHOPEE', 'Mua sắm'],
-        ['counterparty', 'LE THI HOA', 'Nhà cửa'],
-        ['description', 'grab', 'Đi lại'],
-        ['description', 'highlands', 'Ăn uống'],
-        ['description', 'tien dien', 'Hóa đơn'],
+        ['counterparty', 'CONG TY TNHH CONG NGHE ABC', 'Salary'],
+        ['counterparty', 'CONG TY TNHH SHOPEE', 'Shopping'],
+        ['counterparty', 'LE THI HOA', 'Home'],
+        ['description', 'grab', 'Transport'],
+        ['description', 'highlands', 'Food & drink'],
+        ['description', 'tien dien', 'Bills'],
     ];
 
     public function run(): void

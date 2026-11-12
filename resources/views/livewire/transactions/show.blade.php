@@ -58,7 +58,7 @@
                         aria-pressed="{{ $transaction->category_id === $category->id ? 'true' : 'false' }}"
                         @class(['flex min-h-20 flex-col items-center justify-center gap-1 rounded-xl p-3 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-black text-white' => $transaction->category_id === $category->id, 'bg-slate-50 ring-1 ring-slate-200 hover:bg-emerald-50' => $transaction->category_id !== $category->id])>
                     <x-category-icon :category="$category" class="h-8 w-8 text-xl" />
-                    <span class="mt-1 line-clamp-2 text-center">{{ $category->name }}</span>
+                    <span class="mt-1 line-clamp-2 text-center">{{ $category->label }}</span>
                 </button>
             @endforeach
         </div>

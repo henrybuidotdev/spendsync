@@ -34,7 +34,6 @@ class Settings extends Component
 
     public string $editingIcon = '';
 
-
     public function disconnect(): void
     {
         $account = auth()->user()->mailAccount;
@@ -163,8 +162,7 @@ class Settings extends Component
             'categories' => $this->section !== 'categories' ? collect() : $user->availableCategories()
                 ->where('type', $this->categoryType)
                 ->withCount(['transactions' => fn ($query) => $query->where('user_id', $user->id)])
-                ->orderByRaw('user_id is null desc')
-                ->orderBy('id')
+                ->ordered()
                 ->get(),
             'rules' => $this->section !== 'rules' ? collect() : $user->categoryRules()->with('category')->latest()->get(),
         ])->title($title);

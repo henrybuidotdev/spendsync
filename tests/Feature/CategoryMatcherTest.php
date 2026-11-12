@@ -8,8 +8,8 @@ use App\Models\User;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
-    $this->food = $this->user->availableCategories()->where('name', 'Ăn uống')->first();
-    $this->bills = $this->user->availableCategories()->where('name', 'Hóa đơn')->first();
+    $this->food = $this->user->availableCategories()->where('name', 'Food & drink')->first();
+    $this->bills = $this->user->availableCategories()->where('name', 'Bills')->first();
     $this->matcher = app(CategoryMatcher::class);
 });
 
@@ -120,7 +120,7 @@ test('rules never assign a category of the wrong kind', function () {
 });
 
 test('debt and loan rules match money in and money out', function () {
-    $debt = $this->user->availableCategories()->where('name', 'Đi vay')->first();
+    $debt = $this->user->availableCategories()->where('name', 'Borrowing')->first();
     rule($this->user, MatchField::Counterparty, 'nguyen van an', $debt->id);
 
     $out = Transaction::factory()->for($this->user)->create(['counterparty' => 'NGUYEN VAN AN']);

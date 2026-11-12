@@ -73,7 +73,7 @@
                                 <span class="flex min-w-0 items-center gap-1.5 whitespace-nowrap text-xs text-slate-500">
                                     {{ Format::local($transaction->occurred_at)->format('H:i') }} ·
                                     @if($transaction->category)
-                                        <span class="truncate">{{ $transaction->category->name }}</span>
+                                        <span class="truncate">{{ $transaction->category->label }}</span>
                                     @else
                                         <span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-medium text-amber-800">{{ __('Unknown') }}</span>
                                     @endif

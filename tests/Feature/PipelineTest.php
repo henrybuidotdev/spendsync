@@ -281,7 +281,7 @@ test('the scheduler queues a sync for each active account every five minutes', f
 
 test('parsed transactions get categorized by existing rules', function () {
     $user = User::factory()->create();
-    $food = $user->availableCategories()->where('name', 'Ăn uống')->first();
+    $food = $user->availableCategories()->where('name', 'Food & drink')->first();
     CategoryRule::create(['user_id' => $user->id, 'match_field' => MatchField::Description, 'match_value' => 'highlands coffee', 'category_id' => $food->id]);
 
     $this->artisan('spendsync:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/VCB']);

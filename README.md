@@ -19,6 +19,16 @@ php artisan migrate --seed
 npm install && npm run build
 ```
 
+### Default categories
+
+The shared categories every user sees live in `database/seeders/SystemCategorySeeder.php`. To add one, add a line there and run:
+
+```bash
+php artisan db:seed --class=SystemCategorySeeder
+```
+
+It is safe to run again: it only creates categories that don't exist yet (matched by name and type) and never changes existing data. When it creates one, a user's own category with the same name and type is merged into it. Changing the icon or name of an existing line has no effect on existing rows (a rename creates a new category), so do those in a migration.
+
 ### Demo without Gmail
 
 ```bash

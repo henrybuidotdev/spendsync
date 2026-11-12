@@ -137,14 +137,14 @@
                             @else
                                 <x-category-icon :category="$category" class="h-8 w-8 text-lg" />
                                 <span class="min-w-0 flex-1 truncate">
-                                    {{ $category->name }}
+                                    {{ $category->label }}
                                     <span class="text-xs text-slate-400">· {{ $category->transactions_count }}</span>
                                 </span>
                                 @if($category->isSystem())
                                     <span class="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500" title="{{ __('Default category, cannot be edited or deleted') }}">🔒 {{ __('Default') }}</span>
                                 @else
-                                <button type="button" wire:click="editCategory({{ $category->id }})" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="{{ __('Edit :name', ['name' => $category->name]) }}">✏️</button>
-                                <button type="button" wire:click="deleteCategory({{ $category->id }})" wire:confirm="{{ __('Delete this category? Its transactions become uncategorized.') }}" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="{{ __('Delete :name', ['name' => $category->name]) }}">🗑️</button>
+                                <button type="button" wire:click="editCategory({{ $category->id }})" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="{{ __('Edit :name', ['name' => $category->label]) }}">✏️</button>
+                                <button type="button" wire:click="deleteCategory({{ $category->id }})" wire:confirm="{{ __('Delete this category? Its transactions become uncategorized.') }}" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="{{ __('Delete :name', ['name' => $category->label]) }}">🗑️</button>
                                 @endif
                             @endif
                         </li>
@@ -176,7 +176,7 @@
                                 \App\Enums\MatchField::Description => __('Description contains'),
                             } }}</span>
                             <span class="break-words font-medium">“{{ $rule->match_value }}”</span>
-                            → {{ $rule->category->icon }} {{ $rule->category->name }}
+                            → {{ $rule->category->icon }} {{ $rule->category->label }}
                         </p>
                         <button type="button" wire:click="deleteRule({{ $rule->id }})" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="{{ __('Delete rule') }}">🗑️</button>
                     </div>

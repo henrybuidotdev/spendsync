@@ -5,5 +5,5 @@
 @elseif(filled($category->icon))
     <span {{ $attributes->class('flex shrink-0 items-center justify-center rounded-full bg-slate-100') }} aria-hidden="true">{{ $category->icon }}</span>
 @else
-    <span {{ $attributes->class('flex shrink-0 items-center justify-center rounded-full bg-emerald-100 font-bold text-emerald-700') }} aria-hidden="true">{{ mb_strtoupper(mb_substr($category->name, 0, 1)) }}</span>
+    <span {{ $attributes->class('flex shrink-0 items-center justify-center rounded-full bg-emerald-100 font-bold text-emerald-700') }} aria-hidden="true">{{ mb_strtoupper(mb_substr($category->label, 0, 1)) }}</span>
 @endif

@@ -9,9 +9,13 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $this->call(SystemCategorySeeder::class);
+
+        if (! User::where('email', 'test@example.com')->first()) {
+            User::factory()->createOrFirst([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+            ]);
+        }
     }
 }

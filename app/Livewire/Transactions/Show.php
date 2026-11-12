@@ -93,7 +93,7 @@ class Show extends Component
         $rawEmail = $this->transaction->rawEmail;
 
         return view('livewire.transactions.show', [
-            'categories' => $this->selectableCategories()->orderByRaw('user_id is null desc')->orderBy('id')->get(),
+            'categories' => $this->selectableCategories()->ordered()->get(),
             'defaultTab' => ($this->transaction->category?->type ?? $this->transaction->direction->categoryTypes()[0])->value,
             'bankName' => config("banks.{$this->transaction->bank_code}.name", $this->transaction->bank_code),
             'rawText' => $this->showRaw && $rawEmail ? $rawEmail->toParserInput()->text : null,
