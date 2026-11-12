@@ -58,7 +58,7 @@ class CategoryMatcher
 
     public static function ruleField(Transaction $transaction): MatchField
     {
-        if (filled($transaction->counterparty_account)) {
+        if (ctype_digit((string) $transaction->counterparty_account)) {
             return MatchField::Account;
         }
 

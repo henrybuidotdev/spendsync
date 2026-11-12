@@ -64,6 +64,15 @@ test('remember prefers the account number over the name', function () {
         ->and($rule->match_value)->toBe('5600000003');
 });
 
+test('remember uses the name when the account is not only digits', function () {
+    $transaction = Transaction::factory()->for($this->user)->create(['counterparty' => 'TRAN THI BICH', 'counterparty_account' => 'VCB-5600000003']);
+
+    $rule = $this->matcher->remember($transaction, $this->food);
+
+    expect($rule->match_field)->toBe(MatchField::Counterparty)
+        ->and($rule->match_value)->toBe('tran thi bich');
+});
+
 test('other users rules never apply', function () {
     $other = User::factory()->create();
     rule($other, MatchField::Counterparty, 'shopee', $other->availableCategories()->first()->id);
