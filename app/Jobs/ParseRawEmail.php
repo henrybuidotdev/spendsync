@@ -17,6 +17,8 @@ class ParseRawEmail implements ShouldQueue
 {
     use Queueable;
 
+    public bool $deleteWhenMissingModels = true;
+
     public function __construct(public RawEmail $rawEmail) {}
 
     public function handle(ParserRegistry $registry, CategoryMatcher $matcher): void

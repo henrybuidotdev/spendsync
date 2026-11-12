@@ -1,4 +1,6 @@
 <div class="space-y-5">
+    <x-flash />
+
     <div>
         <h1 class="text-2xl font-bold">{{ $reconnecting ? __('Kết nối lại Gmail') : __('Kết nối Gmail') }}</h1>
         <p class="mt-1 text-slate-600">{{ __('Mất khoảng 2 phút. Sau đó giao dịch ngân hàng sẽ tự động hiện ở đây.') }}</p>

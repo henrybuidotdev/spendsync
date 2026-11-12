@@ -17,6 +17,8 @@ class SyncMailAccount implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
+    public bool $deleteWhenMissingModels = true;
+
     public int $timeout = 120;
 
     public int $tries = 2;

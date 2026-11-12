@@ -3,6 +3,7 @@
 use App\Enums\Direction;
 use App\Enums\MailAccountStatus;
 use App\Enums\MatchField;
+use App\Jobs\ParseRawEmail;
 use App\Jobs\SyncMailAccount;
 use App\Livewire\ConnectGmail;
 use App\Livewire\Reports;
@@ -606,4 +607,58 @@ test('settings lists one category type at a time and adds new categories as that
     expect($user->categories()->pluck('type', 'name')->map->value->all())->toBe(['Cà phê' => 'expense', 'Lì xì' => 'income']);
 
     $component->call('showCategoryType', 'nonsense')->assertSet('categoryType', 'expense');
+});
+
+test('the danger zone offers delete data and delete account separately', function () {
+    $this->actingAs(connectedUser())->get('/settings')
+        ->assertSee('Vùng nguy hiểm')
+        ->assertSee('Xóa dữ liệu')
+        ->assertSee('Xóa tài khoản')
+        ->assertDontSee('Xóa toàn bộ dữ liệu</');
+});
+
+test('delete data needs the login password and keeps everything on a wrong one', function () {
+    $user = connectedUser();
+    Transaction::factory()->for($user)->create();
+
+    Livewire::actingAs($user)->test(Settings::class)
+        ->set('deleteDataPassword', 'wrong-password')
+        ->call('deleteData')
+        ->assertHasErrors('deleteDataPassword');
+
+    expect($user->transactions()->count())->toBe(1)
+        ->and($user->mailAccounts()->count())->toBe(1);
+});
+
+test('delete data wipes the users data but keeps the login, other users and system categories', function () {
+    $user = connectedUser();
+    $own = Category::factory()->for($user)->create();
+    $rawEmail = RawEmail::factory()->for($user)->create();
+    Transaction::factory()->for($user)->create(['raw_email_id' => $rawEmail->id, 'category_id' => $own->id]);
+    CategoryRule::factory()->for($user)->create(['category_id' => $own->id]);
+    $other = connectedUser();
+    Transaction::factory()->for($other)->create();
+
+    Livewire::actingAs($user)->test(Settings::class)
+        ->set('deleteDataPassword', 'password')
+        ->call('deleteData')
+        ->assertHasNoErrors()
+        ->assertRedirect(route('connect'));
+
+    expect($user->fresh())->not->toBeNull()
+        ->and($user->transactions()->count())->toBe(0)
+        ->and($user->rawEmails()->count())->toBe(0)
+        ->and($user->categoryRules()->count())->toBe(0)
+        ->and($user->categories()->count())->toBe(0)
+        ->and($user->mailAccounts()->count())->toBe(0)
+        ->and($other->transactions()->count())->toBe(1)
+        ->and($other->mailAccounts()->count())->toBe(1)
+        ->and(Category::system()->count())->toBe(12);
+
+    $this->actingAs($user)->get('/')->assertRedirect('/connect');
+});
+
+test('sync and parse jobs are configured to drop themselves when their model was deleted', function () {
+    expect((new SyncMailAccount(MailAccount::factory()->make()))->deleteWhenMissingModels)->toBeTrue()
+        ->and((new ParseRawEmail(RawEmail::factory()->make()))->deleteWhenMissingModels)->toBeTrue();
 });

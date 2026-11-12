@@ -107,7 +107,7 @@ Gmail ──IMAP SEARCH FROM+SINCE──▶ SyncMailAccount ──firstOrCreate(
 - Every query is scoped to the signed-in user. Policies exist for Transaction, Category, CategoryRule and MailAccount, and tests prove isolation.
 - The connect form is rate-limited to 5 attempts per 10 minutes per user. "Sync now" is limited to once a minute.
 - The original email is shown only to its owner, and only as escaped plain text.
-- `/privacy` explains in Vietnamese what is read, what is stored and how to delete it. **Settings → Delete all data** removes the user and everything they own (FK cascades).
+- `/privacy` explains in Vietnamese what is read, what is stored and how to delete it. **Settings → Danger Zone** has two actions, both password-confirmed: **Delete data** wipes transactions, emails, rules, the user's own categories and the Gmail connection but keeps the login; **Delete account** removes the user and everything they own (FK cascades).
 
 ## Known limitations
 

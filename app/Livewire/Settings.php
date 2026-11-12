@@ -6,6 +6,8 @@ use App\Enums\CategoryType;
 use App\Enums\MailAccountStatus;
 use App\Http\Middleware\SetLocale;
 use App\Livewire\Actions\Logout;
+use App\Models\MailAccount;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -25,6 +27,8 @@ class Settings extends Component
     public string $editingName = '';
 
     public string $editingIcon = '';
+
+    public string $deleteDataPassword = '';
 
     public function disconnect(): void
     {
@@ -102,6 +106,32 @@ class Settings extends Component
         $this->authorize('delete', $rule);
 
         $rule->delete();
+    }
+
+    /** Wipes everything except the login itself; the user starts over at /connect. */
+    public function deleteData(): void
+    {
+        $this->validate(
+            ['deleteDataPassword' => ['required', 'string', 'current_password']],
+            [],
+            ['deleteDataPassword' => __('mật khẩu')],
+        );
+
+        $user = auth()->user();
+
+        DB::transaction(function () use ($user) {
+            $user->transactions()->delete();
+            $user->categoryRules()->delete();
+            $user->categories()->delete();
+            $user->rawEmails()->delete();
+            $user->mailAccounts()->each(fn (MailAccount $account) => $account->finishSyncing());
+            $user->mailAccounts()->delete();
+        });
+
+        $this->reset('deleteDataPassword');
+
+        session()->flash('status', __('Đã xóa toàn bộ dữ liệu. Tài khoản đăng nhập vẫn được giữ.'));
+        $this->redirectRoute('connect', navigate: true);
     }
 
     public function setLocale(string $locale): void
