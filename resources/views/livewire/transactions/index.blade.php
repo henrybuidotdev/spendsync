@@ -20,7 +20,7 @@
                 </button>
             @else
                 <button type="button" wire:click="syncNow" wire:loading.attr="disabled"
-                        class="inline-flex min-h-11 items-center gap-1 rounded text-sm font-medium text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
+                        class="inline-flex items-center gap-1 rounded text-sm font-medium text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
                     ↻ {{ __('Sync now') }}
                 </button>
             @endif

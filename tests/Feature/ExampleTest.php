@@ -5,7 +5,15 @@ test('guests are sent to login from the home page', function () {
 });
 
 test('the privacy page is public', function () {
-    $this->get('/privacy')->assertOk()->assertSee('Quyền riêng tư');
+    $this->get('/privacy')->assertOk()->assertSee('<html lang="vi">', false)->assertSee('Quyền riêng tư');
+});
+
+test('the privacy page follows the chosen language', function () {
+    $this->withCookie('locale', 'en')->get('/privacy')
+        ->assertOk()
+        ->assertSee('<html lang="en">', false)
+        ->assertSee('What we read')
+        ->assertDontSee('Chúng tôi đọc gì');
 });
 
 test('the PWA manifest and service worker are served', function () {
