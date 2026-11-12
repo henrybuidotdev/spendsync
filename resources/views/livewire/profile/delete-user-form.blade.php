@@ -44,7 +44,7 @@ $deleteUser = function (Logout $logout) {
 
             <div class="mt-6">
                 <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
-                <x-text-input wire:model="password" id="password" name="password" type="password" class="mt-1 block w-full" placeholder="{{ __('Password') }}" />
+                <x-password-input wire:model="password" id="password" name="password" class="mt-1" autocomplete="current-password" placeholder="{{ __('Password') }}" />
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
 

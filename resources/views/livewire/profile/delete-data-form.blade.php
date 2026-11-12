@@ -46,7 +46,7 @@ $deleteData = function () {
 
             <div class="mt-6">
                 <label for="delete-data-password" class="sr-only">{{ __('Password') }}</label>
-                <x-text-input wire:model="password" id="delete-data-password" type="password" class="mt-1 block w-full" placeholder="{{ __('Password') }}" />
+                <x-password-input wire:model="password" id="delete-data-password" class="mt-1" autocomplete="current-password" placeholder="{{ __('Password') }}" />
                 @error('password') <p class="mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
 

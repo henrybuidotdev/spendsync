@@ -14,7 +14,6 @@
     "Chưa có giao dịch nào": "No transactions yet",
     "Chưa có khoản chi nào trong tháng này": "No spending this month",
     "Chưa có quy tắc nào. Khi bạn chọn danh mục cho một giao dịch, ứng dụng sẽ ghi nhớ cho các lần sau.": "No rules yet. When you pick a category for a transaction, the app remembers it for next time.",
-    "Chưa có tài khoản?": "Don't have an account?",
     "Chưa kết nối Gmail.": "Gmail is not connected.",
     "Chưa phân loại": "Uncategorized",
     "Chọn biểu tượng": "Choose an icon",
@@ -114,7 +113,6 @@
     "Đã ngắt kết nối": "Disconnected",
     "Đã ngắt kết nối Gmail và xóa mật khẩu ứng dụng. Giao dịch cũ vẫn được giữ.": "Gmail disconnected and app password deleted. Your transactions are kept.",
     "Đã xóa toàn bộ dữ liệu. Tài khoản đăng nhập vẫn được giữ.": "All data deleted. Your login was kept.",
-    "Đăng ký": "Sign up",
     "Đăng nhập Gmail của bạn nếu Google yêu cầu.": "Sign in to your Gmail if Google asks.",
     "Đăng xuất": "Log out",
     "Địa chỉ Gmail": "Gmail address",
@@ -137,5 +135,7 @@
     "Chỉ đọc email biến động số dư từ các ngân hàng được hỗ trợ. Email khác không bị đọc, và email không bị đánh dấu là đã đọc.": "Only balance-change emails from supported banks are read. Other emails are never read, and nothing is marked as read.",
     "Lần đồng bộ đầu lấy :days ngày gần nhất. Các lần sau lấy từ 1 ngày trước lần đồng bộ thành công gần nhất, email đã có sẽ được bỏ qua.": "The first sync looks back :days days. Each later sync starts 1 day before the last successful sync, and emails already imported are skipped.",
     "Xóa email trong Gmail không xóa giao dịch trong ứng dụng.": "Deleting an email in Gmail does not delete its transaction in the app.",
-    "Đang đồng bộ": "Syncing"
+    "Đang đồng bộ": "Syncing",
+    "Khi đăng ký, bạn đồng ý với": "By signing up, you agree to the",
+    "Hiện mật khẩu": "Show password"
 }

@@ -14,10 +14,6 @@
             <div class="rounded-2xl bg-white px-5 py-6 shadow-sm">
                 {{ $slot }}
             </div>
-
-            <p class="mt-6 text-center text-sm text-slate-500">
-                <a href="{{ route('privacy') }}" class="underline hover:text-slate-700">{{ __('Quyền riêng tư') }}</a>
-            </p>
         </div>
     </body>
 </html>
