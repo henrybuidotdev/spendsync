@@ -56,6 +56,13 @@
     <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="categories-heading">
         <h2 id="categories-heading" class="font-semibold">{{ __('Danh mục') }}</h2>
 
+        <div class="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1" role="group" aria-label="{{ __('Loại danh mục') }}">
+            @foreach(['expense' => __('Khoản chi'), 'income' => __('Khoản thu')] as $type => $label)
+                <button type="button" wire:click="showCategoryType('{{ $type }}')" aria-pressed="{{ $categoryType === $type ? 'true' : 'false' }}"
+                        @class(['min-h-11 rounded-lg text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-emerald-700 shadow-sm' => $categoryType === $type, 'text-slate-600 hover:text-slate-900' => $categoryType !== $type])>{{ $label }}</button>
+            @endforeach
+        </div>
+
         <ul class="mt-2 divide-y divide-slate-100">
             @foreach($categories as $category)
                 <li class="flex min-h-14 items-center gap-2 py-1" wire:key="category-{{ $category->id }}">
@@ -70,7 +77,7 @@
                         <x-category-icon :category="$category" class="h-8 w-8 text-lg" />
                         <span class="min-w-0 flex-1 truncate">
                             {{ $category->name }}
-                            <span class="text-xs text-slate-400">· {{ $category->type->value === 'income' ? __('Thu') : __('Chi') }} · {{ $category->transactions_count }}</span>
+                            <span class="text-xs text-slate-400">· {{ $category->transactions_count }}</span>
                         </span>
                         @if($category->isSystem())
                             <span class="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500" title="{{ __('Danh mục mặc định, không thể sửa hoặc xóa') }}">🔒 {{ __('Mặc định') }}</span>
@@ -85,19 +92,12 @@
         @error('editingName') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
 
         <form wire:submit="addCategory" class="mt-3 space-y-2 border-t border-slate-100 pt-3">
-            <p class="text-sm font-medium">{{ __('Thêm danh mục') }}</p>
+            <p class="text-sm font-medium">{{ $categoryType === 'income' ? __('Thêm khoản thu') : __('Thêm khoản chi') }}</p>
             <div class="flex gap-2">
                 <x-emoji-picker model="newIcon" :label="__('Chọn biểu tượng')" />
                 <label for="new-name" class="sr-only">{{ __('Tên danh mục') }}</label>
                 <input wire:model="newName" id="new-name" type="text" maxlength="50" placeholder="{{ __('Tên danh mục') }}" class="min-h-11 min-w-0 flex-1 rounded-xl border-slate-300 text-base focus:border-emerald-500 focus:ring-emerald-500">
-            </div>
-            <div class="flex gap-2">
-                <label for="new-type" class="sr-only">{{ __('Loại') }}</label>
-                <select wire:model="newType" id="new-type" class="min-h-11 flex-1 rounded-xl border-slate-300 text-base focus:border-emerald-500 focus:ring-emerald-500">
-                    <option value="expense">{{ __('Khoản chi') }}</option>
-                    <option value="income">{{ __('Khoản thu') }}</option>
-                </select>
-                <button type="submit" class="min-h-11 rounded-xl bg-emerald-600 px-4 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Thêm') }}</button>
+                <button type="submit" class="min-h-11 shrink-0 rounded-xl bg-emerald-600 px-4 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Thêm') }}</button>
             </div>
             @error('newName') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
         </form>

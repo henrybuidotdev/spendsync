@@ -370,7 +370,7 @@ test('categories can be added, renamed and deleted', function () {
     $transaction = Transaction::factory()->for($user)->create(['category_id' => $category->id]);
 
     Livewire::actingAs($user)->test(Settings::class)
-        ->set('newName', 'Thú cưng')->set('newIcon', '🐶')->set('newType', 'expense')
+        ->set('newName', 'Thú cưng')->set('newIcon', '🐶')
         ->call('addCategory')->assertHasNoErrors()
         ->call('editCategory', $category->id)->assertSet('editingIcon', $category->icon)
         ->set('editingName', 'Ăn ngoài')->set('editingIcon', '☕')
@@ -519,7 +519,8 @@ test('the emoji picker offers spending and income groups', function () {
         ->assertSee('Thu nhập')
         ->assertSeeHtml("\$wire.newIcon = '🧧'")
         ->assertSeeHtml("\$wire.newIcon = '🥖'")
-        ->set('newName', 'Lì xì')->set('newIcon', '🧧')->set('newType', 'income')
+        ->call('showCategoryType', 'income')
+        ->set('newName', 'Lì xì')->set('newIcon', '🧧')
         ->call('addCategory')
         ->assertHasNoErrors();
 
@@ -581,4 +582,28 @@ test('a category of the wrong kind cannot be assigned', function () {
         ->toThrow(ModelNotFoundException::class);
 
     expect($out->fresh()->category_id)->toBeNull();
+});
+
+test('settings lists one category type at a time and adds new categories as that type', function () {
+    $user = connectedUser();
+
+    $component = Livewire::actingAs($user)->test(Settings::class)
+        ->assertSet('categoryType', 'expense')
+        ->assertSee('Ăn uống')
+        ->assertDontSee('Lương')
+        ->assertDontSeeHtml('<select')
+        ->set('newName', 'Cà phê')
+        ->call('addCategory');
+
+    $component->call('showCategoryType', 'income')
+        ->assertSee('Lương')
+        ->assertDontSee('Ăn uống')
+        ->assertDontSee('Cà phê')
+        ->set('newName', 'Lì xì')
+        ->call('addCategory')
+        ->assertSee('Lì xì');
+
+    expect($user->categories()->pluck('type', 'name')->map->value->all())->toBe(['Cà phê' => 'expense', 'Lì xì' => 'income']);
+
+    $component->call('showCategoryType', 'nonsense')->assertSet('categoryType', 'expense');
 });

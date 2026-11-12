@@ -17,7 +17,8 @@ class Settings extends Component
 
     public string $newIcon = '';
 
-    public string $newType = 'expense';
+    /** Which kind of category the list shows and new categories get. */
+    public string $categoryType = 'expense';
 
     public ?int $editingId = null;
 
@@ -40,21 +41,27 @@ class Settings extends Component
         session()->flash('status', __('Đã ngắt kết nối Gmail và xóa mật khẩu ứng dụng. Giao dịch cũ vẫn được giữ.'));
     }
 
+    public function showCategoryType(string $type): void
+    {
+        $this->categoryType = CategoryType::tryFrom($type)?->value ?? CategoryType::Expense->value;
+        $this->reset('editingId', 'editingName', 'editingIcon');
+    }
+
     public function addCategory(): void
     {
         $validated = $this->validate([
             'newName' => ['required', 'string', 'max:50'],
             'newIcon' => ['nullable', 'string', 'max:16'],
-            'newType' => ['required', Rule::enum(CategoryType::class)],
+            'categoryType' => ['required', Rule::enum(CategoryType::class)],
         ], [], ['newName' => __('tên danh mục')]);
 
         auth()->user()->categories()->create([
             'name' => $validated['newName'],
             'icon' => $validated['newIcon'] ?: null,
-            'type' => $validated['newType'],
+            'type' => $validated['categoryType'],
         ]);
 
-        $this->reset('newName', 'newIcon', 'newType');
+        $this->reset('newName', 'newIcon');
     }
 
     public function editCategory(int $id): void
@@ -122,8 +129,8 @@ class Settings extends Component
         return view('livewire.settings', [
             'account' => $user->mailAccount,
             'categories' => $user->availableCategories()
+                ->where('type', $this->categoryType)
                 ->withCount(['transactions' => fn ($query) => $query->where('user_id', $user->id)])
-                ->orderBy('type')
                 ->orderByRaw('user_id is null desc')
                 ->orderBy('id')
                 ->get(),
