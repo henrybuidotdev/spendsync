@@ -31,20 +31,20 @@
 
     <section class="px-1" aria-labelledby="spent-heading">
         <h2 id="spent-heading" class="text-xs font-medium uppercase tracking-widest text-slate-500">{{ __('Spent') }}</h2>
-        <p class="mt-1 whitespace-nowrap text-4xl font-normal tracking-tight tabular-nums">{{ \Illuminate\Support\Str::beforeLast(Format::money($spent), ' ') }}<span class="text-slate-400"> ₫</span></p>
+        <p class="mt-1 whitespace-nowrap text-4xl font-normal tracking-tight font-num">{{ \Illuminate\Support\Str::beforeLast(Format::money($spent), ' ') }}<span class="text-slate-400"> ₫</span></p>
 
-        <dl class="mt-3 grid grid-cols-3 gap-2 text-sm">
+        <dl class="mt-3 grid grid-cols-3 gap-2 text-[13px]">
             <div>
                 <dt class="text-xs text-slate-500">{{ __('Total income') }}</dt>
-                <dd class="whitespace-nowrap font-medium tabular-nums text-emerald-600">{{ Format::money($income, signed: true) }}</dd>
+                <dd class="whitespace-nowrap font-medium font-num text-emerald-600">{{ Format::money($income, signed: true) }}</dd>
             </div>
             <div>
                 <dt class="text-xs text-slate-500">{{ __('Total spent') }}</dt>
-                <dd class="whitespace-nowrap font-medium tabular-nums">{{ Format::money($spent) }}</dd>
+                <dd class="whitespace-nowrap font-medium font-num">{{ Format::money($spent) }}</dd>
             </div>
             <div>
                 <dt class="text-xs text-slate-500">{{ __('Net') }}</dt>
-                <dd @class(['whitespace-nowrap font-medium tabular-nums', 'text-emerald-600' => $income >= $spent, 'text-red-600' => $income < $spent])>{{ Format::money($income - $spent, signed: true) }}</dd>
+                <dd @class(['whitespace-nowrap font-medium font-num', 'text-emerald-600' => $income >= $spent, 'text-red-600' => $income < $spent])>{{ Format::money($income - $spent, signed: true) }}</dd>
             </div>
         </dl>
     </section>

@@ -97,8 +97,11 @@ export default {
             },
             // No soft drop shadows: every shadow-* is a 1px hairline (composes with ring-* like any shadow).
             boxShadow: Object.fromEntries(['sm', 'DEFAULT', 'md', 'lg', 'xl', '2xl'].map((k) => [k, '0 0 0 1px rgb(var(--c-neutral-200))'])),
+            // Squarer corners than Tailwind's defaults; rounded-full (pills) is untouched.
+            borderRadius: { sm: '2px', DEFAULT: '2px', md: '3px', lg: '4px', xl: '4px', '2xl': '6px' },
             fontFamily: {
                 sans: ['Be Vietnam Pro', ...defaultTheme.fontFamily.sans],
+                num: ['IBM Plex Mono', ...defaultTheme.fontFamily.mono],
             },
         },
     },
