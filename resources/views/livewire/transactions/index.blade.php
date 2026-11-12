@@ -18,7 +18,7 @@
     @endif
 
     <div class="flex items-center justify-between gap-2">
-        <h1 class="text-2xl font-bold">{{ __('Giao dịch') }}</h1>
+        <h1 class="text-2xl font-semibold tracking-tight">{{ __('Giao dịch') }}</h1>
         @if($account?->status === \App\Enums\MailAccountStatus::Active)
             <button type="button" wire:click="syncNow" wire:loading.attr="disabled"
                     class="inline-flex min-h-11 items-center gap-1 rounded-xl bg-white px-3 text-sm font-medium text-emerald-700 shadow-sm ring-1 ring-slate-200 hover:bg-emerald-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
@@ -29,25 +29,30 @@
 
     <x-month-switcher :month="$monthStart" />
 
-    <dl class="grid grid-cols-2 gap-2">
-        <div class="rounded-2xl bg-white p-3 shadow-sm">
-            <dt class="text-xs text-slate-500">{{ __('Chi') }}</dt>
-            <dd class="mt-1 whitespace-nowrap font-bold tabular-nums text-red-600">{{ Format::money($spent) }}</dd>
-        </div>
-        <div class="rounded-2xl bg-white p-3 shadow-sm">
-            <dt class="text-xs text-slate-500">{{ __('Thu') }}</dt>
-            <dd class="mt-1 whitespace-nowrap font-bold tabular-nums text-emerald-600">{{ Format::money($income) }}</dd>
-        </div>
-        <div class="col-span-2 flex items-center justify-between rounded-2xl bg-white px-3 py-2.5 shadow-sm">
-            <dt class="text-sm text-slate-500">{{ __('Chênh lệch') }}</dt>
-            <dd @class(['whitespace-nowrap font-bold tabular-nums', 'text-emerald-600' => $income >= $spent, 'text-red-600' => $income < $spent])>{{ Format::money($income - $spent, signed: true) }}</dd>
-        </div>
-    </dl>
+    <section class="px-1" aria-labelledby="spent-heading">
+        <h2 id="spent-heading" class="text-xs font-medium uppercase tracking-widest text-slate-500">{{ __('Đã chi') }}</h2>
+        <p class="mt-1 whitespace-nowrap text-4xl font-normal tracking-tight tabular-nums">{{ \Illuminate\Support\Str::beforeLast(Format::money($spent), ' ') }}<span class="text-slate-400"> ₫</span></p>
 
-    <div class="-mx-4 flex gap-2 overflow-x-auto px-4 py-2" role="group" aria-label="{{ __('Lọc giao dịch') }}">
+        <dl class="mt-3 grid grid-cols-3 gap-2 text-sm">
+            <div>
+                <dt class="text-xs text-slate-500">{{ __('Thu') }}</dt>
+                <dd class="whitespace-nowrap font-medium tabular-nums text-emerald-600">{{ Format::money($income, signed: true) }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs text-slate-500">{{ __('Chi') }}</dt>
+                <dd class="whitespace-nowrap font-medium tabular-nums">{{ Format::money($spent) }}</dd>
+            </div>
+            <div>
+                <dt class="text-xs text-slate-500">{{ __('Chênh lệch') }}</dt>
+                <dd @class(['whitespace-nowrap font-medium tabular-nums', 'text-emerald-600' => $income >= $spent, 'text-red-600' => $income < $spent])>{{ Format::money($income - $spent, signed: true) }}</dd>
+            </div>
+        </dl>
+    </section>
+
+    <div class="flex gap-1 overflow-x-auto rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Lọc giao dịch') }}">
         @foreach(['all' => __('Tất cả'), 'uncategorized' => __('Chưa phân loại'), 'in' => __('Tiền vào'), 'out' => __('Tiền ra')] as $value => $label)
             <button type="button" wire:click="setFilter('{{ $value }}')" aria-pressed="{{ $filter === $value ? 'true' : 'false' }}"
-                    @class(['min-h-11 shrink-0 rounded-full px-4 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-black text-white' => $filter === $value, 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-100' => $filter !== $value])>
+                    @class(['min-h-11 flex-1 shrink-0 whitespace-nowrap rounded-full px-3 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => $filter === $value, 'text-slate-600 hover:text-slate-900' => $filter !== $value])>
                 {{ $label }}
             </button>
         @endforeach

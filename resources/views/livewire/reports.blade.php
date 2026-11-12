@@ -1,7 +1,7 @@
 @php use App\Support\Format; @endphp
 
 <div class="space-y-4">
-    <h1 class="text-2xl font-bold">{{ __('Báo cáo') }}</h1>
+    <h1 class="text-2xl font-semibold tracking-tight">{{ __('Báo cáo') }}</h1>
 
     <x-month-switcher :month="$monthStart" />
 
@@ -16,20 +16,23 @@
         <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="by-category">
             <div class="flex items-baseline justify-between">
                 <h2 id="by-category" class="font-semibold">{{ __('Chi theo danh mục') }}</h2>
-                <p class="font-bold tabular-nums text-red-600">{{ Format::money($total) }}</p>
+                <p class="font-semibold tabular-nums">{{ Format::money($total) }}</p>
             </div>
 
-            <ol class="mt-4 space-y-3">
+            <div class="mt-3 flex h-2.5 gap-0.5 overflow-hidden rounded-full" role="presentation">
                 @foreach($byCategory as $row)
-                    @php($percent = round(100 * $row->total / $total, 1))
-                    <li>
-                        <div class="flex items-center justify-between gap-2 text-sm">
-                            <span class="flex min-w-0 items-center gap-2"><x-category-icon :category="$row->category" class="h-7 w-7 text-base" /><span class="truncate">{{ $row->name }} <span class="text-slate-400">· {{ $row->count }}</span></span></span>
-                            <span class="shrink-0 tabular-nums"><span class="font-semibold">{{ Format::money($row->total) }}</span> <span class="text-slate-500">{{ $percent }}%</span></span>
-                        </div>
-                        <div class="mt-1 h-2.5 overflow-hidden rounded-full bg-slate-100" role="presentation">
-                            <div class="h-full rounded-full bg-emerald-500" style="width: {{ max($percent, 1) }}%"></div>
-                        </div>
+                    <div class="h-full" style="width: {{ 100 * $row->total / $total }}%; background-color: rgb(var(--c-chart-{{ $loop->index % 8 + 1 }}))"></div>
+                @endforeach
+            </div>
+
+            <ol class="mt-2 divide-y divide-slate-100">
+                @foreach($byCategory as $row)
+                    <li class="flex items-center gap-2 py-2.5 text-sm">
+                        <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color: rgb(var(--c-chart-{{ $loop->index % 8 + 1 }}))" aria-hidden="true"></span>
+                        <x-category-icon :category="$row->category" class="h-7 w-7 text-base" />
+                        <span class="min-w-0 flex-1 truncate">{{ $row->name }} <span class="text-slate-400">· {{ $row->count }}</span></span>
+                        <span class="shrink-0 tabular-nums text-slate-500">{{ round(100 * $row->total / $total, 1) }}%</span>
+                        <span class="w-28 shrink-0 text-right font-semibold tabular-nums">{{ Format::money($row->total) }}</span>
                     </li>
                 @endforeach
             </ol>

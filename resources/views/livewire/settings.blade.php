@@ -6,7 +6,7 @@
 <div class="space-y-5">
     <x-flash />
 
-    <h1 class="text-2xl font-bold">{{ __('Cài đặt') }}</h1>
+    <h1 class="text-2xl font-semibold tracking-tight">{{ __('Cài đặt') }}</h1>
 
     <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="account-heading">
         <h2 id="account-heading" class="font-semibold">{{ __('Tài khoản Gmail') }}</h2>
@@ -56,10 +56,10 @@
     <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="categories-heading">
         <h2 id="categories-heading" class="font-semibold">{{ __('Danh mục') }}</h2>
 
-        <div class="mt-3 grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1" role="group" aria-label="{{ __('Loại danh mục') }}">
+        <div class="mt-3 grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1" role="group" aria-label="{{ __('Loại danh mục') }}">
             @foreach(['expense' => __('Khoản chi'), 'income' => __('Khoản thu')] as $type => $label)
                 <button type="button" wire:click="showCategoryType('{{ $type }}')" aria-pressed="{{ $categoryType === $type ? 'true' : 'false' }}"
-                        @class(['min-h-11 rounded-lg text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-emerald-700 shadow-sm' => $categoryType === $type, 'text-slate-600 hover:text-slate-900' => $categoryType !== $type])>{{ $label }}</button>
+                        @class(['min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => $categoryType === $type, 'text-slate-600 hover:text-slate-900' => $categoryType !== $type])>{{ $label }}</button>
             @endforeach
         </div>
 
@@ -121,10 +121,10 @@
 
     <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="language-heading">
         <h2 id="language-heading" class="font-semibold">{{ __('Ngôn ngữ') }}</h2>
-        <div class="mt-2 grid grid-cols-2 gap-2" role="group">
+        <div class="mt-2 grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1" role="group">
             @foreach(['vi' => 'Tiếng Việt', 'en' => 'English'] as $code => $label)
                 <button type="button" wire:click="setLocale('{{ $code }}')" aria-pressed="{{ app()->getLocale() === $code ? 'true' : 'false' }}"
-                        @class(['min-h-11 rounded-xl text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-black text-white' => app()->getLocale() === $code, 'bg-slate-50 ring-1 ring-slate-200 hover:bg-slate-100' => app()->getLocale() !== $code])>{{ $label }}</button>
+                        @class(['min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white text-slate-900 shadow-sm' => app()->getLocale() === $code, 'text-slate-600 hover:text-slate-900' => app()->getLocale() !== $code])>{{ $label }}</button>
             @endforeach
         </div>
     </section>
@@ -145,11 +145,11 @@
                  },
              }">
         <h2 id="theme-heading" class="font-semibold">{{ __('Giao diện') }}</h2>
-        <div class="mt-2 grid grid-cols-3 gap-2" role="group">
+        <div class="mt-2 grid grid-cols-3 gap-1 rounded-full bg-slate-100 p-1" role="group">
             @foreach(['light' => __('Sáng'), 'dark' => __('Tối'), 'system' => __('Theo hệ thống')] as $value => $label)
                 <button type="button" x-on:click="setTheme('{{ $value }}')" x-bind:aria-pressed="theme === '{{ $value }}'"
-                        class="min-h-11 rounded-xl text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-                        x-bind:class="theme === '{{ $value }}' ? 'bg-black text-white' : 'bg-slate-50 ring-1 ring-slate-200 hover:bg-slate-100'">{{ $label }}</button>
+                        class="min-h-11 rounded-full text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                        x-bind:class="theme === '{{ $value }}' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'">{{ $label }}</button>
             @endforeach
         </div>
     </section>

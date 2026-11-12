@@ -2,60 +2,63 @@ import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
 import plugin from 'tailwindcss/plugin';
 
-// Flexoki palette (https://stephango.com/flexoki, MIT), the base of Wealthfolio's look.
+// Calm neutral palette inspired by Wealthfolio: cool off-white page, white cards, sage/brick accents.
 // Existing slate/gray/emerald/... classes are remapped onto it, so views need no edits.
-const base = {
-    50: '#F2F0E5', 100: '#E6E4D9', 150: '#DAD8CE', 200: '#CECDC3', 300: '#B7B5AC',
-    400: '#9F9D96', 500: '#878580', 600: '#6F6E69', 700: '#575653', 800: '#403E3C',
-    850: '#343331', 900: '#282726', 950: '#1C1B1A',
+const neutral = {
+    50: '#F7F7F6', 100: '#EFEFEE', 150: '#E7E7E6', 200: '#E2E2E0', 300: '#D0D0CE',
+    400: '#A3A3A1', 500: '#6B6B6A', 600: '#585857', 700: '#454544', 800: '#3A3A39',
+    850: '#2F2F2E', 900: '#262626', 950: '#171717',
 };
 
 const green = {
-    50: '#EDEECF', 100: '#DDE2B2', 150: '#CDD597', 200: '#BEC97E', 300: '#A0AF54',
-    400: '#879A39', 500: '#768D21', 600: '#66800B', 700: '#536907', 800: '#3D4C07',
-    850: '#313D07', 900: '#252D09', 950: '#1A1E0C',
+    50: '#EEF5F0', 100: '#DCEBE0', 150: '#C9E0D0', 200: '#B3D4BC', 300: '#8DBD9A',
+    400: '#6BA77A', 500: '#4E8E5E', 600: '#3B7A4A', 700: '#2F6140', 800: '#254C33',
+    850: '#1F3F2B', 900: '#1A3324', 950: '#10241A',
 };
 
 const red = {
-    50: '#FFE1D5', 100: '#FFCABB', 150: '#FDB2A2', 200: '#F89A8A', 300: '#E8705F',
-    400: '#D14D41', 500: '#C03E35', 600: '#AF3029', 700: '#942822', 800: '#6C201C',
-    850: '#551B18', 900: '#3E1715', 950: '#261312',
+    50: '#FBEEEC', 100: '#F6DCD7', 150: '#F0C8C1', 200: '#EAB3AA', 300: '#E8988D',
+    400: '#E07A6C', 500: '#C9554A', 600: '#B03A2E', 700: '#8E2F25', 800: '#6B241D',
+    850: '#571E18', 900: '#431813', 950: '#2A100D',
 };
 
 const yellow = {
-    50: '#FAEEC6', 100: '#F6E2A0', 150: '#F1D67E', 200: '#ECCB60', 300: '#DFB431',
-    400: '#D0A215', 500: '#BE9207', 600: '#AD8301', 700: '#8E6B01', 800: '#664D01',
-    850: '#503D02', 900: '#3A2D04', 950: '#241E08',
+    50: '#FAF5E8', 100: '#F3E9CF', 150: '#EDDFB9', 200: '#E7D4A3', 300: '#D6BA74',
+    400: '#C4A157', 500: '#A88944', 600: '#8A6F35', 700: '#6C5729', 800: '#51411F',
+    850: '#45371A', 900: '#382D16', 950: '#221B0D',
 };
 
 const blue = {
-    50: '#E1ECEB', 100: '#C6DDE8', 150: '#ABCFE2', 200: '#92BFDB', 300: '#66A0C8',
-    400: '#4385BE', 500: '#3171B2', 600: '#205EA6', 700: '#1A4F8C', 800: '#163B66',
-    850: '#133051', 900: '#12253B', 950: '#101A24',
+    50: '#EEF2F8', 100: '#DCE4F0', 150: '#CBD7E8', 200: '#BACAE1', 300: '#93AACD',
+    400: '#6F8CB8', 500: '#56729F', 600: '#465D84', 700: '#384A69', 800: '#2B3850',
+    850: '#253045', 900: '#1F2839', 950: '#131924',
+};
+
+// Muted categorical colors for charts (slate blue, sand, lavender, terracotta, sage, rose, teal, grey).
+const chart = {
+    1: '#5B7AA8', 2: '#B99F64', 3: '#9A8BC0', 4: '#B3705A',
+    5: '#6E9A7E', 6: '#C07B9B', 7: '#659892', 8: '#A3A3A1',
 };
 
 // Dark mode mirrors a scale: tints become shades, so bg-x-50 stays "subtle" and text-x-700 stays "strong".
 const mirror = (scale) => Object.fromEntries(Object.keys(scale).map((k) => [k, scale[1000 - k]]));
 
-// Flexoki mid tones are lighter than Tailwind's, so some steps shift to keep WCAG AA (4.5:1) text.
 const palettes = {
     neutral: {
-        light: { ...base, 500: base[600], 600: base[700] },
+        light: neutral,
         dark: {
-            50: '#100F0F', 100: '#282726', 150: '#343331', 200: '#403E3C', 300: '#575653',
-            400: '#6F6E69', 500: '#9F9D96', 600: '#B7B5AC', 700: '#CECDC3', 800: '#DAD8CE',
-            850: '#E6E4D9', 900: '#E6E4D9', 950: '#F2F0E5',
+            50: '#0C0C0C', 100: '#222222', 150: '#2A2A2A', 200: '#2E2E2E', 300: '#3D3D3D',
+            400: '#5C5C5C', 500: '#A3A3A3', 600: '#B8B8B8', 700: '#D4D4D4', 800: '#E0E0E0',
+            850: '#E8E8E8', 900: '#E8E8E8', 950: '#F5F5F5',
         },
     },
-    brand: {
-        light: { ...green, 500: green[600], 600: green[700], 700: green[800], 800: green[850], 900: green[900] },
-        dark: mirror(green),
-    },
-    red: { light: red, dark: { ...mirror(red), 600: red[300], 700: red[200] } },
+    brand: { light: green, dark: mirror(green) },
+    red: { light: red, dark: mirror(red) },
     yellow: { light: yellow, dark: mirror(yellow) },
     blue: { light: blue, dark: mirror(blue) },
-    ink: { light: { DEFAULT: '#100F0F' }, dark: { DEFAULT: '#CECDC3' } },
-    paper: { light: { DEFAULT: '#FFFCF0' }, dark: { DEFAULT: '#1C1B1A' } },
+    chart: { light: chart, dark: chart },
+    ink: { light: { DEFAULT: '#171717' }, dark: { DEFAULT: '#DADADA' } },
+    paper: { light: { DEFAULT: '#FFFFFF' }, dark: { DEFAULT: '#171717' } },
 };
 
 const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(' ');
@@ -91,6 +94,9 @@ export default {
                 yellow: color('yellow'),
                 sky: color('blue'),
                 blue: color('blue'),
+            },
+            boxShadow: {
+                sm: '0 1px 2px 0 rgb(0 0 0 / 0.04), 0 2px 8px -2px rgb(0 0 0 / 0.06)',
             },
             fontFamily: {
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],

@@ -6,7 +6,7 @@
     <body class="bg-slate-100 font-sans text-slate-900 antialiased">
         <main class="mx-auto max-w-md space-y-4 px-4 py-6">
             <a href="{{ url('/') }}" class="inline-flex min-h-11 items-center font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">‹ {{ config('app.name') }}</a>
-            <h1 class="text-2xl font-bold">Quyền riêng tư</h1>
+            <h1 class="text-2xl font-semibold tracking-tight">Quyền riêng tư</h1>
             <p class="text-slate-600">Ngắn gọn, dễ hiểu: chúng tôi đọc gì, lưu gì và cách bạn xóa hết.</p>
 
             @foreach([
