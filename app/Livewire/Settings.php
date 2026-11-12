@@ -67,6 +67,7 @@ class Settings extends Component
             'name' => $validated['newName'],
             'icon' => $validated['newIcon'] ?: null,
             'type' => $validated['categoryType'],
+            'order' => 1,
         ]);
 
         $this->reset('newName', 'newIcon');

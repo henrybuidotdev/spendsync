@@ -48,7 +48,7 @@
 
         @if($this->ruleTarget())
             <label class="mt-5 flex min-h-11 cursor-pointer items-start gap-3 text-sm">
-                <input type="checkbox" wire:model="applyToFuture" class="mt-0.5 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                <input type="checkbox" wire:model.live="applyToFuture" class="mt-0.5 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
                 <span>{{ __('Apply to future transactions with') }} <em class="font-semibold not-italic">{{ \Illuminate\Support\Str::limit($this->ruleTarget(), 60) }}</em></span>
             </label>
         @endif

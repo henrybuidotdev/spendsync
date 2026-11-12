@@ -335,6 +335,83 @@ test('unticking the checkbox only categorizes this transaction', function () {
         ->and($sibling->fresh()->category_id)->toBeNull();
 });
 
+test('the checkbox shows whether a rule exists and unticking removes the rule', function () {
+    $user = connectedUser();
+    $category = $user->availableCategories()->first();
+    $transaction = Transaction::factory()->for($user)->create(['counterparty' => 'X']);
+    $show = fn () => Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction->fresh()]);
+
+    $show()->assertSet('applyToFuture', true)->call('setCategory', $category->id);
+
+    expect(CategoryRule::count())->toBe(1);
+
+    $show()->assertSet('applyToFuture', true)->set('applyToFuture', false)->assertSee('Đã xóa quy tắc.');
+
+    expect(CategoryRule::count())->toBe(0);
+
+    $show()->assertSet('applyToFuture', false)->set('applyToFuture', true);
+
+    expect(CategoryRule::sole()->category_id)->toBe($category->id);
+});
+
+test('a transaction in another category than the rule is an exception and never removes the rule', function () {
+    $user = connectedUser();
+    $food = $user->availableCategories()->where('name', 'Food & drink')->first();
+    $bills = $user->availableCategories()->where('name', 'Bills')->first();
+    $usual = Transaction::factory()->for($user)->create(['counterparty' => 'X']);
+    $exception = Transaction::factory()->for($user)->create(['counterparty' => 'X']);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $usual])->call('setCategory', $food->id);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $exception->fresh()])
+        ->assertSet('applyToFuture', true)
+        ->call('setCategory', $bills->id)
+        ->assertSet('applyToFuture', false);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $exception->fresh()])
+        ->assertSet('applyToFuture', false)
+        ->set('applyToFuture', false);
+
+    expect(CategoryRule::sole()->category_id)->toBe($food->id)
+        ->and($exception->fresh()->category_id)->toBe($bills->id);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $usual])->assertSet('applyToFuture', true);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $exception->fresh()])->set('applyToFuture', true);
+
+    expect(CategoryRule::sole()->category_id)->toBe($bills->id);
+});
+
+test('ticking and unticking update the account rule, and the same account in another category opens unticked', function () {
+    $user = connectedUser();
+    $food = $user->availableCategories()->where('name', 'Food & drink')->first();
+    $bills = $user->availableCategories()->where('name', 'Bills')->first();
+    $inFood = Transaction::factory()->for($user)->create(['counterparty' => 'A', 'counterparty_account' => '0451000555666', 'category_id' => $food->id]);
+    $inBills = Transaction::factory()->for($user)->create(['counterparty' => 'B', 'counterparty_account' => '0451000555666', 'category_id' => $bills->id]);
+    $rule = fn () => CategoryRule::where('user_id', $user->id)->get(['match_field', 'match_value', 'category_id'])->toArray();
+    $open = fn (Transaction $transaction) => Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction->fresh()]);
+
+    $open($inFood)->assertSet('applyToFuture', false)->set('applyToFuture', true);
+
+    expect($rule())->toBe([['match_field' => 'account', 'match_value' => '0451000555666', 'category_id' => $food->id]]);
+
+    $open($inFood)->assertSet('applyToFuture', true);
+    $open($inBills)->assertSet('applyToFuture', false)->set('applyToFuture', false);
+
+    expect($rule())->toHaveCount(1);
+
+    $open($inFood)->set('applyToFuture', false);
+
+    expect($rule())->toBe([]);
+
+    $open($inBills)->set('applyToFuture', true);
+
+    expect($rule())->toBe([['match_field' => 'account', 'match_value' => '0451000555666', 'category_id' => $bills->id]]);
+
+    $open($inFood)->assertSet('applyToFuture', false);
+    $open($inBills)->assertSet('applyToFuture', true);
+});
+
 test('notes save automatically, trimmed, and clearing removes them', function () {
     $user = connectedUser();
     $transaction = Transaction::factory()->for($user)->create();
@@ -605,7 +682,9 @@ test('the emoji picker offers spending and income groups', function () {
         ->call('addCategory')
         ->assertHasNoErrors();
 
-    expect($user->availableCategories()->where('name', 'Lì xì')->value('icon'))->toBe('🧧');
+    expect($user->availableCategories()->where('name', 'Lì xì')->value('icon'))->toBe('🧧')
+        ->and($user->availableCategories()->where('type', 'income')->ordered()->pluck('name')->all())
+        ->toBe(['Salary', 'Gifts', 'Sales', 'Lì xì', 'Other income']);
 });
 
 test('system categories are locked in settings and cannot be edited or deleted', function () {

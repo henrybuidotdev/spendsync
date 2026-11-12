@@ -26,9 +26,11 @@ class Show extends Component
     #[Url]
     public string $filter = 'all';
 
-    public function mount(Transaction $transaction): void
+    public function mount(Transaction $transaction, CategoryMatcher $matcher): void
     {
         $this->authorize('view', $transaction);
+
+        $this->applyToFuture = $transaction->category_id === null || $matcher->follows($transaction);
 
         $this->note = (string) $transaction->note;
     }
@@ -43,13 +45,40 @@ class Show extends Component
 
         $message = __('Category saved.');
 
-        if ($this->applyToFuture && $this->ruleTarget() !== null) {
+        if ($this->applyToFuture && $this->ruleTarget() !== null && $matcher->ruleFor($this->transaction) === null) {
             $count = $matcher->backfill($matcher->remember($this->transaction, $category));
             $message = __('Category saved and applied to :count other transactions.', ['count' => $count]);
         }
 
+        $this->applyToFuture = $matcher->follows($this->transaction);
+
         $this->transaction->load('category');
         session()->flash('status', $message);
+    }
+
+    public function updatedApplyToFuture(): void
+    {
+        $this->authorize('update', $this->transaction);
+
+        if ($this->transaction->category_id === null) {
+            return;
+        }
+
+        if ($this->ruleTarget() === null) {
+            return;
+        }
+
+        $matcher = app(CategoryMatcher::class);
+
+        if (! $this->applyToFuture) {
+            $matcher->forget($this->transaction);
+            session()->flash('status', __('Rule removed.'));
+
+            return;
+        }
+
+        $count = $matcher->backfill($matcher->remember($this->transaction, $this->transaction->category));
+        session()->flash('status', __('Rule saved and applied to :count other transactions.', ['count' => $count]));
     }
 
     public function updatedNote(): void

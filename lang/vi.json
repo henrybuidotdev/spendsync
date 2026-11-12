@@ -191,5 +191,7 @@
     "Debt repayment": "Trả nợ",
     "Debt collection": "Thu nợ",
     "Borrowing": "Đi vay",
-    "Investment": "Đầu tư"
+    "Investment": "Đầu tư",
+    "Rule removed.": "Đã xóa quy tắc.",
+    "Rule saved and applied to :count other transactions.": "Đã lưu quy tắc và áp dụng cho :count giao dịch khác."
 }

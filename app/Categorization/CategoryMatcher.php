@@ -39,6 +39,28 @@ class CategoryMatcher
     /** Creates or updates the rule mapping this transaction's account number (or name, or description) to the category. */
     public function remember(Transaction $transaction, Category $category): CategoryRule
     {
+        return CategoryRule::updateOrCreate(self::ruleKey($transaction), ['category_id' => $category->id]);
+    }
+
+    /** Deletes the rule only when it points to this transaction's category, so an exception never removes the usual rule. */
+    public function forget(Transaction $transaction): void
+    {
+        CategoryRule::where(self::ruleKey($transaction))->where('category_id', $transaction->category_id)->delete();
+    }
+
+    public function ruleFor(Transaction $transaction): ?CategoryRule
+    {
+        return CategoryRule::where(self::ruleKey($transaction))->first();
+    }
+
+    public function follows(Transaction $transaction): bool
+    {
+        return $this->ruleFor($transaction)?->category_id === $transaction->category_id;
+    }
+
+    /** @return array{user_id: int, match_field: MatchField, match_value: string} */
+    private static function ruleKey(Transaction $transaction): array
+    {
         $field = self::ruleField($transaction);
         $value = match ($field) {
             MatchField::Account => $transaction->counterparty_account,
@@ -46,14 +68,11 @@ class CategoryMatcher
             MatchField::Description => $transaction->description,
         };
 
-        return CategoryRule::updateOrCreate(
-            [
-                'user_id' => $transaction->user_id,
-                'match_field' => $field,
-                'match_value' => TextNormalizer::fold($value),
-            ],
-            ['category_id' => $category->id],
-        );
+        return [
+            'user_id' => $transaction->user_id,
+            'match_field' => $field,
+            'match_value' => TextNormalizer::fold($value),
+        ];
     }
 
     public static function ruleField(Transaction $transaction): MatchField
