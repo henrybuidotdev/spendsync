@@ -14,7 +14,7 @@ form(LoginForm::class);
 // TEMP demo prefill (local only) — remove before launch.
 mount(function () {
     if (app()->isLocal()) {
-        $this->form->email = 'demo@thuchi.test';
+        $this->form->email = 'demo@beanpulse.test';
         $this->form->password = 'password';
     }
 });

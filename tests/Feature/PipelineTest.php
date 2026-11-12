@@ -127,7 +127,7 @@ test('messages from unknown senders are never stored even if the mailbox returns
 });
 
 test('transaction times are stored in UTC', function () {
-    $this->artisan('thuchi:import-eml', ['user' => User::factory()->create()->id, 'path' => fixturesPath().'/VCB/05_receipt_transfer.eml'])->assertSuccessful();
+    $this->artisan('beanpulse:import-eml', ['user' => User::factory()->create()->id, 'path' => fixturesPath().'/VCB/05_receipt_transfer.eml'])->assertSuccessful();
 
     expect(DB::table('transactions')->value('occurred_at'))->toBe('2026-10-15 12:09:00')
         ->and(Transaction::first()->occurred_at->timezone('Asia/Ho_Chi_Minh')->format('H:i'))->toBe('19:09');
@@ -136,11 +136,11 @@ test('transaction times are stored in UTC', function () {
 test('import-eml imports a folder once and parses everything', function () {
     $user = User::factory()->create();
 
-    $this->artisan('thuchi:import-eml', ['user' => $user->email, 'path' => fixturesPath()])
+    $this->artisan('beanpulse:import-eml', ['user' => $user->email, 'path' => fixturesPath()])
         ->expectsOutputToContain('Imported 18 of 18 files.')
         ->assertSuccessful();
 
-    $this->artisan('thuchi:import-eml', ['user' => $user->email, 'path' => fixturesPath()])
+    $this->artisan('beanpulse:import-eml', ['user' => $user->email, 'path' => fixturesPath()])
         ->expectsOutputToContain('Imported 0 of 18 files.');
 
     expect($user->transactions()->count())->toBe(14)
@@ -149,7 +149,7 @@ test('import-eml imports a folder once and parses everything', function () {
 });
 
 test('import-eml fails for unknown users', function () {
-    $this->artisan('thuchi:import-eml', ['user' => 'nobody@x.test', 'path' => fixturesPath()])->assertFailed();
+    $this->artisan('beanpulse:import-eml', ['user' => 'nobody@x.test', 'path' => fixturesPath()])->assertFailed();
 });
 
 test('unparseable emails store a reason and log ids without the body', function () {
@@ -183,7 +183,7 @@ test('emails without a parser are marked unsupported_sender', function () {
 test('non-transaction bank emails are marked parsed with no transaction', function () {
     $user = User::factory()->create();
 
-    $this->artisan('thuchi:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/MB/90_otp.eml']);
+    $this->artisan('beanpulse:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/MB/90_otp.eml']);
 
     expect($user->rawEmails()->first()->parsed_at)->not->toBeNull()
         ->and($user->transactions()->count())->toBe(0);
@@ -191,28 +191,28 @@ test('non-transaction bank emails are marked parsed with no transaction', functi
 
 test('reparse --failed fixes emails after a parser fix and keeps the category', function () {
     $user = User::factory()->create();
-    $this->artisan('thuchi:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/TCB']);
+    $this->artisan('beanpulse:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/TCB']);
     $transaction = $user->transactions()->first();
     $transaction->update(['category_id' => $user->availableCategories()->first()->id, 'amount' => 1]);
     $user->rawEmails()->first()->update(['parse_error' => 'old_bug', 'parsed_at' => null]);
 
-    $this->artisan('thuchi:reparse', ['--failed' => true])
+    $this->artisan('beanpulse:reparse', ['--failed' => true])
         ->expectsOutputToContain('Reparsed 1 emails, 0 failed.')
         ->assertSuccessful();
 
     expect(RawEmail::whereNotNull('parse_error')->count())->toBe(0)
         ->and($user->transactions()->count())->toBe(3);
 
-    $this->artisan('thuchi:reparse', ['--bank' => 'tcb'])->expectsOutputToContain('Reparsed 4 emails');
+    $this->artisan('beanpulse:reparse', ['--bank' => 'tcb'])->expectsOutputToContain('Reparsed 4 emails');
 
     expect($transaction->fresh()->amount)->not->toBe(1)
         ->and($transaction->fresh()->category_id)->toBe($user->availableCategories()->first()->id);
 });
 
 test('parse-stats shows 100% for the fixtures', function () {
-    $this->artisan('thuchi:import-eml', ['user' => User::factory()->create()->id, 'path' => fixturesPath()]);
+    $this->artisan('beanpulse:import-eml', ['user' => User::factory()->create()->id, 'path' => fixturesPath()]);
 
-    $this->artisan('thuchi:parse-stats')
+    $this->artisan('beanpulse:parse-stats')
         ->expectsTable(['Bank', 'Total', 'Parsed', 'Failed', 'Success'], [
             ['MB', 5, 5, 0, '100%'],
             ['TCB', 4, 4, 0, '100%'],
@@ -221,12 +221,12 @@ test('parse-stats shows 100% for the fixtures', function () {
         ->assertSuccessful();
 });
 
-test('thuchi:sync syncs active accounts now', function () {
+test('beanpulse:sync syncs active accounts now', function () {
     fakeMailbox();
     MailAccount::factory()->create();
     MailAccount::factory()->needsReconnect()->create();
 
-    $this->artisan('thuchi:sync')->expectsOutputToContain('Synced 1 accounts.')->assertSuccessful();
+    $this->artisan('beanpulse:sync')->expectsOutputToContain('Synced 1 accounts.')->assertSuccessful();
 
     expect(Transaction::count())->toBe(14);
 });
@@ -246,7 +246,7 @@ test('parsed transactions get categorized by existing rules', function () {
     $food = $user->availableCategories()->where('name', 'Ăn uống')->first();
     CategoryRule::create(['user_id' => $user->id, 'match_field' => MatchField::Description, 'match_value' => 'highlands coffee', 'category_id' => $food->id]);
 
-    $this->artisan('thuchi:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/VCB']);
+    $this->artisan('beanpulse:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/VCB']);
 
     expect($user->transactions()->where('category_id', $food->id)->pluck('amount')->all())->toBe([89000]);
 });
@@ -255,7 +255,7 @@ test('the demo seeder creates a populated, categorized demo account', function (
     $this->seed(DemoSeeder::class);
     $this->seed(DemoSeeder::class);
 
-    $user = User::where('email', 'demo@thuchi.test')->sole();
+    $user = User::where('email', 'demo@beanpulse.test')->sole();
 
     expect(Hash::check('password', $user->password))->toBeTrue()
         ->and($user->transactions()->count())->toBe(14)

@@ -13,7 +13,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ImportEmlCommand extends Command
 {
-    protected $signature = 'thuchi:import-eml {user : User id or email} {path : An .eml file or a folder of them (searched recursively)}';
+    protected $signature = 'beanpulse:import-eml {user : User id or email} {path : An .eml file or a folder of them (searched recursively)}';
 
     protected $description = 'Import .eml files as raw emails for a user and parse them (dev/demo path, no Gmail needed)';
 

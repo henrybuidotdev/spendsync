@@ -1,5 +1,5 @@
 // Caches hashed build assets only (their URLs change with their content). Pages, data and icons always come from the network.
-const CACHE = 'thuchi-static-v2';
+const CACHE = 'beanpulse-static-v2';
 
 self.addEventListener('install', () => self.skipWaiting());
 

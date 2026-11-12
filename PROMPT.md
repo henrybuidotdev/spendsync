@@ -1,4 +1,4 @@
-# Build: "ThuChi Auto" — MVP spending tracker that reads bank emails via IMAP
+# Build: "BeanPulse" — MVP spending tracker that reads bank emails via IMAP
 
 You are building a complete, working MVP from an empty directory. You will work **unattended overnight**. Nobody will answer questions. Read this whole document before writing code.
 
@@ -169,10 +169,10 @@ Real client requirements:
    - Exception: store `parse_error` and write a `Log::warning` that includes raw_email id and bank code, but **no email body**.
 3. Scheduler: every 5 minutes, dispatch `SyncMailAccount` for each `active` account. Use `withoutOverlapping()`.
 4. Artisan commands:
-   - `thuchi:sync {account?}` runs a sync now (all accounts, or one).
-   - `thuchi:reparse {--failed} {--bank=}` re-runs parsing over stored raw emails. Use it after fixing a parser.
-   - `thuchi:import-eml {user} {path}` imports `.eml` files from a folder as raw emails and parses them. This is the dev and demo path that needs no Gmail.
-   - `thuchi:parse-stats` prints a table per bank: total, parsed, failed, and success %.
+   - `beanpulse:sync {account?}` runs a sync now (all accounts, or one).
+   - `beanpulse:reparse {--failed} {--bank=}` re-runs parsing over stored raw emails. Use it after fixing a parser.
+   - `beanpulse:import-eml {user} {path}` imports `.eml` files from a folder as raw emails and parses them. This is the dev and demo path that needs no Gmail.
+   - `beanpulse:parse-stats` prints a table per bank: total, parsed, failed, and success %.
 
 Categorization:
 - `CategoryMatcher::match(Transaction)` checks the user's rules against the normalized counterparty, then the description. Normalized means lowercased with Vietnamese accents stripped.
@@ -185,7 +185,7 @@ Categorization:
 Layout: bottom tab bar with **Giao dịch** (Transactions), **Báo cáo** (Reports), **Cài đặt** (Settings).
 
 1. **Onboarding / Connect Gmail** (`/connect`). Logged-in users with no mail account are redirected here.
-   - A 4-step illustrated guide with numbered steps and plain-language copy: turn on 2-Step Verification → open `https://myaccount.google.com/apppasswords` → create an app password named "ThuChi" → paste it here.
+   - A 4-step illustrated guide with numbered steps and plain-language copy: turn on 2-Step Verification → open `https://myaccount.google.com/apppasswords` → create an app password named "BeanPulse" → paste it here.
    - Form fields: Gmail address and the 16-character app password. Accept it with or without spaces and strip the spaces.
    - On submit, test the connection synchronously through `MailboxClient`. Show a clear Vietnamese error on failure. On success, save the account, dispatch the first sync, and redirect to Transactions with a "Đang đồng bộ…" (syncing) banner.
    - A trust box: "Chúng tôi chỉ đọc email từ ngân hàng. Mật khẩu ứng dụng được mã hóa. Bạn có thể thu hồi bất cứ lúc nào tại Google." (We only read emails from banks. The app password is encrypted. You can revoke it at any time in Google.) Link to how to revoke.
@@ -232,11 +232,11 @@ General UI rules: Tailwind only, no component library. Large tap targets (≥44p
 - [ ] M2 Data model: migrations, models, factories, default category seeding on register, policies + isolation tests
 - [ ] M3 Parsing core: MoneyParser, DateParser, TextNormalizer with thorough unit tests (formats with `.` and `,` separators, `đ`/`VND`/`₫` suffixes, +/− signs, Vietnamese diacritics)
 - [ ] M4 Bank parsers: VCB, TCB, MB plus fixtures (real from `samples/` if present, else synthetic) and the data-driven fixture test
-- [ ] M5 Mailbox: interface, Webklex client, Fake client, `thuchi:import-eml`
+- [ ] M5 Mailbox: interface, Webklex client, Fake client, `beanpulse:import-eml`
 - [ ] M6 Pipeline: SyncMailAccount, ParseRawEmail, scheduler, `sync`/`reparse`/`parse-stats` commands, dedupe tests, needs_reconnect test
 - [ ] M7 Categorization: CategoryMatcher, rule creation from the UI flow, backfill of existing transactions, tests
 - [ ] M8 UI: connect/onboarding, transactions list and detail, reports, settings, privacy page, PWA manifest
-- [ ] M9 Demo data: `DemoSeeder` creates `demo@thuchi.test` / `password` and imports all fixtures through the real pipeline via `thuchi:import-eml`, so the app is fully explorable without Gmail
+- [ ] M9 Demo data: `DemoSeeder` creates `demo@beanpulse.test` / `password` and imports all fixtures through the real pipeline via `beanpulse:import-eml`, so the app is fully explorable without Gmail
 - [ ] M10 Hardening: run the full test suite, `./vendor/bin/pint`, fix any N+1 queries on the list page (eager load), check every page at 360px width by reading the Blade output carefully, finish README
 
 ---
@@ -251,8 +251,8 @@ Gmail API/OAuth, Outlook, Google sign-in, native mobile apps, LLM/AI parsing, bu
 
 1. `php artisan test` is all green. Report the count in `PROGRESS.md`.
 2. `php artisan migrate:fresh --seed && php artisan db:seed --class=DemoSeeder` works. `php artisan serve` plus `npm run build` shows a populated app when you log in as the demo user.
-3. `php artisan thuchi:parse-stats` shows 100% for fixtures.
-4. `README.md` covers: what it is, setup steps, how to run the queue worker and scheduler locally (`php artisan queue:work`, `php artisan schedule:work`), how to connect a real Gmail with an app password, how to add a new bank parser (step by step: config sender → parser class → fixtures → test → `thuchi:reparse`), and known limitations.
+3. `php artisan beanpulse:parse-stats` shows 100% for fixtures.
+4. `README.md` covers: what it is, setup steps, how to run the queue worker and scheduler locally (`php artisan queue:work`, `php artisan schedule:work`), how to connect a real Gmail with an app password, how to add a new bank parser (step by step: config sender → parser class → fixtures → test → `beanpulse:reparse`), and known limitations.
 5. `PROGRESS.md` ends with a short **Morning report**: what's done, what's synthetic and needs real samples, anything blocked, and the top 5 suggested next steps.
 6. Everything committed.
 

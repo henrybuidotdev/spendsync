@@ -8,10 +8,10 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 
-/** demo@thuchi.test / password, populated by importing every fixture through the real parsing pipeline. */
+/** demo@beanpulse.test / password, populated by importing every fixture through the real parsing pipeline. */
 class DemoSeeder extends Seeder
 {
-    public const EMAIL = 'demo@thuchi.test';
+    public const EMAIL = 'demo@beanpulse.test';
 
     private const RULES = [
         ['counterparty', 'CONG TY TNHH CONG NGHE ABC', 'Lương'],
@@ -40,7 +40,7 @@ class DemoSeeder extends Seeder
             ]);
         }
 
-        Artisan::call('thuchi:import-eml', [
+        Artisan::call('beanpulse:import-eml', [
             'user' => $user->id,
             'path' => base_path('tests/Fixtures/emails'),
         ]);

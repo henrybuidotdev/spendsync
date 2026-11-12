@@ -29,7 +29,7 @@
     <form wire:submit="connect" class="space-y-4 rounded-2xl bg-white p-4 shadow-sm">
         <div>
             <label for="email" class="block text-sm font-medium">{{ __('Địa chỉ Gmail') }}</label>
-            <input wire:model="email" id="email" type="email" inputmode="email" autocomplete="email" placeholder="ban@gmail.com" required
+            <input wire:model="email" id="email" type="email" inputmode="email" autocomplete="email" placeholder="example@gmail.com" required
                    class="mt-1 block min-h-12 w-full rounded-xl border-slate-300 text-base focus:border-emerald-500 focus:ring-emerald-500">
             @error('email') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>

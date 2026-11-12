@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class ParseStatsCommand extends Command
 {
-    protected $signature = 'thuchi:parse-stats';
+    protected $signature = 'beanpulse:parse-stats';
 
     protected $description = 'Parse success rate per bank';
 
