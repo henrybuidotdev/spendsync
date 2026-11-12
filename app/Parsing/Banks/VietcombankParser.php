@@ -54,20 +54,25 @@ class VietcombankParser extends AbstractBankParser
         );
     }
 
-    /** Card alerts ("Thông báo giao dịch thẻ"), often in a foreign currency with no VND figure; only successful ones count. */
+    /**
+     * Card alerts ("Thông báo giao dịch thẻ"), often in a foreign currency with no VND figure.
+     * A successful charge is money out; a cancelled one ("Huỷ") is a refund of that charge, so money back in.
+     */
     private function parseCardTransaction(ParsedEmailInput $input): ?ParsedTransaction
     {
         $text = $input->text;
         $status = TextNormalizer::fold((string) $this->blockField($text, 'Tình trạng giao dịch', 'Status of Transaction'));
 
-        if (! str_starts_with($status, 'thanh cong')) {
+        $isRefund = str_starts_with($status, 'huy');
+
+        if (! $isRefund && ! str_starts_with($status, 'thanh cong')) {
             return null;
         }
 
         return $this->transaction(
             input: $input,
             amount: $this->blockField($text, 'Số tiền', 'Transaction Amount'),
-            directionHint: 'ghi nợ',
+            directionHint: $isRefund ? 'ghi có' : 'ghi nợ',
             counterparty: $this->blockField($text, 'Sử dụng tại', 'At'),
             time: $this->blockField($text, 'Ngày, giờ giao dịch', 'Trans. Date, Time'),
         );
