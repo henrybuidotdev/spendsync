@@ -8,6 +8,7 @@ use App\Parsing\ParsedEmailInput;
 use App\Parsing\ParsedTransaction;
 use App\Parsing\ParserRegistry;
 use App\Parsing\Support\DateParser;
+use App\Parsing\Support\ExchangeRates;
 use App\Parsing\Support\MoneyParser;
 use App\Parsing\Support\TextNormalizer;
 use App\Parsing\UnparseableEmailException;
@@ -120,7 +121,7 @@ abstract class AbstractBankParser implements BankEmailParser
             return ['vnd' => abs($charged), 'estimated' => false];
         }
 
-        $rate = config('services.fx.'.strtolower($currency).'_vnd');
+        $rate = ExchangeRates::vndPer($currency);
 
         if (! $rate) {
             throw new UnparseableEmailException('currency_unsupported');

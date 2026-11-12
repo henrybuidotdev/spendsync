@@ -35,6 +35,7 @@ return [
         ],
     ],
 
+    // Fallback rates (VND per unit) used until spendsync:update-exchange-rates has downloaded the daily table.
     'fx' => [
         'usd_vnd' => env('FX_USD_VND', 26000),
     ],

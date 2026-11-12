@@ -13,11 +13,16 @@ use App\Models\MailAccount;
 use App\Models\RawEmail;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Parsing\Banks\VietcombankParser;
+use App\Parsing\ParsedEmailInput;
 use App\Parsing\ParserRegistry;
+use App\Parsing\Support\ExchangeRates;
+use App\Parsing\UnparseableEmailException;
 use Carbon\CarbonImmutable;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 
@@ -45,9 +50,9 @@ test('sync fetches only configured senders, stores raw emails and parses them', 
     SyncMailAccount::dispatchSync($account);
 
     expect($fake->searches[0]['senders'])->toBe(app(ParserRegistry::class)->senders())
-        ->and(RawEmail::count())->toBe(19)
+        ->and(RawEmail::count())->toBe(21)
         ->and(RawEmail::whereNull('parsed_at')->count())->toBe(0)
-        ->and(Transaction::where('user_id', $account->user_id)->count())->toBe(15)
+        ->and(Transaction::where('user_id', $account->user_id)->count())->toBe(16)
         ->and($account->fresh()->last_synced_at)->not->toBeNull()
         ->and($account->fresh()->last_error)->toBeNull();
 });
@@ -71,7 +76,7 @@ test('the first sync walks the last 90 days in 15-day windows, one queued job ea
         ['2026-10-23', '2026-11-07'],
         ['2026-11-06', null],
     ])
-        ->and(RawEmail::count())->toBe(19)
+        ->and(RawEmail::count())->toBe(21)
         ->and($account->fresh()->last_synced_at->toDateTimeString())->toBe('2026-11-12 12:00:00')
         ->and($account->isSyncing())->toBeFalse();
 });
@@ -96,8 +101,8 @@ test('a second sync starts one day before the last sync and creates no duplicate
     SyncMailAccount::dispatchSync($account);
 
     expect(end($fake->searches)['since']->toDateTimeString())->toBe('2026-11-11 12:00:00')
-        ->and(RawEmail::count())->toBe(19)
-        ->and(Transaction::count())->toBe(15);
+        ->and(RawEmail::count())->toBe(21)
+        ->and(Transaction::count())->toBe(16);
 });
 
 test('the same email for two different users is stored for each', function () {
@@ -108,8 +113,8 @@ test('the same email for two different users is stored for each', function () {
     SyncMailAccount::dispatchSync($first);
     SyncMailAccount::dispatchSync($second);
 
-    expect(Transaction::where('user_id', $first->user_id)->count())->toBe(15)
-        ->and(Transaction::where('user_id', $second->user_id)->count())->toBe(15);
+    expect(Transaction::where('user_id', $first->user_id)->count())->toBe(16)
+        ->and(Transaction::where('user_id', $second->user_id)->count())->toBe(16);
 });
 
 test('invalid credentials mark the account as needs_reconnect', function () {
@@ -170,13 +175,13 @@ test('import-eml imports a folder once and parses everything', function () {
     $user = User::factory()->create();
 
     $this->artisan('spendsync:import-eml', ['user' => $user->email, 'path' => fixturesPath()])
-        ->expectsOutputToContain('Imported 19 of 19 files.')
+        ->expectsOutputToContain('Imported 21 of 21 files.')
         ->assertSuccessful();
 
     $this->artisan('spendsync:import-eml', ['user' => $user->email, 'path' => fixturesPath()])
-        ->expectsOutputToContain('Imported 0 of 19 files.');
+        ->expectsOutputToContain('Imported 0 of 21 files.');
 
-    expect($user->transactions()->count())->toBe(15)
+    expect($user->transactions()->count())->toBe(16)
         ->and($user->rawEmails()->whereNotNull('parse_error')->count())->toBe(0)
         ->and($user->transactions()->where('bank_code', 'MB')->sum('amount'))->toBe(2000000 + 150000 + 459000 + 1250000);
 });
@@ -249,7 +254,7 @@ test('parse-stats shows 100% for the fixtures', function () {
         ->expectsTable(['Bank', 'Total', 'Parsed', 'Failed', 'Success'], [
             ['MB', 5, 5, 0, '100%'],
             ['TCB', 4, 4, 0, '100%'],
-            ['VCB', 10, 10, 0, '100%'],
+            ['VCB', 12, 12, 0, '100%'],
         ])
         ->assertSuccessful();
 });
@@ -261,7 +266,7 @@ test('spendsync:sync syncs active accounts now', function () {
 
     $this->artisan('spendsync:sync')->expectsOutputToContain('Synced 1 accounts.')->assertSuccessful();
 
-    expect(Transaction::count())->toBe(15);
+    expect(Transaction::count())->toBe(16);
 });
 
 test('the scheduler queues a sync for each active account every five minutes', function () {
@@ -291,7 +296,7 @@ test('the demo seeder creates a populated, categorized demo account', function (
     $user = User::where('email', 'demo@spendsync.test')->sole();
 
     expect(Hash::check('password', $user->password))->toBeTrue()
-        ->and($user->transactions()->count())->toBe(15)
+        ->and($user->transactions()->count())->toBe(16)
         ->and($user->transactions()->whereNotNull('category_id')->count())->toBe(6)
         ->and($user->rawEmails()->whereNotNull('parse_error')->count())->toBe(0);
 
@@ -311,4 +316,30 @@ test('the app password never appears in exception traces', function () {
     }
 
     $this->fail('Expected a MailboxConnectionException.');
+});
+
+test('daily exchange rates let any currency parse and requeue emails that failed for a missing rate', function () {
+    Queue::fake();
+    Http::fake(['open.er-api.com/*' => Http::response(['result' => 'success', 'rates' => ['USD' => 1, 'VND' => 26000, 'THB' => 32.5]])]);
+    $stuck = RawEmail::factory()->create(['parse_error' => 'currency_unsupported']);
+    $thb = fn () => (new VietcombankParser)->parse(ParsedEmailInput::make('x@bank.vn', 'x', null, "Số tiền: -95 THB\nNội dung: 7-ELEVEN", now()->toImmutable()));
+
+    expect($thb)->toThrow(UnparseableEmailException::class, 'currency_unsupported');
+
+    $this->artisan('spendsync:update-exchange-rates')
+        ->expectsOutputToContain('Saved rates for 3 currencies.')
+        ->assertSuccessful();
+
+    expect($thb()->amount)->toBe(76000)
+        ->and($thb()->amountEstimated)->toBeTrue();
+    Queue::assertPushed(ParseRawEmail::class, fn ($job) => $job->rawEmail->is($stuck));
+});
+
+test('a failed exchange rate download keeps the previous rates', function () {
+    ExchangeRates::save(['USD' => 25000.0]);
+    Http::fake(['open.er-api.com/*' => Http::response('down', 503)]);
+
+    $this->artisan('spendsync:update-exchange-rates')->assertFailed();
+
+    expect(ExchangeRates::vndPer('USD'))->toBe(25000.0);
 });
