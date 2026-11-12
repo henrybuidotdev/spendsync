@@ -40,9 +40,9 @@ class SystemCategorySeeder extends Seeder
         ['Sales', '🏷️', CategoryType::Income, 10],
         ['Other income', '➕', CategoryType::Income, 0],
         ['Lending', '🤝', CategoryType::DebtLoan, 30],
-        ['Debt repayment', '💸', CategoryType::DebtLoan, 20],
-        ['Debt collection', '💵', CategoryType::DebtLoan, 10],
-        ['Borrowing', '🏦', CategoryType::DebtLoan, 0],
+        ['Debt collection', '💵', CategoryType::DebtLoan, 20],
+        ['Borrowing', '🏦', CategoryType::DebtLoan, 10],
+        ['Debt repayment', '💸', CategoryType::DebtLoan, 0],
     ];
 
     public function run(): void

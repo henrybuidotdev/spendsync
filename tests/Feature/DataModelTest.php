@@ -137,3 +137,12 @@ test('categories with a higher order come first', function () {
 
     expect($names())->toBe(['Sales', 'Salary', 'Gifts', 'Other income', 'Coffee']);
 });
+
+test('a fresh install orders system categories exactly like the seeder', function () {
+    $seeded = collect((new ReflectionClassConstant(SystemCategorySeeder::class, 'CATEGORIES'))->getValue())
+        ->mapWithKeys(fn (array $category) => [$category[0] => $category[3]])
+        ->sortKeys()
+        ->all();
+
+    expect(Category::system()->pluck('order', 'name')->sortKeys()->all())->toBe($seeded);
+});

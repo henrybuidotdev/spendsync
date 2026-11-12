@@ -27,9 +27,9 @@ return new class extends Migration
         'Sales' => 10,
         'Other income' => 0,
         'Lending' => 30,
-        'Debt repayment' => 20,
-        'Debt collection' => 10,
-        'Borrowing' => 0,
+        'Debt collection' => 20,
+        'Borrowing' => 10,
+        'Debt repayment' => 0,
     ];
 
     public function up(): void
