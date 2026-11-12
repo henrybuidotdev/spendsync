@@ -20,3 +20,11 @@ test('the PWA manifest and service worker are served', function () {
     expect(json_decode(file_get_contents(public_path('manifest.webmanifest')), true))->toHaveKey('start_url', '/')
         ->and(file_exists(public_path('sw.js')))->toBeTrue();
 });
+
+test('the terms page is public, follows the chosen language and is linked from sign-up and settings', function () {
+    $this->get('/terms')->assertOk()->assertSee('<html lang="vi">', false)->assertSee('Điều khoản sử dụng');
+
+    $this->withCookie('locale', 'en')->get('/terms')->assertOk()->assertSee('Terms of use');
+
+    $this->get('/register')->assertSee(route('terms'))->assertSee(route('privacy'));
+});

@@ -8,6 +8,7 @@ use App\Livewire\Transactions\Show as TransactionsShow;
 use Illuminate\Support\Facades\Route;
 
 Route::get('privacy', fn () => view('privacy.'.app()->getLocale()))->name('privacy');
+Route::get('terms', fn () => view('terms.'.app()->getLocale()))->name('terms');
 
 Route::middleware('auth')->group(function () {
     Route::get('connect', ConnectGmail::class)->name('connect');

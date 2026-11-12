@@ -201,5 +201,7 @@
     "Hidden transactions stay in the list but are not counted in totals or reports.": "Giao dịch bị ẩn vẫn nằm trong danh sách nhưng không được tính vào tổng hay báo cáo.",
     "Transaction hidden. It no longer counts in totals or reports.": "Đã ẩn giao dịch. Giao dịch này sẽ không được tính vào tổng và báo cáo.",
     "Transaction shown again. It counts in totals and reports.": "Đã hiện lại giao dịch. Giao dịch này được tính vào tổng và báo cáo.",
-    "Auto-sync your spending from bank emails.": "Tự động đồng bộ chi tiêu từ email ngân hàng."
+    "Auto-sync your spending from bank emails.": "Tự động đồng bộ chi tiêu từ email ngân hàng.",
+    "Terms of use": "Điều khoản sử dụng",
+    "and": "và"
 }
