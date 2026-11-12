@@ -27,4 +27,9 @@ return new class extends Migration
             $table->index(['user_id', 'occurred_at']);
         });
     }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('transactions');
+    }
 };

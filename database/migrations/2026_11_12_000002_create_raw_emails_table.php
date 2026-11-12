@@ -27,4 +27,9 @@ return new class extends Migration
             $table->index('bank_code');
         });
     }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('raw_emails');
+    }
 };

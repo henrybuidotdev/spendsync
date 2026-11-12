@@ -19,4 +19,9 @@ return new class extends Migration
             $table->unique(['user_id', 'match_field', 'match_value']);
         });
     }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('category_rules');
+    }
 };
