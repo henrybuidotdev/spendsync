@@ -26,7 +26,7 @@ class SyncMailAccount implements ShouldBeUnique, ShouldQueue
     /** Releases the unique lock even if a worker dies mid-job. */
     public int $uniqueFor = 600;
 
-    public const FIRST_SYNC_DAYS = 30;
+    public const FIRST_SYNC_DAYS = 90;
 
     public function __construct(public MailAccount $account) {}
 

@@ -1,5 +1,6 @@
 @php
     use App\Enums\MailAccountStatus;
+    use App\Jobs\SyncMailAccount;
     use App\Support\Format;
 @endphp
 
@@ -99,6 +100,16 @@
                     <p class="mt-2 text-sm text-slate-600">{{ __('Chưa kết nối Gmail.') }}</p>
                     <a href="{{ route('connect') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 text-sm font-medium text-white">{{ __('Kết nối Gmail') }}</a>
                 @endif
+            </section>
+
+            <section class="rounded-2xl bg-white p-4 shadow-sm" aria-labelledby="sync-heading">
+                <h2 id="sync-heading" class="font-semibold">{{ __('Cách đồng bộ') }}</h2>
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
+                    <li>{{ __('Tự động đồng bộ mỗi giờ. Bạn có thể bấm "Đồng bộ ngay" ở trang giao dịch bất cứ lúc nào.') }}</li>
+                    <li>{{ __('Chỉ đọc email biến động số dư từ các ngân hàng được hỗ trợ. Email khác không bị đọc, và email không bị đánh dấu là đã đọc.') }}</li>
+                    <li>{{ __('Lần đồng bộ đầu lấy :days ngày gần nhất. Các lần sau lấy từ 1 ngày trước lần đồng bộ thành công gần nhất, email đã có sẽ được bỏ qua.', ['days' => SyncMailAccount::FIRST_SYNC_DAYS]) }}</li>
+                    <li>{{ __('Xóa email trong Gmail không xóa giao dịch trong ứng dụng.') }}</li>
+                </ul>
             </section>
                 @break
 

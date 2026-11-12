@@ -36,6 +36,10 @@ class Index extends Component
             return;
         }
 
+        if ($account->isSyncing()) {
+            return;
+        }
+
         $key = 'sync-now:'.auth()->id();
 
         if (RateLimiter::tooManyAttempts($key, 1)) {

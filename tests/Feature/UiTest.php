@@ -229,6 +229,20 @@ test('sync now runs a sync at most once per minute', function () {
     expect($fake->searches)->toHaveCount(2);
 });
 
+test('sync now is hidden and ignored while a sync is running', function () {
+    Queue::fake();
+    $user = connectedUser();
+    $user->mailAccounts()->first()->queueSync();
+    Queue::assertPushed(SyncMailAccount::class, 1);
+
+    Livewire::actingAs($user)->test(Index::class)
+        ->assertSee('Đang đồng bộ')
+        ->assertDontSee('Đồng bộ ngay')
+        ->call('syncNow');
+
+    Queue::assertPushed(SyncMailAccount::class, 1);
+});
+
 test('needs_reconnect accounts get a red banner linking to connect', function () {
     $account = MailAccount::factory()->needsReconnect()->create();
 

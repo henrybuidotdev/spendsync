@@ -8,4 +8,4 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::call(function () {
     MailAccount::where('status', MailAccountStatus::Active)
         ->each(fn (MailAccount $account) => SyncMailAccount::dispatch($account));
-})->name('sync-mail-accounts')->everyFiveMinutes()->withoutOverlapping();
+})->name('sync-mail-accounts')->hourly()->withoutOverlapping();

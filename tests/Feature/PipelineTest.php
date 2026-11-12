@@ -46,7 +46,7 @@ test('sync fetches only configured senders, stores raw emails and parses them', 
 
     expect($fake->searches)->toHaveCount(1)
         ->and($fake->searches[0]['senders'])->toBe(app(ParserRegistry::class)->senders())
-        ->and($fake->searches[0]['since']->toDateString())->toBe('2026-10-13')
+        ->and($fake->searches[0]['since']->toDateString())->toBe(now()->subDays(SyncMailAccount::FIRST_SYNC_DAYS)->toDateString())
         ->and(RawEmail::count())->toBe(17)
         ->and(RawEmail::whereNull('parsed_at')->count())->toBe(0)
         ->and(Transaction::where('user_id', $account->user_id)->count())->toBe(13)

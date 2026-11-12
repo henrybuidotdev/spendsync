@@ -10,20 +10,20 @@
         </a>
     @endif
 
-    @if($account?->isSyncing())
-        <div wire:poll.3s role="status" class="flex items-center gap-2 rounded-2xl bg-sky-50 p-4 text-sm text-sky-800">
-            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" stroke-dasharray="40 20"/></svg>
-            {{ __('Đang đồng bộ… Giao dịch mới sẽ hiện sau ít phút.') }}
-        </div>
-    @endif
-
     <div class="flex items-center justify-between gap-2">
         <h1 class="text-2xl font-semibold tracking-tight">{{ __('Giao dịch') }}</h1>
         @if($account?->status === \App\Enums\MailAccountStatus::Active)
-            <button type="button" wire:click="syncNow" wire:loading.attr="disabled"
-                    class="inline-flex min-h-11 items-center gap-1 rounded-xl bg-white px-3 text-sm font-medium text-emerald-700 shadow-sm ring-1 ring-slate-200 hover:bg-emerald-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
-                ↻ {{ __('Đồng bộ ngay') }}
-            </button>
+            @if($account->isSyncing())
+                <button type="button" disabled wire:poll.3s role="status"
+                        class="inline-flex min-h-11 cursor-not-allowed items-center rounded-xl bg-white px-3 text-sm font-medium text-slate-500 shadow-sm ring-1 ring-slate-200">
+                    {{ __('Đang đồng bộ') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                </button>
+            @else
+                <button type="button" wire:click="syncNow" wire:loading.attr="disabled"
+                        class="inline-flex min-h-11 items-center gap-1 rounded-xl bg-white px-3 text-sm font-medium text-emerald-700 shadow-sm ring-1 ring-slate-200 hover:bg-emerald-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
+                    ↻ {{ __('Đồng bộ ngay') }}
+                </button>
+            @endif
         @endif
     </div>
 
@@ -98,7 +98,7 @@
                 @endif
             @else
                 <p class="mt-2 font-semibold">{{ __('Chưa có giao dịch nào') }}</p>
-                <p class="mt-1 text-sm text-slate-600">{{ __('Khi ngân hàng gửi email biến động số dư, giao dịch sẽ tự hiện ở đây. Lần đồng bộ đầu lấy 30 ngày gần nhất.') }}</p>
+                <p class="mt-1 text-sm text-slate-600">{{ __('Khi ngân hàng gửi email biến động số dư, giao dịch sẽ tự hiện ở đây. Lần đồng bộ đầu lấy 90 ngày gần nhất.') }}</p>
                 @if(! $account)
                     <a href="{{ route('connect') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white">{{ __('Kết nối Gmail') }}</a>
                 @endif

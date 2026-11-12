@@ -32,7 +32,7 @@
     "Google chỉ cho tạo mật khẩu ứng dụng khi tài khoản đã bật xác minh 2 bước.": "Google only allows app passwords once 2-Step Verification is on.",
     "Gõ ThuChi vào ô tên ứng dụng rồi bấm Tạo. Google hiện 16 chữ cái trong khung màu vàng.": "Type ThuChi as the app name and tap Create. Google shows 16 letters in a yellow box.",
     "Hồ sơ & mật khẩu": "Profile & password",
-    "Khi ngân hàng gửi email biến động số dư, giao dịch sẽ tự hiện ở đây. Lần đồng bộ đầu lấy 30 ngày gần nhất.": "When your bank emails a balance change, the transaction shows up here. The first sync looks back 30 days.",
+    "Khi ngân hàng gửi email biến động số dư, giao dịch sẽ tự hiện ở đây. Lần đồng bộ đầu lấy 90 ngày gần nhất.": "When your bank emails a balance change, the transaction shows up here. The first sync looks back 90 days.",
     "Khoản chi": "Expense",
     "Khoản thu": "Income",
     "Không có giao dịch nào ở đây": "Nothing here",
@@ -107,7 +107,6 @@
     "Áp dụng cho các giao dịch sau với": "Apply to future transactions with",
     "Đang hoạt động": "Active",
     "Đang kiểm tra…": "Checking…",
-    "Đang đồng bộ… Giao dịch mới sẽ hiện sau ít phút.": "Syncing… New transactions will appear in a few minutes.",
     "Điều hướng chính": "Main navigation",
     "Đã lưu danh mục và áp dụng cho :count giao dịch khác.": "Category saved and applied to :count other transactions.",
     "Đã lưu danh mục.": "Category saved.",
@@ -132,5 +131,11 @@
     "Giao diện & ngôn ngữ": "Appearance & language",
     "Chưa kết nối": "Not connected",
     "Tài khoản": "Account",
-    "Gmail": "Gmail"
+    "Gmail": "Gmail",
+    "Cách đồng bộ": "How syncing works",
+    "Tự động đồng bộ mỗi giờ. Bạn có thể bấm \"Đồng bộ ngay\" ở trang giao dịch bất cứ lúc nào.": "Syncs automatically every hour. You can tap \"Sync now\" on the transactions page any time.",
+    "Chỉ đọc email biến động số dư từ các ngân hàng được hỗ trợ. Email khác không bị đọc, và email không bị đánh dấu là đã đọc.": "Only balance-change emails from supported banks are read. Other emails are never read, and nothing is marked as read.",
+    "Lần đồng bộ đầu lấy :days ngày gần nhất. Các lần sau lấy từ 1 ngày trước lần đồng bộ thành công gần nhất, email đã có sẽ được bỏ qua.": "The first sync looks back :days days. Each later sync starts 1 day before the last successful sync, and emails already imported are skipped.",
+    "Xóa email trong Gmail không xóa giao dịch trong ứng dụng.": "Deleting an email in Gmail does not delete its transaction in the app.",
+    "Đang đồng bộ": "Syncing"
 }
