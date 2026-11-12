@@ -10,7 +10,7 @@
         @foreach([
             [__('Bật xác minh 2 bước'), __('Google chỉ cho tạo mật khẩu ứng dụng khi tài khoản đã bật xác minh 2 bước.'), 'https://myaccount.google.com/signinoptions/two-step-verification', __('Mở cài đặt bảo mật'), '🔐'],
             [__('Mở trang Mật khẩu ứng dụng'), __('Đăng nhập Gmail của bạn nếu Google yêu cầu.'), 'https://myaccount.google.com/apppasswords', 'myaccount.google.com/apppasswords', '🌐'],
-            [__('Tạo mật khẩu tên "ThuChi"'), __('Gõ ThuChi vào ô tên ứng dụng rồi bấm Tạo. Google hiện 16 chữ cái trong khung màu vàng.'), null, null, '✍️'],
+            [__('Tạo mật khẩu tên "BeanPulse"'), __('Gõ BeanPulse vào ô tên ứng dụng rồi bấm Tạo. Google hiện 16 chữ cái trong khung màu vàng.'), null, null, '✍️'],
             [__('Dán vào ô bên dưới'), __('Có hay không có dấu cách đều được.'), null, null, '📋'],
         ] as $index => [$heading, $body, $url, $linkText, $icon])
             <li class="flex gap-3 rounded-2xl bg-white p-4 shadow-sm">

@@ -22,7 +22,7 @@
                 ]],
                 ['🗑️ Cách xóa', [
                     'Ngắt kết nối: Cài đặt → Ngắt kết nối. Mật khẩu ứng dụng bị xóa ngay, giao dịch cũ vẫn giữ.',
-                    'Thu hồi tại Google: vào myaccount.google.com/apppasswords và xóa mật khẩu "ThuChi". Ứng dụng sẽ mất quyền đọc ngay lập tức.',
+                    'Thu hồi tại Google: vào myaccount.google.com/apppasswords và xóa mật khẩu "BeanPulse". Ứng dụng sẽ mất quyền đọc ngay lập tức.',
                     'Xóa dữ liệu: Cài đặt → Vùng nguy hiểm → Xóa dữ liệu. Email, giao dịch, danh mục, quy tắc và kết nối Gmail bị xóa vĩnh viễn; tài khoản đăng nhập được giữ lại.',
                     'Xóa tài khoản: Cài đặt → Vùng nguy hiểm → Xóa tài khoản. Tài khoản đăng nhập cùng toàn bộ dữ liệu bị xóa vĩnh viễn.',
                 ]],
