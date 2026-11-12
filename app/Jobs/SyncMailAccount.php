@@ -9,11 +9,18 @@ use App\Mail\Inbox\MailboxConnectionException;
 use App\Models\MailAccount;
 use App\Models\RawEmail;
 use App\Parsing\ParserRegistry;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Throwable;
 
-class SyncMailAccount implements ShouldBeUnique, ShouldQueue
+/*
+ * Each run fetches one window of at most WINDOW_DAYS days, starting from last_synced_at
+ * (or FIRST_SYNC_DAYS ago), saves its progress there, and queues the next run until it reaches today.
+ * ponytail: with several workers, a scheduled run can overlap a queued continuation; it only refetches
+ * already stored emails. Add a WithoutOverlapping middleware if that ever matters.
+ */
+class SyncMailAccount implements ShouldBeUniqueUntilProcessing, ShouldQueue
 {
     use Queueable;
 
@@ -28,6 +35,8 @@ class SyncMailAccount implements ShouldBeUnique, ShouldQueue
 
     public const FIRST_SYNC_DAYS = 90;
 
+    public const WINDOW_DAYS = 15;
+
     public function __construct(public MailAccount $account) {}
 
     public function uniqueId(): string
@@ -38,18 +47,31 @@ class SyncMailAccount implements ShouldBeUnique, ShouldQueue
     public function handle(MailboxClient $client, ParserRegistry $registry): void
     {
         try {
-            $this->sync($client, $registry);
-        } finally {
+            $hasMore = $this->sync($client, $registry);
+        } catch (Throwable $exception) {
             $this->account->finishSyncing();
+
+            throw $exception;
         }
+
+        if (! $hasMore) {
+            $this->account->finishSyncing();
+
+            return;
+        }
+
+        $this->account->isSyncing()
+            ? $this->account->queueSync()
+            : self::dispatch($this->account);
     }
 
-    private function sync(MailboxClient $client, ParserRegistry $registry): void
+    /** Returns whether older-than-today windows are still left to fetch. */
+    private function sync(MailboxClient $client, ParserRegistry $registry): bool
     {
         $account = $this->account->fresh();
 
         if (! $account?->isActive() || blank($account->app_password)) {
-            return;
+            return false;
         }
 
         try {
@@ -57,7 +79,7 @@ class SyncMailAccount implements ShouldBeUnique, ShouldQueue
         } catch (InvalidCredentialsException) {
             $account->update(['status' => MailAccountStatus::NeedsReconnect, 'last_error' => 'invalid_credentials']);
 
-            return;
+            return false;
         } catch (MailboxConnectionException $exception) {
             $account->update(['last_error' => 'connection_failed']);
 
@@ -66,11 +88,13 @@ class SyncMailAccount implements ShouldBeUnique, ShouldQueue
 
         $senders = $registry->senders();
         $since = $account->last_synced_at
-            ? $account->last_synced_at->copy()->subDays(30) // TEMP: testing card backfill, revert to subDay()
+            ? $account->last_synced_at->copy()->subDay()
             : now()->subDays(self::FIRST_SYNC_DAYS);
+        $before = $since->copy()->addDays(self::WINDOW_DAYS)->startOfDay();
+        $isLastWindow = $before->isFuture();
 
         try {
-            foreach ($client->fetchFrom($senders, $since) as $message) {
+            foreach ($client->fetchFrom($senders, $since, $isLastWindow ? null : $before) as $message) {
                 if (! in_array($message->from, $senders, true)) {
                     continue;
                 }
@@ -85,6 +109,8 @@ class SyncMailAccount implements ShouldBeUnique, ShouldQueue
             $client->disconnect();
         }
 
-        $account->update(['last_synced_at' => now(), 'last_error' => null]);
+        $account->update(['last_synced_at' => $isLastWindow ? now() : $before, 'last_error' => null]);
+
+        return ! $isLastWindow;
     }
 }

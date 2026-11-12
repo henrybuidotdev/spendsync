@@ -44,14 +44,47 @@ test('sync fetches only configured senders, stores raw emails and parses them', 
 
     SyncMailAccount::dispatchSync($account);
 
-    expect($fake->searches)->toHaveCount(1)
-        ->and($fake->searches[0]['senders'])->toBe(app(ParserRegistry::class)->senders())
-        ->and($fake->searches[0]['since']->toDateString())->toBe(now()->subDays(SyncMailAccount::FIRST_SYNC_DAYS)->toDateString())
+    expect($fake->searches[0]['senders'])->toBe(app(ParserRegistry::class)->senders())
         ->and(RawEmail::count())->toBe(18)
         ->and(RawEmail::whereNull('parsed_at')->count())->toBe(0)
         ->and(Transaction::where('user_id', $account->user_id)->count())->toBe(14)
         ->and($account->fresh()->last_synced_at)->not->toBeNull()
         ->and($account->fresh()->last_error)->toBeNull();
+});
+
+test('the first sync walks the last 90 days in 15-day windows, one queued job each', function () {
+    $fake = fakeMailbox();
+    $account = MailAccount::factory()->create();
+    $account->queueSync();
+
+    $windows = collect($fake->searches)->map(fn (array $search) => [
+        $search['since']->toDateString(),
+        $search['before']?->toDateString(),
+    ]);
+
+    expect($windows->all())->toBe([
+        ['2026-08-14', '2026-08-29'],
+        ['2026-08-28', '2026-09-12'],
+        ['2026-09-11', '2026-09-26'],
+        ['2026-09-25', '2026-10-10'],
+        ['2026-10-09', '2026-10-24'],
+        ['2026-10-23', '2026-11-07'],
+        ['2026-11-06', null],
+    ])
+        ->and(RawEmail::count())->toBe(18)
+        ->and($account->fresh()->last_synced_at->toDateTimeString())->toBe('2026-11-12 12:00:00')
+        ->and($account->isSyncing())->toBeFalse();
+});
+
+test('an interrupted first sync resumes from the last finished window', function () {
+    Queue::fake();
+    fakeMailbox();
+    $account = MailAccount::factory()->create();
+
+    (new SyncMailAccount($account))->handle(app(MailboxClient::class), app(ParserRegistry::class));
+
+    expect($account->fresh()->last_synced_at->toDateTimeString())->toBe('2026-08-29 00:00:00');
+    Queue::assertPushed(SyncMailAccount::class, 1);
 });
 
 test('a second sync starts one day before the last sync and creates no duplicates', function () {
@@ -62,7 +95,7 @@ test('a second sync starts one day before the last sync and creates no duplicate
     $this->travel(5)->minutes();
     SyncMailAccount::dispatchSync($account);
 
-    expect($fake->searches[1]['since']->toDateTimeString())->toBe('2026-11-11 12:00:00')
+    expect(end($fake->searches)['since']->toDateTimeString())->toBe('2026-11-11 12:00:00')
         ->and(RawEmail::count())->toBe(18)
         ->and(Transaction::count())->toBe(14);
 });
@@ -114,7 +147,7 @@ test('inactive or disconnected accounts are not synced', function () {
 test('messages from unknown senders are never stored even if the mailbox returns them', function () {
     $rogue = new class extends FakeMailboxClient
     {
-        public function fetchFrom(array $senders, $since): iterable
+        public function fetchFrom(array $senders, $since, $before = null): iterable
         {
             yield new FetchedMessage('<x@spam>', 'boss@company.com', 'Lương', CarbonImmutable::now(), null, 'Số tiền: +1,000 VND');
         }

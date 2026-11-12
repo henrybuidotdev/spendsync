@@ -39,17 +39,22 @@ class WebklexGmailClient implements MailboxClient
         }
     }
 
-    public function fetchFrom(array $senders, CarbonInterface $since): iterable
+    public function fetchFrom(array $senders, CarbonInterface $since, ?CarbonInterface $before = null): iterable
     {
         $folder = $this->allMailFolder();
 
         foreach ($senders as $sender) {
-            $messages = $folder->query()
+            $query = $folder->query()
                 ->whereFrom($sender)
                 ->whereSince($since->toDateTime())
                 ->leaveUnread()
-                ->setFetchBody(true)
-                ->get();
+                ->setFetchBody(true);
+
+            if ($before !== null) {
+                $query->whereBefore($before->toDateTime());
+            }
+
+            $messages = $query->get();
 
             foreach ($messages as $message) {
                 yield FetchedMessage::fromWebklex($message);

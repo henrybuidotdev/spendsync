@@ -4,10 +4,10 @@ namespace App\Mail\Inbox;
 
 use Carbon\CarbonInterface;
 
-/** Test double: serves .eml files from a folder, applying the same sender/since filter as the IMAP search. */
+/** Test double: serves .eml files from a folder, applying the same sender/since/before filter as the IMAP search. */
 class FakeMailboxClient implements MailboxClient
 {
-    /** @var array<int, array{senders: array<int, string>, since: CarbonInterface}> */
+    /** @var array<int, array{senders: array<int, string>, since: CarbonInterface, before: ?CarbonInterface}> */
     public array $searches = [];
 
     public ?string $connectedAs = null;
@@ -39,14 +39,24 @@ class FakeMailboxClient implements MailboxClient
         $this->connectedAs = $email;
     }
 
-    public function fetchFrom(array $senders, CarbonInterface $since): iterable
+    public function fetchFrom(array $senders, CarbonInterface $since, ?CarbonInterface $before = null): iterable
     {
-        $this->searches[] = ['senders' => $senders, 'since' => $since];
+        $this->searches[] = ['senders' => $senders, 'since' => $since, 'before' => $before];
 
         foreach ($this->messages as $message) {
-            if (in_array($message->from, $senders, true) && $message->receivedAt->gte($since->copy()->startOfDay())) {
-                yield $message;
+            if (! in_array($message->from, $senders, true)) {
+                continue;
             }
+
+            if ($message->receivedAt->lt($since->copy()->startOfDay())) {
+                continue;
+            }
+
+            if ($before !== null && $message->receivedAt->gte($before->copy()->startOfDay())) {
+                continue;
+            }
+
+            yield $message;
         }
     }
 

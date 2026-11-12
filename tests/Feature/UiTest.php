@@ -219,6 +219,7 @@ test('sync now runs a sync at most once per minute', function () {
     $fake = new FakeMailboxClient;
     app()->instance(MailboxClient::class, $fake);
     $user = connectedUser();
+    $user->mailAccount->update(['last_synced_at' => now()]);
 
     $component = Livewire::actingAs($user)->test(Index::class)->call('syncNow')->assertDontSee('Đang đồng bộ');
     $component->call('syncNow')->assertSee('Vừa đồng bộ xong');
@@ -536,6 +537,7 @@ test('the syncing banner shows only while a user-started sync is pending and pol
     Queue::fake();
     $user = connectedUser();
     $account = $user->mailAccount;
+    $account->update(['last_synced_at' => now()]);
 
     $this->actingAs($user)->get('/')->assertDontSee('Đang đồng bộ');
 
