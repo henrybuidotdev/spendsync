@@ -46,7 +46,6 @@ class Show extends Component
         $this->applyToFuture = $matcher->follows($this->transaction);
 
         $this->transaction->load('category');
-        session()->flash('status', __('Category saved.'));
     }
 
     public function updatedApplyToFuture(): void
@@ -66,7 +65,6 @@ class Show extends Component
         if (! $this->applyToFuture) {
             $matcher->forget($this->transaction);
             session()->flash('status', __('Rule removed.'));
-            $this->flashRulesLink();
 
             return;
         }
@@ -74,11 +72,6 @@ class Show extends Component
         $matcher->remember($this->transaction, $this->transaction->category);
 
         session()->flash('status', __('Rule saved.'));
-        $this->flashRulesLink();
-    }
-
-    private function flashRulesLink(): void
-    {
         session()->flash('status_link', ['url' => route('settings', 'rules'), 'label' => __('Manage rules')]);
     }
 

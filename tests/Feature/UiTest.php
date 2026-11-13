@@ -363,7 +363,7 @@ test('the button is hidden when no uncategorized transaction matches', function 
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
         ->call('setCategory', $user->availableCategories()->first()->id)
-        ->assertSee('Đã lưu danh mục.')
+        ->assertDontSee('Category saved')
         ->assertSee('Tự động lưu')
         ->assertDontSee('Tìm thấy');
 });
@@ -390,7 +390,7 @@ test('the checkbox shows whether a rule exists and unticking removes the rule', 
 
     expect(CategoryRule::count())->toBe(1);
 
-    $show()->assertSet('applyToFuture', true)->set('applyToFuture', false)->assertSee('Đã xóa quy tắc.');
+    $show()->assertSet('applyToFuture', true)->set('applyToFuture', false)->assertSee('Đã xóa quy tắc.')->assertDontSee('Quản lý quy tắc');
 
     expect(CategoryRule::count())->toBe(0);
 
