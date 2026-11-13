@@ -348,6 +348,8 @@ test('ticking the checkbox creates a rule without filling in past transactions',
         ->call('setCategory', $food->id)
         ->set('applyToFuture', true)
         ->assertSee('Đã lưu quy tắc.')
+        ->assertSee('Quản lý quy tắc')
+        ->assertSee(route('settings', 'rules'))
         ->assertSee('Tìm thấy 1 giao dịch với');
 
     expect($sibling->fresh()->category_id)->toBeNull()
