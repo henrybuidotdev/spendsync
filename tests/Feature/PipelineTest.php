@@ -279,14 +279,20 @@ test('spendsync:sync syncs active accounts now', function () {
     expect(Transaction::count())->toBe(16);
 });
 
-test('the scheduler queues a sync for each active account every five minutes', function () {
+test('the scheduler queues a sync for active accounts in the current minute slot that have not synced recently', function () {
     Queue::fake();
-    MailAccount::factory()->count(2)->create();
-    MailAccount::factory()->needsReconnect()->create();
+    $this->travelTo(now()->setTime(10, 0));
+    MailAccount::factory()->create(['id' => 60]);
+    MailAccount::factory()->create(['id' => 120, 'last_synced_at' => now()->subHour()]);
+    MailAccount::factory()->create(['id' => 180, 'last_synced_at' => now()->subMinutes(5)]);
+    MailAccount::factory()->needsReconnect()->create(['id' => 240]);
+    MailAccount::factory()->create(['id' => 61]);
 
     $this->artisan('schedule:run');
 
     Queue::assertPushed(SyncMailAccount::class, 2);
+    Queue::assertPushed(SyncMailAccount::class, fn (SyncMailAccount $job) => $job->account->id === 60);
+    Queue::assertPushed(SyncMailAccount::class, fn (SyncMailAccount $job) => $job->account->id === 120);
 });
 
 test('parsed transactions get categorized by existing rules', function () {

@@ -45,10 +45,18 @@ Syncs and parsing run on the `database` queue. In two terminals:
 
 ```bash
 php artisan queue:work      # runs SyncMailAccount / ParseRawEmail jobs
-php artisan schedule:work   # every 5 min: queues a sync for each active account
+php artisan schedule:work   # every minute: queues syncs for that minute's slot of accounts
 ```
 
 In production, use a single cron entry `* * * * * php artisan schedule:run` plus a supervised `queue:work`.
+
+#### How syncs are spread
+
+Each active account syncs about once an hour, in its own minute slot: `id % 60`. Every minute the scheduler queues a `SyncMailAccount` job only for the accounts in that minute's slot, so IMAP load is spread over the whole hour instead of hitting every mailbox at :00.
+
+- Accounts that synced less than 30 minutes ago (`last_synced_at`) are skipped, so a manual "Sync now" or a fresh connect isn't repeated by the schedule right after.
+- Jobs are queued without a delay, so a manual sync is never blocked by a scheduled job waiting in the queue (`SyncMailAccount` allows one queued job per account).
+- If a minute's `schedule:run` is missed (for example during a deploy), the accounts in that slot sync an hour later.
 
 ### Connect a real Gmail
 
