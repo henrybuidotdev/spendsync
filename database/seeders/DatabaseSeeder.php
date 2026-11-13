@@ -11,11 +11,17 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(SystemCategorySeeder::class);
 
-        if (! User::where('email', 'test@example.com')->first()) {
-            User::factory()->create([
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-            ]);
+        if (! app()->environment('local', 'testing')) {
+            return;
         }
+
+        if (User::where('email', 'test@example.com')->exists()) {
+            return;
+        }
+
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
     }
 }
