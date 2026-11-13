@@ -4,7 +4,7 @@
         @include('partials.head')
     </head>
     <body class="bg-slate-50 font-sans text-slate-900 antialiased">
-        <div class="mx-auto max-w-md px-4 pb-8 pt-16 sm:pt-24">
+        <div class="mx-auto max-w-lg px-4 pb-8 pt-16 sm:pt-24">
             @php([$brandHead, $brandTail] = array_pad(\Illuminate\Support\Str::ucsplit(config('app.name')), 2, ''))
             <div class="mb-8">
                 <a href="/" aria-label="{{ config('app.name') }}" class="inline-flex items-center gap-2.5 text-2xl tracking-tighter text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2" wire:navigate>

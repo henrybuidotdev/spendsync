@@ -6,7 +6,7 @@
         @include('partials.head', ['title' => $title])
     </head>
     <body class="bg-slate-100 font-sans text-slate-900 antialiased">
-        <main class="mx-auto max-w-md space-y-4 px-4 py-6">
+        <main class="mx-auto max-w-lg space-y-4 px-4 py-6">
             <a href="{{ url('/') }}" class="inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"><x-icon name="chevron-left" class="h-4 w-4" /> {{ config('app.name') }}</a>
             <h1 class="text-2xl font-semibold tracking-tight">{{ $title }}</h1>
 

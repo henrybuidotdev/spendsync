@@ -14,7 +14,7 @@ new class extends Component
 }; ?>
 
 <nav class="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)]" aria-label="{{ __('Main navigation') }}">
-    <div class="mx-auto grid max-w-md grid-cols-3">
+    <div class="mx-auto grid max-w-lg grid-cols-3">
         @foreach([
             ['transactions', __('Transactions'), 'M4 6h16M4 12h16M4 18h10', ['transactions', 'transactions.*']],
             ['reports', __('Reports'), 'M5 20V10m7 10V4m7 16v-7', ['reports']],
