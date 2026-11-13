@@ -62,6 +62,10 @@ class Settings extends Component
             return;
         }
 
+        if ($account->syncedRecently()) {
+            return;
+        }
+
         $key = 'sync-now:'.auth()->id();
 
         if (RateLimiter::tooManyAttempts($key, 1)) {

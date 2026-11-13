@@ -228,19 +228,30 @@ test('the list query count does not grow with the number of transactions', funct
     expect(count(DB::getQueryLog()))->toBe($few);
 });
 
-test('sync now runs a sync at most once per minute', function () {
+test('sync now is hidden and ignored within 15 minutes of the last sync', function () {
     $fake = new FakeMailboxClient;
     app()->instance(MailboxClient::class, $fake);
     $user = connectedUser();
-    $user->mailAccount->update(['last_synced_at' => now()]);
+    $user->mailAccount->update(['last_synced_at' => now()->subMinutes(16)]);
 
-    $component = Livewire::actingAs($user)->test(Settings::class, ['section' => 'gmail'])->call('syncNow')->assertSee('Có thể mất đến 10 phút');
-    $component->call('syncNow')->assertSee('Vừa đồng bộ xong');
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'gmail'])
+        ->assertSeeHtml('wire:click="syncNow"')
+        ->call('syncNow')
+        ->assertSee('Có thể mất đến 10 phút');
+
+    $this->travel(2)->minutes();
+
+    Livewire::actingAs($user->fresh())->test(Settings::class, ['section' => 'gmail'])
+        ->assertDontSeeHtml('wire:click="syncNow"')
+        ->call('syncNow');
 
     expect($fake->searches)->toHaveCount(1);
 
-    $this->travel(61)->seconds();
-    $component->call('syncNow');
+    $this->travel(16)->minutes();
+
+    Livewire::actingAs($user->fresh())->test(Settings::class, ['section' => 'gmail'])
+        ->assertSeeHtml('wire:click="syncNow"')
+        ->call('syncNow');
 
     expect($fake->searches)->toHaveCount(2);
 });

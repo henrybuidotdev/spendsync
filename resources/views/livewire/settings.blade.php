@@ -83,7 +83,7 @@
                                 <span wire:poll.3s role="status" class="inline-flex min-h-11 items-center font-medium text-slate-500">
                                     {{ __('Syncing') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
                                 </span>
-                            @else
+                            @elseif(! $account->syncedRecently())
                                 <button type="button" wire:click="syncNow" wire:loading.attr="disabled"
                                         class="inline-flex min-h-11 items-center gap-1 rounded font-medium text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
                                     <x-icon name="refresh" class="h-4 w-4" /> {{ __('Sync now') }}

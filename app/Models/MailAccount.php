@@ -55,6 +55,11 @@ class MailAccount extends Model
         return Cache::has($this->syncingKey());
     }
 
+    public function syncedRecently(): bool
+    {
+        return $this->last_synced_at?->gt(now()->subMinutes(15)) ?? false;
+    }
+
     public function finishSyncing(): void
     {
         Cache::forget($this->syncingKey());
