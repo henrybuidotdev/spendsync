@@ -55,6 +55,11 @@
         </p>
     </div>
 
+    <p class="text-sm text-slate-600">
+        {{ __('No Gmail, or your bank is not supported?') }}
+        <a href="{{ route('transactions.create') }}" wire:navigate class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">{{ __('Add transactions manually') }}</a>
+    </p>
+
     <div>
         <p class="text-sm font-medium text-slate-600">{{ __('Supported banks') }}</p>
         <ul class="mt-2 flex flex-wrap gap-2">

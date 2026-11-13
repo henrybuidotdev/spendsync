@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\Direction;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -24,5 +25,10 @@ class TransactionFactory extends Factory
     public function income(): static
     {
         return $this->state(['direction' => Direction::In]);
+    }
+
+    public function manual(): static
+    {
+        return $this->state(['bank_code' => Transaction::MANUAL, 'description' => null]);
     }
 }

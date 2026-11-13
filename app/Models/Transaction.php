@@ -15,6 +15,8 @@ class Transaction extends Model
     use HasFactory;
     use SoftDeletes;
 
+    public const MANUAL = 'manual';
+
     protected function casts(): array
     {
         return [
@@ -49,6 +51,11 @@ class Transaction extends Model
     public function signedAmount(): int
     {
         return $this->isIncome() ? $this->amount : -$this->amount;
+    }
+
+    public function isManual(): bool
+    {
+        return $this->bank_code === self::MANUAL;
     }
 
     public function label(): string

@@ -146,7 +146,7 @@ class CategoryMatcher
             return false;
         }
 
-        if (! in_array($rule->category->type, $transaction->direction->categoryTypes(), true)) {
+        if (! $rule->category->fits($transaction->direction)) {
             return false;
         }
 

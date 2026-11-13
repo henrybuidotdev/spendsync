@@ -23,26 +23,10 @@
         @error('note') <p class="mt-1 text-left text-sm text-red-600">{{ $message }}</p> @enderror
     </div>
 
-    <section class="border-t border-slate-200 pt-4" aria-labelledby="category-heading"
-             x-data="{ tab: @js($defaultTab) }">
+    <section class="border-t border-slate-200 pt-4" aria-labelledby="category-heading">
         <h2 id="category-heading" class="font-semibold">{{ __('Category') }}</h2>
 
-        <div class="tabs mt-3" role="group" aria-label="{{ __('Category type') }}">
-            @foreach(\App\Enums\CategoryType::cases() as $case)
-                <button type="button" x-on:click="tab = @js($case->value)" x-bind:aria-pressed="tab === @js($case->value)" class="tab">{{ $case->label() }}</button>
-            @endforeach
-        </div>
-
-        <div class="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
-            @foreach($categories as $category)
-                <button type="button" wire:click="setCategory({{ $category->id }})" wire:key="cat-{{ $category->id }}" x-show="tab === @js($category->type->value)"
-                        aria-pressed="{{ $transaction->category_id === $category->id ? 'true' : 'false' }}"
-                        @class(['flex min-h-20 flex-col items-center justify-center gap-1 rounded-xl p-3 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'bg-white font-semibold ring-2 ring-black' => $transaction->category_id === $category->id, 'bg-white ring-1 ring-slate-200 hover:bg-emerald-50' => $transaction->category_id !== $category->id])>
-                    <x-category-icon :category="$category" class="h-8 w-8 text-xl" />
-                    <span class="mt-1 line-clamp-2 text-center">{{ $category->label }}</span>
-                </button>
-            @endforeach
-        </div>
+        <x-category-picker :categories="$categories" :direction="$transaction->direction" :selected="$transaction->category_id" class="mt-3" />
 
 
         @if($transaction->category_id && $this->ruleTarget())
@@ -66,8 +50,8 @@
 
     <dl class="divide-y divide-slate-200 border-y border-slate-200 text-sm">
         @foreach([
-            __('Bank') => "{$bankName} ({$transaction->bank_code})",
-            __('Type') => $transaction->isIncome() ? __('Money in') : __('Money out'),
+            __('Bank') => $bankName,
+            __('Type') => $transaction->direction->label(),
             __('Original amount') => $transaction->currency ? Format::foreign($transaction->original_amount, $transaction->currency).($transaction->amount_estimated ? ' · '.__('estimated conversion') : '') : null,
             __('Counterparty') => $transaction->counterparty,
             __('Account number') => $transaction->counterparty_account,
@@ -91,6 +75,13 @@
                 <pre class="mt-2 max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-xl bg-white p-3 ring-1 ring-slate-200 font-mono text-xs">{{ $rawText }}</pre>
             @endif
         </section>
+    @endif
+
+    @if($transaction->isManual())
+        <div class="flex gap-3">
+            <a href="{{ route('transactions.edit', $transaction) }}" wire:navigate class="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl bg-black px-4 text-sm font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Edit') }}</a>
+            <button type="button" wire:click="destroy" wire:confirm="{{ __('Delete this transaction? This cannot be undone.') }}" class="min-h-11 flex-1 rounded-xl px-4 text-sm font-medium text-red-700 ring-1 ring-red-300 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">{{ __('Delete') }}</button>
+        </div>
     @endif
 
     @if($transaction->trashed())

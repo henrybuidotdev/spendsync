@@ -7,15 +7,24 @@ enum Direction: string
     case In = 'in';
     case Out = 'out';
 
+    public function label(): string
+    {
+        return $this === self::In ? __('Money in') : __('Money out');
+    }
+
+    /** Money out is an expense, money in is income. */
+    public function categoryType(): CategoryType
+    {
+        return $this === self::In ? CategoryType::Income : CategoryType::Expense;
+    }
+
     /**
-     * Money out is categorized with expense categories, money in with income categories; debt/loan fits either.
+     * Category tabs for this direction. Which debt/loan categories fit is decided by Category::DEBT_LOAN_DIRECTIONS.
      *
      * @return array<int, CategoryType>
      */
     public function categoryTypes(): array
     {
-        return $this === self::In ?
-            [CategoryType::Income, CategoryType::DebtLoan] :
-            [CategoryType::Expense, CategoryType::DebtLoan];
+        return [$this->categoryType(), CategoryType::DebtLoan];
     }
 }

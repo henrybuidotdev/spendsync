@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CategoryType;
+use App\Enums\Direction;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,6 +17,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Category extends Model
 {
     use HasFactory;
+
+    /** Debt/loan categories are fixed system rows (users can't add them), and each one moves money one way. */
+    public const DEBT_LOAN_DIRECTIONS = [
+        'Lending' => Direction::Out,
+        'Debt repayment' => Direction::Out,
+        'Borrowing' => Direction::In,
+        'Debt collection' => Direction::In,
+    ];
 
     protected function casts(): array
     {
@@ -36,6 +45,26 @@ class Category extends Model
     protected function ordered(Builder $query): void
     {
         $query->orderByDesc('order')->orderByRaw('user_id is null desc')->orderBy('id');
+    }
+
+    /** Categories that make sense for the direction: expense or income, plus the debt/loan ones going the same way. */
+    #[Scope]
+    protected function fitting(Builder $query, Direction $direction): void
+    {
+        $debtLoanNames = array_keys(array_filter(self::DEBT_LOAN_DIRECTIONS, fn (Direction $debtLoanDirection) => $debtLoanDirection === $direction));
+
+        $query->where(fn (Builder $query) => $query
+            ->where('type', $direction->categoryType())
+            ->orWhere(fn (Builder $query) => $query->where('type', CategoryType::DebtLoan)->whereNull('user_id')->whereIn('name', $debtLoanNames)));
+    }
+
+    public function fits(Direction $direction): bool
+    {
+        if ($this->type === CategoryType::DebtLoan) {
+            return $this->isSystem() && (self::DEBT_LOAN_DIRECTIONS[$this->name] ?? null) === $direction;
+        }
+
+        return $this->type === $direction->categoryType();
     }
 
     #[Scope]

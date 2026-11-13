@@ -159,13 +159,13 @@ test('rules never assign a category of the wrong kind', function () {
         ->and($refund->fresh()->category_id)->toBeNull();
 });
 
-test('debt and loan rules match money in and money out', function () {
-    $debt = $this->user->availableCategories()->where('name', 'Borrowing')->first();
-    rule($this->user, MatchField::Counterparty, 'nguyen van an', $debt->id);
+test('debt and loan rules only match the direction their category moves money', function () {
+    $borrowing = $this->user->availableCategories()->where('name', 'Borrowing')->first();
+    rule($this->user, MatchField::Counterparty, 'nguyen van an', $borrowing->id);
 
     $out = Transaction::factory()->for($this->user)->create(['counterparty' => 'NGUYEN VAN AN']);
     $in = Transaction::factory()->for($this->user)->income()->create(['counterparty' => 'NGUYEN VAN AN']);
 
-    expect($this->matcher->match($out)?->category_id)->toBe($debt->id)
-        ->and($this->matcher->match($in)?->category_id)->toBe($debt->id);
+    expect($this->matcher->match($out))->toBeNull()
+        ->and($this->matcher->match($in)?->category_id)->toBe($borrowing->id);
 });

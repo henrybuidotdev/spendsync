@@ -6,6 +6,7 @@ use App\Categorization\CategoryMatcher;
 use App\Enums\MatchField;
 use App\Models\Category;
 use App\Models\Transaction;
+use App\Support\Format;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -118,6 +119,21 @@ class Show extends Component
             __('Transaction shown again. It counts in totals and reports.'));
     }
 
+    public function destroy(): void
+    {
+        $this->authorize('delete', $this->transaction);
+
+        abort_unless($this->transaction->isManual(), 404);
+
+        $month = Format::local($this->transaction->occurred_at)->format('Y-m');
+
+        $this->transaction->forceDelete();
+
+        session()->flash('status', __('Transaction deleted.'));
+
+        $this->redirectRoute('transactions', ['month' => $month], navigate: true);
+    }
+
     public function toggleRaw(): void
     {
         $this->showRaw = ! $this->showRaw;
@@ -135,10 +151,14 @@ class Show extends Component
         };
     }
 
-    /** @return Builder<Category> */
+    /**
+     * Only categories that fit the direction (see Category::fitting()).
+     *
+     * @return Builder<Category>
+     */
     private function selectableCategories(): Builder
     {
-        return auth()->user()->availableCategories();
+        return auth()->user()->availableCategories()->fitting($this->transaction->direction);
     }
 
     public function render()
@@ -147,8 +167,9 @@ class Show extends Component
 
         return view('livewire.transactions.show', [
             'categories' => $this->selectableCategories()->ordered()->get(),
-            'defaultTab' => ($this->transaction->category?->type ?? $this->transaction->direction->categoryTypes()[0])->value,
-            'bankName' => config("banks.{$this->transaction->bank_code}.name", $this->transaction->bank_code),
+            'bankName' => $this->transaction->isManual() ?
+                __('Added manually') :
+                config("banks.{$this->transaction->bank_code}.name", $this->transaction->bank_code)." ({$this->transaction->bank_code})",
             'rawText' => $this->showRaw && $rawEmail ? $rawEmail->toParserInput()->text : null,
             'rawEmail' => $rawEmail,
             'backfillCount' => $this->transaction->category_id && $this->ruleTarget() !== null ?

@@ -12,11 +12,14 @@
 
     <div class="flex items-center justify-between gap-2">
         <h1 class="text-2xl font-semibold tracking-tight">{{ __('Transactions') }}</h1>
-        @if($account?->isSyncing())
-            <p wire:poll.3s role="status" class="inline-flex min-h-11 items-center text-sm font-medium text-slate-500">
-                {{ __('Syncing') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
-            </p>
-        @endif
+        <div class="flex items-center gap-3">
+            @if($account?->isSyncing())
+                <p wire:poll.3s role="status" class="inline-flex min-h-11 items-center text-sm font-medium text-slate-500">
+                    {{ __('Syncing') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                </p>
+            @endif
+            <a href="{{ route('transactions.create') }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 rounded-xl bg-black px-4 text-sm font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">+ {{ __('Add') }}</a>
+        </div>
     </div>
 
     <x-month-switcher :month="$monthStart" />
