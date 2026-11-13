@@ -88,7 +88,7 @@
             </ul>
         </section>
     @empty
-        <div class="border-y border-slate-200 px-1 py-8 text-center">
+        <div class="px-1 py-8 text-center">
             @if($hasAnyTransactions)
                 <p class="font-semibold">{{ __('Nothing here') }}</p>
                 <p class="mt-1 text-sm text-slate-600">{{ __('Try another month or clear the filter.') }}</p>

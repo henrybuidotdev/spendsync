@@ -6,7 +6,7 @@
     <x-month-switcher :month="$monthStart" />
 
     @if($total === 0)
-        <div class="border-y border-slate-200 px-1 py-8 text-center">
+        <div class="px-1 py-8 text-center">
             <p class="font-semibold">{{ __('No spending this month') }}</p>
             <p class="mt-1 text-sm text-slate-600">{{ __('Try the previous month, or look at your transactions.') }}</p>
             <a href="{{ route('transactions') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('View transactions') }}</a>
