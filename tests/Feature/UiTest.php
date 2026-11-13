@@ -316,46 +316,62 @@ test('users cannot assign another users category', function () {
     expect($transaction->fresh()->category_id)->toBeNull();
 });
 
-test('choosing a category with the checkbox creates a rule and backfills', function () {
+test('after choosing a category, the button fills in matching uncategorized transactions without creating a rule', function () {
     $user = connectedUser();
     $food = $user->availableCategories()->where('name', 'Food & drink')->first();
     $transaction = Transaction::factory()->for($user)->create(['counterparty' => 'BÚN BÒ HUẾ']);
     $sibling = Transaction::factory()->for($user)->create(['counterparty' => 'bun bo hue']);
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
-        ->assertSet('applyToFuture', true)
-        ->assertSee('Áp dụng danh mục này cho các giao dịch kế tiếp với')
+        ->assertDontSee('Tìm thấy')
+        ->assertDontSee('Tự động lưu')
         ->call('setCategory', $food->id)
-        ->assertSee('Đã lưu danh mục và áp dụng cho 1 giao dịch khác.');
+        ->assertSee('Tìm thấy 1 giao dịch với')
+        ->assertSee('bạn có muốn lưu "Ăn uống" cho các giao dịch đó không?', false)
+        ->assertSee('Tự động lưu "Ăn uống" cho các giao dịch trong tương lai với', false)
+        ->assertSet('applyToFuture', false)
+        ->call('applyToUncategorized')
+        ->assertSee('Đã áp dụng cho 1 giao dịch.')
+        ->assertDontSee('Tìm thấy');
 
-    expect($transaction->fresh()->category_id)->toBe($food->id)
-        ->and($sibling->fresh()->category_id)->toBe($food->id)
-        ->and(CategoryRule::first()->match_value)->toBe('bun bo hue')
-        ->and(CategoryRule::first()->match_field)->toBe(MatchField::Counterparty);
+    expect($sibling->fresh()->category_id)->toBe($food->id)
+        ->and(CategoryRule::count())->toBe(0);
 });
 
-test('saving a rule that matches no other transactions does not mention a count', function () {
+test('ticking the checkbox creates a rule without filling in past transactions', function () {
     $user = connectedUser();
-    $category = $user->availableCategories()->first();
+    $food = $user->availableCategories()->where('name', 'Food & drink')->first();
+    $transaction = Transaction::factory()->for($user)->create(['counterparty' => 'BÚN BÒ HUẾ']);
+    $sibling = Transaction::factory()->for($user)->create(['counterparty' => 'bun bo hue']);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
+        ->call('setCategory', $food->id)
+        ->set('applyToFuture', true)
+        ->assertSee('Đã lưu quy tắc.')
+        ->assertSee('Tìm thấy 1 giao dịch với');
+
+    expect($sibling->fresh()->category_id)->toBeNull()
+        ->and(CategoryRule::sole()->match_value)->toBe('bun bo hue')
+        ->and(CategoryRule::sole()->match_field)->toBe(MatchField::Counterparty);
+});
+
+test('the button is hidden when no uncategorized transaction matches', function () {
+    $user = connectedUser();
     $transaction = Transaction::factory()->for($user)->create(['counterparty' => 'ONLY ONE']);
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
-        ->call('setCategory', $category->id)
+        ->call('setCategory', $user->availableCategories()->first()->id)
         ->assertSee('Đã lưu danh mục.')
-        ->assertDontSee('0 giao dịch khác')
-        ->set('applyToFuture', false)
-        ->set('applyToFuture', true)
-        ->assertSee('Đã lưu quy tắc.')
-        ->assertDontSee('0 giao dịch khác');
+        ->assertSee('Tự động lưu')
+        ->assertDontSee('Tìm thấy');
 });
 
-test('unticking the checkbox only categorizes this transaction', function () {
+test('choosing a category without ticking only categorizes this transaction', function () {
     $user = connectedUser();
     $transaction = Transaction::factory()->for($user)->create(['counterparty' => 'X']);
     $sibling = Transaction::factory()->for($user)->create(['counterparty' => 'X']);
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
-        ->set('applyToFuture', false)
         ->call('setCategory', $user->availableCategories()->first()->id);
 
     expect(CategoryRule::count())->toBe(0)
@@ -368,7 +384,7 @@ test('the checkbox shows whether a rule exists and unticking removes the rule', 
     $transaction = Transaction::factory()->for($user)->create(['counterparty' => 'X']);
     $show = fn () => Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction->fresh()]);
 
-    $show()->assertSet('applyToFuture', true)->call('setCategory', $category->id);
+    $show()->assertSet('applyToFuture', false)->call('setCategory', $category->id)->set('applyToFuture', true);
 
     expect(CategoryRule::count())->toBe(1);
 
@@ -388,7 +404,7 @@ test('a transaction in another category than the rule is an exception and never 
     $usual = Transaction::factory()->for($user)->create(['counterparty' => 'X']);
     $exception = Transaction::factory()->for($user)->create(['counterparty' => 'X']);
 
-    Livewire::actingAs($user)->test(Show::class, ['transaction' => $usual])->call('setCategory', $food->id);
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $usual])->call('setCategory', $food->id)->call('applyToUncategorized')->set('applyToFuture', true);
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $exception->fresh()])
         ->assertSet('applyToFuture', true)
@@ -402,7 +418,7 @@ test('a transaction in another category than the rule is an exception and never 
     expect(CategoryRule::sole()->category_id)->toBe($food->id)
         ->and($exception->fresh()->category_id)->toBe($bills->id);
 
-    Livewire::actingAs($user)->test(Show::class, ['transaction' => $usual])->assertSet('applyToFuture', true);
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $usual->fresh()])->assertSet('applyToFuture', true);
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $exception->fresh()])->set('applyToFuture', true);
 

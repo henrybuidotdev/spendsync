@@ -94,17 +94,36 @@ class CategoryMatcher
      */
     public function backfill(CategoryRule $rule): int
     {
-        $ids = Transaction::where('user_id', $rule->user_id)
-            ->whereNull('category_id')
-            ->get(['id', 'user_id', 'direction', 'counterparty', 'counterparty_account', 'description'])
-            ->filter(fn (Transaction $transaction) => $this->matches($rule, $transaction))
-            ->pluck('id');
+        $ids = $this->uncategorizedMatching($rule)->pluck('id');
 
         if ($ids->isEmpty()) {
             return 0;
         }
 
         return Transaction::whereIn('id', $ids)->update(['category_id' => $rule->category_id]);
+    }
+
+    /** How many uncategorized transactions the rule would fill in. */
+    public function backfillCount(CategoryRule $rule): int
+    {
+        return $this->uncategorizedMatching($rule)->count();
+    }
+
+    /** An unsaved rule mapping this transaction's account number (or name, or description) to its category. */
+    public function draft(Transaction $transaction): CategoryRule
+    {
+        return (new CategoryRule)
+            ->forceFill([...self::ruleKey($transaction), 'category_id' => $transaction->category_id])
+            ->setRelation('category', $transaction->category);
+    }
+
+    /** @return Collection<int, Transaction> */
+    private function uncategorizedMatching(CategoryRule $rule): Collection
+    {
+        return Transaction::where('user_id', $rule->user_id)
+            ->whereNull('category_id')
+            ->get(['id', 'user_id', 'direction', 'counterparty', 'counterparty_account', 'description'])
+            ->filter(fn (Transaction $transaction) => $this->matches($rule, $transaction));
     }
 
     /** @param Collection<int, CategoryRule> $rules */

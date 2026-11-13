@@ -16,7 +16,7 @@ class Show extends Component
 {
     public Transaction $transaction;
 
-    public bool $applyToFuture = true;
+    public bool $applyToFuture = false;
 
     public string $note = '';
 
@@ -30,7 +30,7 @@ class Show extends Component
     {
         $this->authorize('view', $transaction);
 
-        $this->applyToFuture = $transaction->category_id === null || $matcher->follows($transaction);
+        $this->applyToFuture = $transaction->category_id !== null && $matcher->follows($transaction);
 
         $this->note = (string) $transaction->note;
     }
@@ -43,20 +43,10 @@ class Show extends Component
 
         $this->transaction->update(['category_id' => $category->id]);
 
-        $message = __('Category saved.');
-
-        if ($this->applyToFuture && $this->ruleTarget() !== null && $matcher->ruleFor($this->transaction) === null) {
-            $count = $matcher->backfill($matcher->remember($this->transaction, $category));
-
-            if ($count > 0) {
-                $message = __('Category saved and applied to :count other transactions.', ['count' => $count]);
-            }
-        }
-
         $this->applyToFuture = $matcher->follows($this->transaction);
 
         $this->transaction->load('category');
-        session()->flash('status', $message);
+        session()->flash('status', __('Category saved.'));
     }
 
     public function updatedApplyToFuture(): void
@@ -80,11 +70,26 @@ class Show extends Component
             return;
         }
 
-        $count = $matcher->backfill($matcher->remember($this->transaction, $this->transaction->category));
+        $matcher->remember($this->transaction, $this->transaction->category);
 
-        session()->flash('status', $count > 0 ?
-            __('Rule saved and applied to :count other transactions.', ['count' => $count]) :
-            __('Rule saved.'));
+        session()->flash('status', __('Rule saved.'));
+    }
+
+    public function applyToUncategorized(CategoryMatcher $matcher): void
+    {
+        $this->authorize('update', $this->transaction);
+
+        if ($this->transaction->category_id === null) {
+            return;
+        }
+
+        if ($this->ruleTarget() === null) {
+            return;
+        }
+
+        $count = $matcher->backfill($matcher->draft($this->transaction));
+
+        session()->flash('status', __('Applied to :count transactions.', ['count' => $count]));
     }
 
     public function updatedNote(): void
@@ -146,6 +151,9 @@ class Show extends Component
             'bankName' => config("banks.{$this->transaction->bank_code}.name", $this->transaction->bank_code),
             'rawText' => $this->showRaw && $rawEmail ? $rawEmail->toParserInput()->text : null,
             'rawEmail' => $rawEmail,
+            'backfillCount' => $this->transaction->category_id && $this->ruleTarget() !== null ?
+                app(CategoryMatcher::class)->backfillCount(app(CategoryMatcher::class)->draft($this->transaction)) :
+                0,
             'backFilter' => in_array($this->filter, Index::FILTERS, true) && $this->filter !== 'all' ? $this->filter : null,
         ])->title(__('Transaction details'));
     }

@@ -117,6 +117,37 @@ test('backfill only touches the owners uncategorized matching transactions', fun
         ->and($otherUser->fresh()->category_id)->toBeNull();
 });
 
+test('draft builds an unsaved rule from the transaction and its category', function () {
+    $transaction = Transaction::factory()->for($this->user)->create(['counterparty' => 'Bún Bò Huế', 'counterparty_account' => null, 'category_id' => $this->food->id]);
+
+    $rule = $this->matcher->draft($transaction);
+
+    expect($rule->exists)->toBeFalse()
+        ->and($rule->user_id)->toBe($this->user->id)
+        ->and($rule->match_field)->toBe(MatchField::Counterparty)
+        ->and($rule->match_value)->toBe('bun bo hue')
+        ->and($rule->category_id)->toBe($this->food->id)
+        ->and($rule->category->is($this->food))->toBeTrue()
+        ->and(CategoryRule::count())->toBe(0);
+});
+
+test('backfillCount counts what backfill would fill in without changing anything', function () {
+    $transaction = Transaction::factory()->for($this->user)->create(['counterparty' => 'TRAN THI BICH', 'counterparty_account' => null, 'category_id' => $this->food->id]);
+    $match = Transaction::factory()->for($this->user)->create(['counterparty' => 'Trần Thị Bích']);
+    Transaction::factory()->for($this->user)->create(['counterparty' => 'TRAN THI BICH', 'category_id' => $this->bills->id]);
+    Transaction::factory()->for($this->user)->income()->create(['counterparty' => 'TRAN THI BICH']);
+    Transaction::factory()->for($this->user)->create(['counterparty' => 'LE VAN A']);
+    Transaction::factory()->create(['counterparty' => 'TRAN THI BICH']);
+
+    $rule = $this->matcher->draft($transaction);
+
+    expect($this->matcher->backfillCount($rule))->toBe(1)
+        ->and($match->fresh()->category_id)->toBeNull()
+        ->and($this->matcher->backfill($rule))->toBe(1)
+        ->and($this->matcher->backfillCount($rule))->toBe(0)
+        ->and(CategoryRule::count())->toBe(0);
+});
+
 test('rules never assign a category of the wrong kind', function () {
     $rule = rule($this->user, MatchField::Description, 'grab', $this->food->id);
     $payment = Transaction::factory()->for($this->user)->create(['description' => 'GRAB FOOD']);

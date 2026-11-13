@@ -52,10 +52,19 @@
         </div>
 
 
-        @if($this->ruleTarget())
+        @if($transaction->category_id && $this->ruleTarget())
+            @php($ruleTexts = ['target' => '<em class="font-semibold not-italic">'.e(\Illuminate\Support\Str::limit($this->ruleTarget(), 60)).'</em>', 'category' => e($transaction->category->label)])
+
+            @if($backfillCount > 0)
+                <div class="mt-5 flex items-center gap-3 rounded-xl bg-amber-50 p-3 text-sm">
+                    <p class="flex-1">{!! __('Found :count "Uncategorized" transactions with :target. Set them to ":category" too?', ['count' => $backfillCount, ...$ruleTexts]) !!}</p>
+                    <x-primary-button type="button" wire:click="applyToUncategorized" class="shrink-0">{{ __('Apply') }}</x-primary-button>
+                </div>
+            @endif
+
             <label class="mt-5 flex min-h-11 cursor-pointer items-start gap-3 text-sm">
                 <input type="checkbox" wire:model.live="applyToFuture" class="mt-0.5 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
-                <span>{{ __('Apply this category to future transactions with') }} <em class="font-semibold not-italic">{{ \Illuminate\Support\Str::limit($this->ruleTarget(), 60) }}</em></span>
+                <span>{!! __('Automatically set ":category" for future transactions with :target', $ruleTexts) !!}</span>
             </label>
         @endif
 
