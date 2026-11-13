@@ -9,10 +9,9 @@
     <section class="rounded-2xl bg-white p-4 shadow-sm">
         <ol class="space-y-3">
             @foreach([
-                [__('Step 1: Turn on 2-Step Verification for your Google account.'), 'https://myaccount.google.com/signinoptions/two-step-verification', __('Open security settings')],
-                [__('Step 2: Open the App passwords page.'), 'https://myaccount.google.com/apppasswords', 'myaccount.google.com/apppasswords'],
-                [__('Step 3: Create a password named SpendSync. Google shows 16 letters.'), null, null],
-                [__('Step 4: Paste those 16 letters below.'), null, null],
+                [__('Step 1: Turn on 2-Step Verification for your Google account. Google only lets you create App passwords when it is on.'), 'https://myaccount.google.com/signinoptions/two-step-verification', __('Open security settings')],
+                [__('Step 2: Open the App passwords page and create a password named SpendSync. Google shows 16 letters.'), 'https://myaccount.google.com/apppasswords', 'myaccount.google.com/apppasswords'],
+                [__('Step 3: Paste those 16 letters below.'), null, null],
             ] as [$step, $url, $linkText])
                 <li>
                     <p>{{ $step }}</p>
