@@ -180,7 +180,7 @@
                         <button type="button" wire:click="deleteRule({{ $rule->id }})" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="{{ __('Delete rule') }}"><x-icon name="trash" class="mx-auto h-4 w-4" /></button>
                     </div>
                 @empty
-                    <p class="mt-2 text-sm text-slate-600">{{ __('No rules yet. When you pick a category for a transaction, the app remembers it for next time.') }}</p>
+                    <p class="mt-2 text-sm text-slate-600">{{ __('No rules yet. Open a transaction, pick a category, then tick "Automatically set…" to create one.') }}</p>
                 @endforelse
             </section>
                 @break
