@@ -46,9 +46,9 @@ $login = function () {
         <div>
             <div class="flex items-baseline justify-between gap-2">
                 <x-input-label for="password" :value="__('Password')" />
-                @if(Route::has('password.request'))
+                {{-- @if(Route::has('password.request'))
                     <a href="{{ route('password.request') }}" wire:navigate class="text-sm text-slate-500 hover:text-slate-900 focus:outline-none focus-visible:underline">{{ __('Forgot your password?') }}</a>
-                @endif
+                @endif --}}
             </div>
             <x-password-input wire:model="form.password" class="mt-1" name="password" required autocomplete="current-password" />
             <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
