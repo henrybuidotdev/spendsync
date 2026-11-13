@@ -5,13 +5,6 @@
 
     <a href="{{ route('transactions', ['month' => Format::local($transaction->occurred_at)->format('Y-m'), 'filter' => $backFilter]) }}" wire:navigate class="-ml-1 inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"><x-icon name="chevron-left" class="h-4 w-4" /> {{ __('Transactions') }}</a>
 
-    @if($transaction->trashed())
-        <div class="flex items-center justify-between gap-3 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900 ring-1 ring-amber-200" role="status">
-            <p>{{ __('This transaction is hidden. It is not counted in totals or reports.') }}</p>
-            <button type="button" wire:click="toggleHidden" class="min-h-11 shrink-0 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Unhide') }}</button>
-        </div>
-    @endif
-
     <div class="py-2 text-center">
         <x-category-icon :category="$transaction->category" class="mx-auto h-16 w-16 text-4xl" />
         <p class="mt-2 break-words font-semibold">{{ $transaction->label() }}</p>
@@ -100,8 +93,13 @@
         </section>
     @endif
 
-    @unless($transaction->trashed())
+    @if($transaction->trashed())
+        <div class="flex items-center justify-between gap-3 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900 ring-1 ring-amber-200" role="status">
+            <p>{{ __('This transaction is hidden. It is not counted in totals or reports.') }}</p>
+            <button type="button" wire:click="toggleHidden" class="min-h-11 shrink-0 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Unhide') }}</button>
+        </div>
+    @else
         <button type="button" wire:click="toggleHidden" class="min-h-11 w-full rounded-xl px-4 text-sm font-medium text-slate-600 ring-1 ring-slate-300 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Hide transaction') }}</button>
         <p class="-mt-2 px-1 text-center text-xs text-slate-500">{{ __('Hidden transactions stay in the list but are not counted in totals or reports.') }}</p>
-    @endunless
+    @endif
 </div>
