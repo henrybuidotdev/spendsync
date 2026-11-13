@@ -38,7 +38,7 @@ $updatePassword = function () {
 
 ?>
 
-<section>
+<section x-data="{ open: false }">
     <header>
         <h2 class="text-lg font-medium text-gray-900">
             {{ __('Update Password') }}
@@ -49,7 +49,11 @@ $updatePassword = function () {
         </p>
     </header>
 
-    <form wire:submit="updatePassword" class="mt-6 space-y-6">
+    <x-secondary-button x-show="! open" @click="open = true; $nextTick(() => document.getElementById('update_password_current_password').focus())" class="mt-6">
+        {{ __('Update password') }}
+    </x-secondary-button>
+
+    <form x-show="open" x-cloak wire:submit="updatePassword" class="mt-6 space-y-6">
         <div>
             <x-input-label for="update_password_current_password" :value="__('Current Password')" />
             <x-password-input wire:model="current_password" id="update_password_current_password" name="current_password" class="mt-1" autocomplete="current-password" />
@@ -63,10 +67,10 @@ $updatePassword = function () {
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button>{{ __('Update password') }}</x-primary-button>
 
             <x-action-message class="me-3" on="password-updated">
-                {{ __('Saved.') }}
+                {{ __('Password changed!') }}
             </x-action-message>
         </div>
     </form>
