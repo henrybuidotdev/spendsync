@@ -49,7 +49,7 @@ $updatePassword = function () {
         </p>
     </header>
 
-    <x-secondary-button x-show="! open" @click="open = true; $nextTick(() => document.getElementById('update_password_current_password').focus())" class="mt-6">
+    <x-secondary-button x-show="! open" @click="open = true; $nextTick(() => document.getElementById('update_password_current_password').focus())" class="mt-3">
         {{ __('Update password') }}
     </x-secondary-button>
 
