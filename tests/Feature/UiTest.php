@@ -234,7 +234,7 @@ test('sync now runs a sync at most once per minute', function () {
     $user = connectedUser();
     $user->mailAccount->update(['last_synced_at' => now()]);
 
-    $component = Livewire::actingAs($user)->test(Index::class)->call('syncNow')->assertDontSee('Đang đồng bộ');
+    $component = Livewire::actingAs($user)->test(Settings::class, ['section' => 'gmail'])->call('syncNow')->assertSee('Có thể mất đến 10 phút');
     $component->call('syncNow')->assertSee('Vừa đồng bộ xong');
 
     expect($fake->searches)->toHaveCount(1);
@@ -251,9 +251,9 @@ test('sync now is hidden and ignored while a sync is running', function () {
     $user->mailAccounts()->first()->queueSync();
     Queue::assertPushed(SyncMailAccount::class, 1);
 
-    Livewire::actingAs($user)->test(Index::class)
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'gmail'])
         ->assertSee('Đang đồng bộ')
-        ->assertDontSee('Đồng bộ ngay')
+        ->assertDontSeeHtml('wire:click="syncNow"')
         ->call('syncNow');
 
     Queue::assertPushed(SyncMailAccount::class, 1);
@@ -622,7 +622,6 @@ test('the language switch is saved to the user settings', function () {
 
     $this->actingAs($user->fresh())->get('/')
         ->assertSee('Transactions')
-        ->assertSee('Sync now')
         ->assertCookie('locale', 'en');
 });
 

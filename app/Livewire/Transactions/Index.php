@@ -3,12 +3,10 @@
 namespace App\Livewire\Transactions;
 
 use App\Enums\Direction;
-use App\Enums\MailAccountStatus;
 use App\Livewire\Concerns\WithMonth;
 use App\Models\Transaction;
 use App\Support\Format;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -26,30 +24,6 @@ class Index extends Component
     public function setFilter(string $filter): void
     {
         $this->filter = in_array($filter, self::FILTERS, true) ? $filter : 'all';
-    }
-
-    public function syncNow(): void
-    {
-        $account = auth()->user()->mailAccount;
-
-        if ($account?->status !== MailAccountStatus::Active) {
-            return;
-        }
-
-        if ($account->isSyncing()) {
-            return;
-        }
-
-        $key = 'sync-now:'.auth()->id();
-
-        if (RateLimiter::tooManyAttempts($key, 1)) {
-            session()->flash('status', __('Just synced. Try again in :seconds seconds.', ['seconds' => RateLimiter::availableIn($key)]));
-
-            return;
-        }
-
-        RateLimiter::hit($key, 60);
-        $account->queueSync();
     }
 
     public function render()

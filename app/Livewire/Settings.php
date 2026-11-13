@@ -7,6 +7,7 @@ use App\Enums\Locale;
 use App\Enums\MailAccountStatus;
 use App\Enums\Theme;
 use App\Livewire\Actions\Logout;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
@@ -47,6 +48,32 @@ class Settings extends Component
         $account->update(['app_password' => null, 'status' => MailAccountStatus::Disabled, 'last_error' => null]);
 
         session()->flash('status', __('Gmail disconnected and app password deleted. Your transactions are kept.'));
+    }
+
+    public function syncNow(): void
+    {
+        $account = auth()->user()->mailAccount;
+
+        if ($account?->status !== MailAccountStatus::Active) {
+            return;
+        }
+
+        if ($account->isSyncing()) {
+            return;
+        }
+
+        $key = 'sync-now:'.auth()->id();
+
+        if (RateLimiter::tooManyAttempts($key, 1)) {
+            session()->flash('status', __('Just synced. Try again in :seconds seconds.', ['seconds' => RateLimiter::availableIn($key)]));
+
+            return;
+        }
+
+        RateLimiter::hit($key, 60);
+        $account->queueSync();
+
+        session()->flash('status', __('Syncing started. It can take up to 10 minutes, so you don\'t need to wait here.'));
     }
 
     public function showCategoryType(string $type): void

@@ -73,9 +73,23 @@
                                 <span class="rounded-full bg-slate-200 px-2 py-0.5 font-medium text-slate-700">{{ __('Disconnected') }}</span>
                         @endswitch
                     </p>
-                    <p class="mt-2 text-sm text-slate-600">
-                        {{ __('Last synced') }}:
-                        {{ $account->last_synced_at ? Format::local($account->last_synced_at)->format('H:i d/m/Y').' ('.Format::local($account->last_synced_at)->diffForHumans().')' : __('never') }}
+                    <p class="mt-2 flex flex-wrap items-center gap-x-2 text-sm text-slate-600">
+                        <span>
+                            {{ __('Last synced') }}:
+                            {{ $account->last_synced_at ? Format::local($account->last_synced_at)->format('H:i d/m/Y').' ('.Format::local($account->last_synced_at)->diffForHumans().')' : __('never') }}
+                        </span>
+                        @if($account->status === MailAccountStatus::Active)
+                            @if($account->isSyncing())
+                                <span wire:poll.3s role="status" class="inline-flex min-h-11 items-center font-medium text-slate-500">
+                                    {{ __('Syncing') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                                </span>
+                            @else
+                                <button type="button" wire:click="syncNow" wire:loading.attr="disabled"
+                                        class="inline-flex min-h-11 items-center gap-1 rounded font-medium text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
+                                    <x-icon name="refresh" class="h-4 w-4" /> {{ __('Sync now') }}
+                                </button>
+                            @endif
+                        @endif
                     </p>
                     @if($account->last_error)
                         <p class="mt-1 text-sm text-red-600">
@@ -104,7 +118,7 @@
             <section class="border-t border-slate-200 pt-5" aria-labelledby="sync-heading">
                 <h2 id="sync-heading" class="font-semibold">{{ __('How syncing works') }}</h2>
                 <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
-                    <li>{{ __('Syncs automatically every hour. You can tap "Sync now" on the transactions page any time.') }}</li>
+                    <li>{{ __('Syncs automatically every hour. You can also tap "Sync now" above.') }}</li>
                     <li>{{ __('Only balance-change emails from supported banks are read. Other emails are never read, and nothing is marked as read.') }}</li>
                     <li>{{ __('The first sync looks back :days days. Each later sync starts 1 day before the last successful sync, and emails already imported are skipped.', ['days' => SyncMailAccount::FIRST_SYNC_DAYS]) }}</li>
                     <li>{{ __('Deleting an email in Gmail does not delete its transaction in the app.') }}</li>

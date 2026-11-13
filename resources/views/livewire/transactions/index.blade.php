@@ -12,18 +12,10 @@
 
     <div class="flex items-center justify-between gap-2">
         <h1 class="text-2xl font-semibold tracking-tight">{{ __('Transactions') }}</h1>
-        @if($account?->status === \App\Enums\MailAccountStatus::Active)
-            @if($account->isSyncing())
-                <button type="button" disabled wire:poll.3s role="status"
-                        class="inline-flex min-h-11 cursor-not-allowed items-center text-sm font-medium text-slate-500">
-                    {{ __('Syncing') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
-                </button>
-            @else
-                <button type="button" wire:click="syncNow" wire:loading.attr="disabled"
-                        class="inline-flex items-center gap-1 rounded text-sm font-medium text-emerald-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:cursor-not-allowed disabled:opacity-60">
-                    <x-icon name="refresh" class="h-4 w-4" /> {{ __('Sync now') }}
-                </button>
-            @endif
+        @if($account?->isSyncing())
+            <p wire:poll.3s role="status" class="inline-flex min-h-11 items-center text-sm font-medium text-slate-500">
+                {{ __('Syncing') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+            </p>
         @endif
     </div>
 
