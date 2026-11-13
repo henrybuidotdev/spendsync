@@ -18,8 +18,11 @@
         'log-out' => 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
         'lock' => 'M5 11h14v10H5ZM7 11V7a5 5 0 0 1 10 0v4',
         'pencil' => 'M21.17 6.81a2.83 2.83 0 0 0-4-4L3.84 16.17a2 2 0 0 0-.5.83l-1.32 4.35a.5.5 0 0 0 .62.62l4.35-1.32a2 2 0 0 0 .83-.5ZM15 5l4 4',
+        'list' => 'M3 5h.01M3 12h.01M3 19h.01M8 5h13M8 12h13M8 19h13',
+        'chart-no-axes-column' => 'M5 21v-6M12 21V3M19 21V9',
+        'settings' => 'M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
         'trash' => 'M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2',
     ];
 @endphp
 
-<svg {{ $attributes->merge(['class' => 'h-5 w-5 shrink-0']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ $paths[$name] }}"/></svg>
+<svg {{ $attributes->class(['h-5 w-5' => ! preg_match('/(^|\s)h-/', $attributes->get('class', '')), 'shrink-0']) }} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ $paths[$name] }}"/></svg>
