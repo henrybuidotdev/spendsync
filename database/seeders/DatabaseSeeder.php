@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SystemCategorySeeder::class);
 
         if (! User::where('email', 'test@example.com')->first()) {
-            User::factory()->createOrFirst([
+            User::factory()->create([
                 'name' => 'Test User',
                 'email' => 'test@example.com',
             ]);
