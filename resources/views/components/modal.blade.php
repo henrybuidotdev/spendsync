@@ -12,6 +12,8 @@ $maxWidth = [
     'xl' => 'sm:max-w-xl',
     '2xl' => 'sm:max-w-2xl',
 ][$maxWidth];
+
+$sheet = $attributes->has('sheet');
 @endphp
 
 <div
@@ -46,7 +48,7 @@ $maxWidth = [
     x-on:keydown.tab.prevent="$event.shiftKey || nextFocusable().focus()"
     x-on:keydown.shift.tab.prevent="prevFocusable().focus()"
     x-show="show"
-    class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50"
+    @class(['fixed inset-0 z-50', 'overflow-y-auto px-4 py-6 sm:px-0' => ! $sheet, 'flex items-end sm:block sm:py-6' => $sheet])
     style="display: {{ $show ? 'block' : 'none' }};"
 >
     <div
@@ -65,13 +67,18 @@ $maxWidth = [
 
     <div
         x-show="show"
-        class="mb-6 bg-white rounded-lg shadow-xl transform transition-all sm:w-full {{ $maxWidth }} sm:mx-auto"
+        @class([
+            'bg-white shadow-xl transform transition-all sm:w-full sm:mx-auto',
+            $maxWidth,
+            'mb-6 rounded-lg' => ! $sheet,
+            'relative h-[85dvh] w-full overflow-y-auto overscroll-contain rounded-t-2xl pb-[env(safe-area-inset-bottom)] sm:h-full sm:rounded-lg sm:pb-0' => $sheet,
+        ])
         x-transition:enter="ease-out duration-300"
-        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        x-transition:enter-start="{{ $sheet ? 'translate-y-full' : 'opacity-0 translate-y-4' }} sm:translate-y-0 sm:opacity-0 sm:scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
         x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        x-transition:leave-end="{{ $sheet ? 'translate-y-full' : 'opacity-0 translate-y-4' }} sm:translate-y-0 sm:opacity-0 sm:scale-95"
     >
         {{ $slot }}
     </div>
