@@ -87,7 +87,7 @@
     "Main navigation": "Điều hướng chính",
     "Money in": "Tiền vào",
     "Money out": "Tiền ra",
-    "Month :month": "Tháng :month",
+    ":monthName :year": "Tháng :number/:year",
     "Name": "Tên",
     "Needs reconnect": "Cần kết nối lại",
     "Net": "Chênh lệch",

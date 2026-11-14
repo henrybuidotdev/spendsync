@@ -1376,3 +1376,19 @@ test('report rows open the transactions behind them', function () {
     $this->actingAs($user)->get(route('transactions.show', [$transaction, 'payee' => 'GRAB']))
         ->assertSee(route('transactions', ['month' => '2026-11', 'payee' => 'GRAB']));
 });
+
+test('the month switcher names the month and stops at the current one', function () {
+    $user = connectedUser();
+
+    Livewire::actingAs($user)->test(Index::class)
+        ->assertSee('Tháng 11/2026')
+        ->assertSeeHtml('wire:click="nextMonth" disabled')
+        ->call('previousMonth')
+        ->assertSee('Tháng 10/2026')
+        ->assertDontSeeHtml('wire:click="nextMonth" disabled');
+
+    $user->update(['locale' => Locale::En]);
+    app()->setLocale('en');
+
+    Livewire::actingAs($user)->test(Reports::class)->assertSee('November 2026');
+});
