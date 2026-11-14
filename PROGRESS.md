@@ -13,6 +13,10 @@
 - [x] M9 Demo data: DemoSeeder
 - [x] M10 Hardening
 
+## Later
+
+- Connect by email forwarding instead of the app password — parked, see `docs/plans/inbound-forwarding.md`.
+
 ## Blocked
 
 (none)
