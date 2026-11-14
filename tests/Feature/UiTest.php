@@ -1402,3 +1402,18 @@ test('day headers say today and yesterday', function () {
     Livewire::actingAs($user)->test(Index::class)
         ->assertSeeInOrder(['Hôm nay', 'Hôm qua', 'Thứ ba, 10/11']);
 });
+
+test('reports compare spending with the previous month', function () {
+    $user = connectedUser();
+    Transaction::factory()->for($user)->create(['amount' => 100000, 'occurred_at' => '2026-11-03 03:00:00']);
+    Transaction::factory()->for($user)->create(['amount' => 50000, 'occurred_at' => '2026-10-05 03:00:00']);
+    Transaction::factory()->for($user)->create(['amount' => 500000, 'occurred_at' => '2026-10-20 03:00:00']);
+    Transaction::factory()->for($user)->create(['amount' => 1100000, 'occurred_at' => '2026-09-10 03:00:00']);
+
+    Livewire::actingAs($user)->test(Reports::class)
+        ->assertSee('Tăng 100% so với cùng kỳ tháng trước')
+        ->call('previousMonth')
+        ->assertSee('Giảm 50% so với tháng trước')
+        ->call('previousMonth')
+        ->assertDontSee('so với');
+});

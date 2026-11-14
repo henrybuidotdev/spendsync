@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use App\Enums\Direction;
 use App\Livewire\Concerns\WithMonth;
+use App\Support\Format;
+use Carbon\CarbonImmutable;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -50,11 +52,33 @@ class Reports extends Component
             ->toBase()
             ->get();
 
+        $isCurrentMonth = $this->monthStart()->equalTo(Format::month(null));
+        $previousTotal = $this->previousMonthSpending($isCurrentMonth);
+
         return view('livewire.reports', [
             'monthStart' => $this->monthStart(),
             'byCategory' => $byCategory,
             'total' => $total,
+            'change' => $previousTotal > 0 ? (int) round(100 * ($total - $previousTotal) / $previousTotal) : null,
+            'comparedTo' => $isCurrentMonth ? __('this time last month') : __('last month'),
             'topCounterparties' => $topCounterparties,
         ])->title(__('Reports'));
+    }
+
+    /** A month in progress is compared with the same stretch of the previous month, so early days don't always look cheaper. */
+    private function previousMonthSpending(bool $isCurrentMonth): int
+    {
+        $monthStart = $this->monthStart();
+        $previousStart = $monthStart->subMonth();
+
+        $previousEnd = $isCurrentMonth ?
+            $previousStart->add($monthStart->diff(CarbonImmutable::now()))->min($monthStart) :
+            $monthStart;
+
+        return (int) auth()->user()->transactions()
+            ->where('direction', Direction::Out)
+            ->where('occurred_at', '>=', $previousStart->utc())
+            ->where('occurred_at', '<', $previousEnd->utc())
+            ->sum('amount');
     }
 }

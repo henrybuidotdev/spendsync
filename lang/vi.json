@@ -255,5 +255,10 @@
     "Clear filter: :name": "Bỏ lọc: :name",
     "Today": "Hôm nay",
     "Yesterday": "Hôm qua",
-    "Default categories can't be edited or deleted.": "Không thể sửa hoặc xóa danh mục mặc định."
+    "Default categories can't be edited or deleted.": "Không thể sửa hoặc xóa danh mục mặc định.",
+    "Up :percent vs :period": "Tăng :percent so với :period",
+    "Down :percent vs :period": "Giảm :percent so với :period",
+    "Same as :period": "Bằng :period",
+    "last month": "tháng trước",
+    "this time last month": "cùng kỳ tháng trước"
 }

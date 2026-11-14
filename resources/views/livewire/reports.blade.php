@@ -17,6 +17,15 @@
                 <h2 id="by-category" class="font-semibold">{{ __('Spending by category') }}</h2>
                 <p class="font-semibold font-num">{{ Format::money($total) }}</p>
             </div>
+            @if($change !== null)
+                <p @class(['mt-0.5 text-right text-xs', 'text-red-600' => $change > 0, 'text-emerald-600' => $change < 0, 'text-slate-500' => $change === 0])>
+                    {{ match (true) {
+                        $change > 0 => __('Up :percent vs :period', ['percent' => "{$change}%", 'period' => $comparedTo]),
+                        $change < 0 => __('Down :percent vs :period', ['percent' => abs($change).'%', 'period' => $comparedTo]),
+                        default => __('Same as :period', ['period' => $comparedTo]),
+                    } }}
+                </p>
+            @endif
 
             <div class="mt-3 flex h-2.5 gap-0.5 overflow-hidden rounded-full" role="presentation">
                 @foreach($byCategory as $row)
