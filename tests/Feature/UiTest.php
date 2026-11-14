@@ -687,7 +687,7 @@ test('deleting all data removes the user and everything they own', function () {
     }
 
     expect(DB::table('categories')->whereNotNull('user_id')->count())->toBe(0)
-        ->and(DB::table('categories')->whereNull('user_id')->count())->toBe(22);
+        ->and(DB::table('categories')->whereNull('user_id')->count())->toBe(44);
 });
 
 test('every main page renders for a populated account', function () {
@@ -827,19 +827,19 @@ test('the category picker only offers categories that fit the direction and open
         ->assertDontSeeHtml("setCategory({$borrowing->id})")
         ->assertDontSeeHtml("setCategory({$salary->id})")
         ->assertSeeHtml("setCategory({$loan->id})")
-        ->assertSeeHtml("{ tab: 'expense' }");
+        ->assertSeeHtml("tab: 'expense' }");
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $in])
         ->assertSeeHtml("setCategory({$salary->id})")
         ->assertDontSeeHtml("setCategory({$food->id})")
         ->assertDontSeeHtml("setCategory({$loan->id})")
         ->assertSeeHtml("setCategory({$borrowing->id})")
-        ->assertSeeHtml("{ tab: 'income' }");
+        ->assertSeeHtml("tab: 'income' }");
 
     $out->update(['category_id' => $loan->id]);
 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => $out->fresh()])
-        ->assertSeeHtml("{ tab: 'debt_loan' }");
+        ->assertSeeHtml("tab: 'debt_loan' }");
 });
 
 test('an income category cannot be assigned to money out', function () {
@@ -860,7 +860,7 @@ test('settings lists one category type at a time and adds new categories as that
         ->assertSet('categoryType', 'expense')
         ->assertSee('Ăn uống')
         ->assertDontSee('Lương')
-        ->assertDontSeeHtml('<select')
+        ->assertDontSeeHtml('wire:model="categoryType"')
         ->set('newName', 'Cà phê')
         ->call('addCategory');
 
@@ -936,7 +936,7 @@ test('delete data wipes the users data but keeps the login, other users and syst
         ->and($user->mailAccounts()->count())->toBe(0)
         ->and($other->transactions()->count())->toBe(1)
         ->and($other->mailAccounts()->count())->toBe(1)
-        ->and(Category::system()->count())->toBe(22);
+        ->and(Category::system()->count())->toBe(44);
 
     $this->actingAs($user)->get('/')->assertRedirect('/connect');
 });
@@ -1323,4 +1323,17 @@ test('guests cannot add, edit or delete transactions', function () {
     $this->get('/transactions/create')->assertRedirect('/login');
     $this->get(route('transactions.edit', $manual))->assertRedirect('/login');
     $this->get(route('transactions.show', $manual))->assertRedirect('/login');
+});
+
+test('the category picker shows the selected category with its parent and opens the tree in a modal', function () {
+    $user = connectedUser();
+    $coffee = Category::system()->where('name', 'Coffee')->first();
+    $transaction = Transaction::factory()->for($user)->create(['category_id' => $coffee->id]);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => $transaction])
+        ->assertSeeHtml('aria-haspopup="dialog"')
+        ->assertSeeInOrder(['Ăn uống', 'Cà phê', 'Khoản chi']);
+
+    Livewire::actingAs($user)->test(Show::class, ['transaction' => Transaction::factory()->for($user)->create()])
+        ->assertSee('Chọn danh mục');
 });

@@ -7,6 +7,7 @@ use App\Enums\Locale;
 use App\Enums\MailAccountStatus;
 use App\Enums\Theme;
 use App\Livewire\Actions\Logout;
+use Closure;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -25,6 +26,8 @@ class Settings extends Component
     public string $newName = '';
 
     public string $newIcon = '';
+
+    public ?int $newParentId = null;
 
     /** Which kind of category the list shows and new categories get. */
     public string $categoryType = 'expense';
@@ -83,7 +86,7 @@ class Settings extends Component
     public function showCategoryType(string $type): void
     {
         $this->categoryType = CategoryType::tryFrom($type)?->value ?? CategoryType::Expense->value;
-        $this->reset('editingId', 'editingName', 'editingIcon');
+        $this->reset('editingId', 'editingName', 'editingIcon', 'newParentId');
     }
 
     public function addCategory(): void
@@ -92,16 +95,29 @@ class Settings extends Component
             'newName' => ['required', 'string', 'max:50'],
             'newIcon' => ['nullable', 'string', 'max:16'],
             'categoryType' => ['required', Rule::enum(CategoryType::class)->only([CategoryType::Expense, CategoryType::Income])],
+            'newParentId' => ['nullable', 'integer', function (string $attribute, mixed $value, Closure $fail): void {
+                $isTopLevel = auth()->user()->availableCategories()
+                    ->whereNull('parent_id')
+                    ->where('type', $this->categoryType)
+                    ->whereKey($value)
+                    ->exists();
+
+                if (! $isTopLevel) {
+                    $fail(__('Pick a parent category of the same type.'));
+                }
+            }],
         ], [], ['newName' => __('category name')]);
 
         auth()->user()->categories()->create([
+            'parent_id' => $validated['newParentId'],
             'name' => $validated['newName'],
             'icon' => $validated['newIcon'] ?: null,
             'type' => $validated['categoryType'],
             'order' => 1,
         ]);
 
-        $this->reset('newName', 'newIcon');
+        $this->reset('newName', 'newIcon', 'newParentId');
+        $this->dispatch('category-added');
     }
 
     public function editCategory(int $id): void
@@ -195,7 +211,8 @@ class Settings extends Component
                 ->where('type', $this->categoryType)
                 ->withCount(['transactions' => fn ($query) => $query->where('user_id', $user->id)])
                 ->ordered()
-                ->get(),
+                ->get()
+                ->pipe(fn ($categories) => $categories->whereNull('parent_id')->flatMap(fn ($parent) => [$parent, ...$categories->where('parent_id', $parent->id)])),
             'rules' => $this->section !== 'rules' ? collect() : $user->categoryRules()->with('category')->latest()->get(),
         ])->title($title);
     }

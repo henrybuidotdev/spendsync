@@ -16,10 +16,10 @@ class DemoSeeder extends Seeder
     private const RULES = [
         ['counterparty', 'CONG TY TNHH CONG NGHE ABC', 'Salary'],
         ['counterparty', 'CONG TY TNHH SHOPEE', 'Shopping'],
-        ['counterparty', 'LE THI HOA', 'Home'],
-        ['description', 'grab', 'Transport'],
-        ['description', 'highlands', 'Food & drink'],
-        ['description', 'tien dien', 'Bills'],
+        ['counterparty', 'LE THI HOA', 'Rentals'],
+        ['description', 'grab', 'Taxi'],
+        ['description', 'highlands', 'Coffee'],
+        ['description', 'tien dien', 'Electricity bill'],
     ];
 
     public function run(): void

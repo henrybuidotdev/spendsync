@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'name', 'icon', 'type', 'order'])]
+#[Fillable(['user_id', 'parent_id', 'name', 'icon', 'type', 'order'])]
 class Category extends Model
 {
     use HasFactory;
@@ -88,6 +88,11 @@ class Category extends Model
     public function isSystem(): bool
     {
         return $this->user_id === null;
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
     }
 
     public function user(): BelongsTo

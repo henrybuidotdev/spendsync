@@ -27,15 +27,17 @@ class Reports extends Component
         $byCategory = (clone $spending)
             ->selectRaw('category_id, sum(amount) as total, count(*) as count')
             ->groupBy('category_id')
-            ->orderByDesc('total')
             ->toBase()
             ->get()
-            ->map(fn ($row) => (object) [
-                'name' => $categories->get($row->category_id)?->label ?? __('Uncategorized'),
-                'category' => $categories->get($row->category_id),
-                'total' => (int) $row->total,
-                'count' => (int) $row->count,
-            ]);
+            ->groupBy(fn ($row) => $categories->get($row->category_id)?->parent_id ?? $row->category_id)
+            ->map(fn ($rows, $categoryId) => (object) [
+                'name' => $categories->get($categoryId)?->label ?? __('Uncategorized'),
+                'category' => $categories->get($categoryId),
+                'total' => (int) $rows->sum('total'),
+                'count' => (int) $rows->sum('count'),
+            ])
+            ->sortByDesc('total')
+            ->values();
 
         $total = $byCategory->sum('total');
 
