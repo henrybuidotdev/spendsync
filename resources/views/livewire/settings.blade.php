@@ -141,6 +141,8 @@
                     @endforeach
                 </div>
 
+                <p class="mt-3 flex items-center gap-1.5 px-1 text-sm text-slate-500"><x-icon name="lock" class="h-3.5 w-3.5" /> {{ __('Default categories can\'t be edited or deleted.') }}</p>
+
                 <ul class="mt-2 divide-y divide-slate-200">
                     @foreach($categories as $category)
                         <li @class(['flex min-h-14 items-center gap-2 py-1', 'pl-8' => $category->parent_id]) wire:key="category-{{ $category->id }}">
@@ -155,10 +157,12 @@
                                 <x-category-icon :category="$category" class="h-8 w-8 text-lg" />
                                 <span class="min-w-0 flex-1 truncate">
                                     {{ $category->label }}
-                                    <span class="text-xs text-slate-400">· {{ $category->transactions_count }}</span>
+                                    @if($category->transactions_count > 0)
+                                        <span class="text-xs text-slate-400">· {{ $category->transactions_count }}</span>
+                                    @endif
                                 </span>
                                 @if($category->isSystem())
-                                    <span class="inline-flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500" title="{{ __('Default category, cannot be edited or deleted') }}"><x-icon name="lock" class="h-3 w-3" /> {{ __('Default') }}</span>
+                                    <span class="flex h-11 w-11 shrink-0 items-center justify-center text-slate-400" title="{{ __('Default category, cannot be edited or deleted') }}"><x-icon name="lock" class="h-4 w-4" /><span class="sr-only">{{ __('Default category, cannot be edited or deleted') }}</span></span>
                                 @else
                                 <button type="button" wire:click="editCategory({{ $category->id }})" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="{{ __('Edit :name', ['name' => $category->label]) }}"><x-icon name="pencil" class="mx-auto h-4 w-4" /></button>
                                 <button type="button" wire:click="deleteCategory({{ $category->id }})" wire:confirm="{{ __('Delete this category? Its transactions become uncategorized.') }}" class="min-h-11 min-w-11 rounded-xl px-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500" aria-label="{{ __('Delete :name', ['name' => $category->label]) }}"><x-icon name="trash" class="mx-auto h-4 w-4" /></button>

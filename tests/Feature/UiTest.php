@@ -791,7 +791,7 @@ test('system categories are locked in settings and cannot be edited or deleted',
     $system = Category::system()->where('name', 'Food & drink')->first();
 
     Livewire::actingAs($user)->test(Settings::class, ['section' => 'categories'])
-        ->assertSee('Mặc định')
+        ->assertSee('Danh mục mặc định, không thể sửa hoặc xóa')
         ->assertDontSeeHtml("editCategory({$system->id})")
         ->assertDontSeeHtml("deleteCategory({$system->id})");
 

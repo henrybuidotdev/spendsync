@@ -40,7 +40,6 @@
     "Danger Zone": "Vùng nguy hiểm",
     "Dark": "Tối",
     "Debt/Loan": "Nợ/Vay",
-    "Default": "Mặc định",
     "Default category, cannot be edited or deleted": "Danh mục mặc định, không thể sửa hoặc xóa",
     "Delete :name": "Xóa :name",
     "Delete Account": "Xóa tài khoản",
@@ -254,5 +253,6 @@
     "Close": "Đóng",
     "Clear filter: :name": "Bỏ lọc: :name",
     "Today": "Hôm nay",
-    "Yesterday": "Hôm qua"
+    "Yesterday": "Hôm qua",
+    "Default categories can't be edited or deleted.": "Không thể sửa hoặc xóa danh mục mặc định."
 }
