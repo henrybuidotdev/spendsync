@@ -62,7 +62,7 @@ class SystemCategorySeeder extends Seeder
         ['Gifts', '🎁', CategoryType::Income, 20],
         ['Sales', '🏷️', CategoryType::Income, 10],
         ['Refund', '↩️', CategoryType::Income, 5],
-        ['Other income', '➕', CategoryType::Income, 0],
+        ['Other income', '🤑', CategoryType::Income, 0],
         ['Lending', '🤝', CategoryType::DebtLoan, 30],
         ['Debt collection', '💵', CategoryType::DebtLoan, 20],
         ['Borrowing', '🏦', CategoryType::DebtLoan, 10],
