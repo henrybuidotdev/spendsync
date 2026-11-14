@@ -49,18 +49,17 @@
     </section>
 
     <dl class="divide-y divide-slate-200 border-y border-slate-200 text-sm">
-        @foreach([
+        @foreach(array_filter([
             __('Bank') => $bankName,
-            __('Type') => $transaction->direction->label(),
             __('Original amount') => $transaction->currency ? Format::foreign($transaction->original_amount, $transaction->currency).($transaction->amount_estimated ? ' · '.__('estimated conversion') : '') : null,
             __('Counterparty') => $transaction->counterparty,
             __('Account number') => $transaction->counterparty_account,
             __('Description') => $transaction->description,
             __('Reference') => $transaction->reference,
-        ] as $label => $value)
+        ], 'filled') as $label => $value)
             <div class="flex justify-between gap-4 py-3">
                 <dt class="shrink-0 text-slate-500">{{ $label }}</dt>
-                <dd class="min-w-0 break-words text-right font-medium">{{ $value ?? '—' }}</dd>
+                <dd class="min-w-0 break-words text-right font-medium">{{ $value }}</dd>
             </div>
         @endforeach
     </dl>
