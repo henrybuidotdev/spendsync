@@ -1392,3 +1392,13 @@ test('the month switcher names the month and stops at the current one', function
 
     Livewire::actingAs($user)->test(Reports::class)->assertSee('November 2026');
 });
+
+test('day headers say today and yesterday', function () {
+    $user = connectedUser();
+    Transaction::factory()->for($user)->create(['occurred_at' => '2026-11-12 03:00:00']);
+    Transaction::factory()->for($user)->create(['occurred_at' => '2026-11-11 03:00:00']);
+    Transaction::factory()->for($user)->create(['occurred_at' => '2026-11-10 03:00:00']);
+
+    Livewire::actingAs($user)->test(Index::class)
+        ->assertSeeInOrder(['Hôm nay', 'Hôm qua', 'Thứ ba, 10/11']);
+});

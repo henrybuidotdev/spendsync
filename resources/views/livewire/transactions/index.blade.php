@@ -56,8 +56,13 @@
     @forelse($days as $date => $transactions)
         <section wire:key="day-{{ $date }}">
             @php($dayTotal = $transactions->reject->trashed()->sum->signedAmount())
+            @php($day = Format::local($transactions->first()->occurred_at))
             <h2 class="mb-1 flex items-baseline justify-between gap-2 px-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                <span>{{ ucfirst(Format::local($transactions->first()->occurred_at)->translatedFormat('l, d/m')) }}</span>
+                <span>{{ match (true) {
+                    $day->isToday() => __('Today'),
+                    $day->isYesterday() => __('Yesterday'),
+                    default => ucfirst($day->translatedFormat('l, d/m')),
+                } }}</span>
                 <span @class(['whitespace-nowrap font-num normal-case tracking-normal', 'text-emerald-600' => $dayTotal > 0])>{{ Format::money($dayTotal, signed: true) }}</span>
             </h2>
             <ul class="divide-y divide-slate-200 border-y border-slate-200">
