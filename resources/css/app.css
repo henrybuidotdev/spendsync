@@ -6,6 +6,15 @@
     display: none !important;
 }
 
+/* Livewire's wire:navigate progress bar: brand colour, thick enough to notice on phones. */
+:root {
+    --livewire-progress-bar-color: theme('colors.emerald.500');
+}
+
+#nprogress .bar {
+    height: 3px !important;
+}
+
 /* "..." typed one dot at a time: 1, 2, 3, repeat. */
 .typing-dots > span {
     animation: typing-dot 1.2s step-end infinite;
