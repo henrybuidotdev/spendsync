@@ -88,7 +88,7 @@
             <p>{{ __('This transaction is hidden. It is not counted in totals or reports.') }}</p>
             <button type="button" wire:click="toggleHidden" class="min-h-11 shrink-0 rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Unhide') }}</button>
         </div>
-    @else
+    @elseif(! $transaction->isManual())
         <button type="button" wire:click="toggleHidden" class="min-h-11 w-full rounded-xl px-4 text-sm font-medium text-slate-600 ring-1 ring-slate-300 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Hide transaction') }}</button>
         <p class="-mt-2 px-1 text-center text-xs text-slate-500">{{ __('Hidden transactions stay in the list but are not counted in totals or reports.') }}</p>
     @endif

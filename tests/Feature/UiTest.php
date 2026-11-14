@@ -1337,3 +1337,12 @@ test('the category picker shows the selected category with its parent and opens 
     Livewire::actingAs($user)->test(Show::class, ['transaction' => Transaction::factory()->for($user)->create()])
         ->assertSee('Chọn danh mục');
 });
+
+test('manual transactions offer delete instead of hide', function () {
+    $user = connectedUser();
+    $manual = Transaction::factory()->for($user)->manual()->create();
+    $synced = Transaction::factory()->for($user)->create();
+
+    $this->actingAs($user)->get(route('transactions.show', $manual))->assertOk()->assertSee('Xóa')->assertDontSee('Ẩn giao dịch');
+    $this->actingAs($user)->get(route('transactions.show', $synced))->assertOk()->assertSee('Ẩn giao dịch');
+});
