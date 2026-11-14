@@ -18,7 +18,7 @@
                     MailAccountStatus::Disabled => __('Disconnected'),
                     null => __('Not connected'),
                 }],
-                ['categories', 'tag', __('Category'), $categoryCount],
+                ['categories', 'tag', __('Categories'), $categoryCount],
                 ['rules', 'zap', __('Auto-categorize rules'), $ruleCount],
                 ['appearance', 'contrast', __('Appearance & language'), app()->getLocale() === 'en' ? 'English' : 'Tiếng Việt'],
             ];

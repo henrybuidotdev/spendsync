@@ -221,7 +221,7 @@ class Settings extends Component
     {
         return match ($this->section) {
             'gmail' => __('Gmail account'),
-            'categories' => __('Category'),
+            'categories' => __('Categories'),
             'rules' => __('Auto-categorize rules'),
             'appearance' => __('Appearance & language'),
             default => __('Settings'),
