@@ -27,6 +27,12 @@ class Show extends Component
     #[Url]
     public string $filter = 'all';
 
+    #[Url]
+    public ?int $category = null;
+
+    #[Url]
+    public string $payee = '';
+
     public function mount(Transaction $transaction, CategoryMatcher $matcher): void
     {
         $this->authorize('view', $transaction);

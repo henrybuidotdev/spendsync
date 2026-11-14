@@ -40,6 +40,13 @@
         </dl>
     </section>
 
+    @if($scopeLabel)
+        <button type="button" wire:click="clearScope" aria-label="{{ __('Clear filter: :name', ['name' => $scopeLabel]) }}"
+                class="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full bg-white px-4 text-sm font-medium ring-1 ring-slate-300 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
+            <span class="truncate">{{ $scopeLabel }}</span> <x-icon name="x" class="h-4 w-4 text-slate-500" />
+        </button>
+    @endif
+
     <div class="tabs" role="group" aria-label="{{ __('Filter transactions') }}">
         @foreach(['all' => __('All'), 'in' => __('Money in'), 'out' => __('Money out'), 'uncategorized' => __('Uncategorized')] as $value => $label)
             <button type="button" wire:click="setFilter('{{ $value }}')" aria-pressed="{{ $filter === $value ? 'true' : 'false' }}" class="tab">{{ $label }}</button>
@@ -56,7 +63,7 @@
             <ul class="divide-y divide-slate-200 border-y border-slate-200">
                 @foreach($transactions as $transaction)
                     <li wire:key="tx-{{ $transaction->id }}">
-                        <a href="{{ route('transactions.show', [$transaction, 'filter' => $filter !== 'all' ? $filter : null]) }}" wire:navigate @class(['flex min-h-16 items-center gap-3 px-1 py-2 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500', 'opacity-50' => $transaction->trashed()])>
+                        <a href="{{ route('transactions.show', [$transaction, 'filter' => $filter !== 'all' ? $filter : null, 'category' => $category, 'payee' => $payee ?: null]) }}" wire:navigate @class(['flex min-h-16 items-center gap-3 px-1 py-2 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500', 'opacity-50' => $transaction->trashed()])>
                             <x-category-icon :category="$transaction->category" class="h-10 w-10 text-xl" />
                             <span class="min-w-0 flex-1">
                                 <span class="block truncate font-medium">{{ $transaction->label() }}</span>

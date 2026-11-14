@@ -3,7 +3,7 @@
 <div class="space-y-4">
     <x-flash key="visibility" />
 
-    <a href="{{ route('transactions', ['month' => Format::local($transaction->occurred_at)->format('Y-m'), 'filter' => $backFilter]) }}" wire:navigate class="-ml-1 inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"><x-icon name="chevron-left" class="h-4 w-4" /> {{ __('Transactions') }}</a>
+    <a href="{{ route('transactions', ['month' => Format::local($transaction->occurred_at)->format('Y-m'), 'filter' => $backFilter, 'category' => $category, 'payee' => $payee ?: null]) }}" wire:navigate class="-ml-1 inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"><x-icon name="chevron-left" class="h-4 w-4" /> {{ __('Transactions') }}</a>
 
     <div class="py-2 text-center">
         <x-category-icon :category="$transaction->category" class="mx-auto h-16 w-16 text-4xl" />

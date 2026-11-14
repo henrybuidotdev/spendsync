@@ -26,12 +26,14 @@
 
             <ol class="mt-2 divide-y divide-slate-100">
                 @foreach($byCategory as $row)
-                    <li class="flex items-center gap-2 py-2.5 text-sm">
-                        <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color: rgb(var(--c-chart-{{ $row->category?->color ?? 8 }}))" aria-hidden="true"></span>
-                        <x-category-icon :category="$row->category" class="h-7 w-7 text-base" />
-                        <span class="min-w-0 flex-1 truncate">{{ $row->name }} <span class="text-slate-400">· {{ $row->count }}</span></span>
-                        <span class="shrink-0 font-num text-slate-500">{{ round(100 * $row->total / $total, 1) }}%</span>
-                        <span class="w-28 shrink-0 text-right font-semibold font-num">{{ Format::money($row->total) }}</span>
+                    <li>
+                        <a href="{{ route('transactions', ['month' => $monthStart->format('Y-m'), ...($row->category ? ['filter' => 'out', 'category' => $row->category->id] : ['filter' => 'uncategorized'])]) }}" wire:navigate class="-mx-1 flex items-center gap-2 px-1 py-2.5 text-sm hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500">
+                            <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color: rgb(var(--c-chart-{{ $row->category?->color ?? 8 }}))" aria-hidden="true"></span>
+                            <x-category-icon :category="$row->category" class="h-7 w-7 text-base" />
+                            <span class="min-w-0 flex-1 truncate">{{ $row->name }} <span class="text-slate-400">· {{ $row->count }}</span></span>
+                            <span class="shrink-0 font-num text-slate-500">{{ round(100 * $row->total / $total, 1) }}%</span>
+                            <span class="w-28 shrink-0 text-right font-semibold font-num">{{ Format::money($row->total) }}</span>
+                        </a>
                     </li>
                 @endforeach
             </ol>
@@ -42,10 +44,12 @@
                 <h2 id="top-counterparties" class="font-semibold">{{ __('Top payees') }}</h2>
                 <ol class="mt-2 divide-y divide-slate-100">
                     @foreach($topCounterparties as $index => $row)
-                        <li class="flex items-center gap-3 py-2.5 text-sm">
-                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 font-semibold text-slate-600">{{ $index + 1 }}</span>
-                            <span class="min-w-0 flex-1 truncate font-medium">{{ $row->counterparty }}</span>
-                            <span class="shrink-0 font-semibold font-num">{{ Format::money((int) $row->total) }}</span>
+                        <li>
+                            <a href="{{ route('transactions', ['month' => $monthStart->format('Y-m'), 'filter' => 'out', 'payee' => $row->counterparty]) }}" wire:navigate class="-mx-1 flex items-center gap-3 px-1 py-2.5 text-sm hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500">
+                                <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 font-semibold text-slate-600">{{ $index + 1 }}</span>
+                                <span class="min-w-0 flex-1 truncate font-medium">{{ $row->counterparty }}</span>
+                                <span class="shrink-0 font-semibold font-num">{{ Format::money((int) $row->total) }}</span>
+                            </a>
                         </li>
                     @endforeach
                 </ol>

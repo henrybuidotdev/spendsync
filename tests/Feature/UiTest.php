@@ -1346,3 +1346,33 @@ test('manual transactions offer delete instead of hide', function () {
     $this->actingAs($user)->get(route('transactions.show', $manual))->assertOk()->assertSee('Xóa')->assertDontSee('Ẩn giao dịch');
     $this->actingAs($user)->get(route('transactions.show', $synced))->assertOk()->assertSee('Ẩn giao dịch');
 });
+
+test('report rows open the transactions behind them', function () {
+    $user = connectedUser();
+    $parent = Category::factory()->for($user)->create(['name' => 'An uong']);
+    $child = Category::factory()->for($user)->create(['name' => 'Ca phe', 'parent_id' => $parent->id]);
+    Transaction::factory()->for($user)->create(['counterparty' => 'QUAN PHO', 'category_id' => $parent->id, 'occurred_at' => '2026-11-03 03:00:00']);
+    Transaction::factory()->for($user)->create(['counterparty' => 'HIGHLANDS', 'category_id' => $child->id, 'occurred_at' => '2026-11-04 03:00:00']);
+    Transaction::factory()->for($user)->create(['counterparty' => 'GRAB', 'occurred_at' => '2026-11-05 03:00:00']);
+
+    Livewire::actingAs($user)->test(Reports::class)
+        ->assertSee(route('transactions', ['month' => '2026-11', 'filter' => 'out', 'category' => $parent->id]))
+        ->assertSee(route('transactions', ['month' => '2026-11', 'filter' => 'uncategorized']))
+        ->assertSee(route('transactions', ['month' => '2026-11', 'filter' => 'out', 'payee' => 'GRAB']));
+
+    Livewire::actingAs($user)->withQueryParams(['category' => $parent->id])->test(Index::class)
+        ->assertSee('QUAN PHO')->assertSee('HIGHLANDS')->assertDontSee('GRAB')
+        ->assertSee('Bỏ lọc: An uong')
+        ->call('clearScope')
+        ->assertSee('GRAB')->assertDontSee('Bỏ lọc');
+
+    Livewire::actingAs($user)->withQueryParams(['payee' => 'GRAB'])->test(Index::class)
+        ->assertSee('GRAB')->assertDontSee('QUAN PHO');
+
+    $this->actingAs($user)->get(route('transactions', ['month' => '2026-11', 'filter' => 'out', 'category' => Category::factory()->create()->id]))
+        ->assertRedirect(route('transactions', ['month' => '2026-11', 'filter' => 'out']));
+
+    $transaction = Transaction::where('counterparty', 'GRAB')->first();
+    $this->actingAs($user)->get(route('transactions.show', [$transaction, 'payee' => 'GRAB']))
+        ->assertSee(route('transactions', ['month' => '2026-11', 'payee' => 'GRAB']));
+});
