@@ -88,7 +88,7 @@ class SyncMailAccount implements ShouldBeUniqueUntilProcessing, ShouldQueue
 
         $senders = $registry->senders();
         $since = $account->last_synced_at
-            ? $account->last_synced_at->copy()->subDay()
+            ? $account->last_synced_at->copy()->subDays(config('services.mail_sync.resync_days'))
             : now()->subDays(self::FIRST_SYNC_DAYS);
         $before = $since->copy()->addDays(self::WINDOW_DAYS)->startOfDay();
         $isLastWindow = $before->isFuture();
