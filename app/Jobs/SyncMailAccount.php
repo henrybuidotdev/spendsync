@@ -9,14 +9,15 @@ use App\Mail\Inbox\MailboxConnectionException;
 use App\Models\MailAccount;
 use App\Models\RawEmail;
 use App\Parsing\ParserRegistry;
+use Carbon\CarbonInterface;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Throwable;
 
 /*
- * Each run fetches one window of at most WINDOW_DAYS days, starting from last_synced_at
- * (or FIRST_SYNC_DAYS ago), saves its progress there, and queues the next run until it reaches today.
+ * A sync starts services.mail_sync.first_sync_days ago (first sync) or resync_days before last_synced_at,
+ * then each run fetches one WINDOW_DAYS window and queues the next window until it reaches today.
  * ponytail: with several workers, a scheduled run can overlap a queued continuation; it only refetches
  * already stored emails. Add a WithoutOverlapping middleware if that ever matters.
  */
@@ -26,18 +27,16 @@ class SyncMailAccount implements ShouldBeUniqueUntilProcessing, ShouldQueue
 
     public bool $deleteWhenMissingModels = true;
 
-    public int $timeout = 120;
+    public int $timeout = 600;
 
     public int $tries = 2;
 
     /** Releases the unique lock even if a worker dies mid-job. */
     public int $uniqueFor = 600;
 
-    public const FIRST_SYNC_DAYS = 90;
-
     public const WINDOW_DAYS = 15;
 
-    public function __construct(public MailAccount $account) {}
+    public function __construct(public MailAccount $account, public ?CarbonInterface $from = null) {}
 
     public function uniqueId(): string
     {
@@ -47,31 +46,31 @@ class SyncMailAccount implements ShouldBeUniqueUntilProcessing, ShouldQueue
     public function handle(MailboxClient $client, ParserRegistry $registry): void
     {
         try {
-            $hasMore = $this->sync($client, $registry);
+            $nextFrom = $this->sync($client, $registry);
         } catch (Throwable $exception) {
             $this->account->finishSyncing();
 
             throw $exception;
         }
 
-        if (! $hasMore) {
+        if ($nextFrom === null) {
             $this->account->finishSyncing();
 
             return;
         }
 
         $this->account->isSyncing()
-            ? $this->account->queueSync()
-            : self::dispatch($this->account);
+            ? $this->account->queueSync($nextFrom)
+            : self::dispatch($this->account, $nextFrom);
     }
 
-    /** Returns whether older-than-today windows are still left to fetch. */
-    private function sync(MailboxClient $client, ParserRegistry $registry): bool
+    /** Returns where the next window starts, or null when the sync has reached today. */
+    private function sync(MailboxClient $client, ParserRegistry $registry): ?CarbonInterface
     {
         $account = $this->account->fresh();
 
         if (! $account?->isActive() || blank($account->app_password)) {
-            return false;
+            return null;
         }
 
         try {
@@ -79,7 +78,7 @@ class SyncMailAccount implements ShouldBeUniqueUntilProcessing, ShouldQueue
         } catch (InvalidCredentialsException) {
             $account->update(['status' => MailAccountStatus::NeedsReconnect, 'last_error' => 'invalid_credentials']);
 
-            return false;
+            return null;
         } catch (MailboxConnectionException $exception) {
             $account->update(['last_error' => 'connection_failed']);
 
@@ -87,9 +86,9 @@ class SyncMailAccount implements ShouldBeUniqueUntilProcessing, ShouldQueue
         }
 
         $senders = $registry->senders();
-        $since = $account->last_synced_at
+        $since = $this->from ?? ($account->last_synced_at
             ? $account->last_synced_at->copy()->subDays(config('services.mail_sync.resync_days'))
-            : now()->subDays(self::FIRST_SYNC_DAYS);
+            : now()->subDays(config('services.mail_sync.first_sync_days')));
         $before = $since->copy()->addDays(self::WINDOW_DAYS)->startOfDay();
         $isLastWindow = $before->isFuture();
 
@@ -109,8 +108,20 @@ class SyncMailAccount implements ShouldBeUniqueUntilProcessing, ShouldQueue
             $client->disconnect();
         }
 
-        $account->update(['last_synced_at' => $isLastWindow ? now() : $before, 'last_error' => null]);
+        if ($isLastWindow) {
+            $account->update(['last_synced_at' => now(), 'last_run_at' => now(), 'last_error' => null]);
 
-        return ! $isLastWindow;
+            return null;
+        }
+
+        $movesForward = $account->last_synced_at === null || $account->last_synced_at->lt($before);
+
+        $account->update([
+            'last_synced_at' => $movesForward ? $before : $account->last_synced_at,
+            'last_run_at' => now(),
+            'last_error' => null,
+        ]);
+
+        return $before;
     }
 }

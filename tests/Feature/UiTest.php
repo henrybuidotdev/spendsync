@@ -229,11 +229,30 @@ test('the list query count does not grow with the number of transactions', funct
     expect(count(DB::getQueryLog()))->toBe($few);
 });
 
+test('last synced shows when the sync last ran, not how far it has got', function () {
+    $user = connectedUser();
+    $user->mailAccount->update(['last_synced_at' => now()->subMonths(2), 'last_run_at' => now()->subMinutes(3)]);
+
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'gmail'])
+        ->assertSee('11:57 12/11/2026');
+});
+
+test('sync help texts show the configured look-back days', function () {
+    config(['services.mail_sync.first_sync_days' => 30, 'services.mail_sync.resync_days' => 3]);
+    $user = connectedUser();
+
+    Livewire::actingAs($user)->test(Settings::class, ['section' => 'gmail'])
+        ->assertSee('Lần đồng bộ đầu lấy 30 ngày gần nhất. Các lần sau lấy từ 3 ngày trước');
+
+    Livewire::actingAs($user)->test(Index::class)
+        ->assertSee('Lần đồng bộ đầu lấy 30 ngày gần nhất.');
+});
+
 test('sync now is hidden and ignored within 15 minutes of the last sync', function () {
     $fake = new FakeMailboxClient;
     app()->instance(MailboxClient::class, $fake);
     $user = connectedUser();
-    $user->mailAccount->update(['last_synced_at' => now()->subMinutes(16)]);
+    $user->mailAccount->update(['last_synced_at' => now()->subMinutes(16), 'last_run_at' => now()->subMinutes(16)]);
 
     Livewire::actingAs($user)->test(Settings::class, ['section' => 'gmail'])
         ->assertSeeHtml('wire:click="syncNow"')
@@ -713,7 +732,7 @@ test('the syncing banner shows only while a user-started sync is pending and pol
     Queue::fake();
     $user = connectedUser();
     $account = $user->mailAccount;
-    $account->update(['last_synced_at' => now()]);
+    $account->update(['last_synced_at' => now(), 'last_run_at' => now()]);
 
     $this->actingAs($user)->get('/')->assertDontSee('Đang đồng bộ');
 

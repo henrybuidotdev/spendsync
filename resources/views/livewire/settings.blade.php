@@ -1,6 +1,5 @@
 @php
     use App\Enums\MailAccountStatus;
-    use App\Jobs\SyncMailAccount;
     use App\Support\Format;
 @endphp
 
@@ -82,7 +81,7 @@
                     <p class="mt-2 flex flex-wrap items-center gap-x-2 text-sm text-slate-600">
                         <span>
                             {{ __('Last synced') }}:
-                            {{ $account->last_synced_at ? Format::local($account->last_synced_at)->format('H:i d/m/Y').' ('.Format::local($account->last_synced_at)->diffForHumans().')' : __('never') }}
+                            {{ $account->last_run_at ? Format::local($account->last_run_at)->format('H:i d/m/Y').' ('.Format::local($account->last_run_at)->diffForHumans().')' : __('never') }}
                         </span>
                         @if($account->status === MailAccountStatus::Active)
                             @if($account->isSyncing())
@@ -126,7 +125,7 @@
                 <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
                     <li>{{ __('Syncs automatically every hour. You can also tap "Sync now" above.') }}</li>
                     <li>{{ __('Only balance-change emails from supported banks are read. Other emails are never read, and nothing is marked as read.') }}</li>
-                    <li>{{ __('The first sync looks back :days days. Each later sync starts 1 day before the last successful sync, and emails already imported are skipped.', ['days' => SyncMailAccount::FIRST_SYNC_DAYS]) }}</li>
+                    <li>{{ __('The first sync looks back :days days. Each later sync starts :resync day(s) before the last successful sync, and emails already imported are skipped.', ['days' => config('services.mail_sync.first_sync_days'), 'resync' => config('services.mail_sync.resync_days')]) }}</li>
                     <li>{{ __('Deleting an email in Gmail does not delete its transaction in the app.') }}</li>
                 </ul>
             </section>

@@ -84,6 +84,7 @@ class ConnectGmail extends Component
 
         if ($account->email !== $email) {
             $account->last_synced_at = null;
+            $account->last_run_at = null;
         }
 
         $account->fill([

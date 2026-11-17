@@ -35,5 +35,7 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="MAIL_SYNC_FIRST_SYNC_DAYS" value="90"/>
+        <env name="MAIL_SYNC_RESYNC_DAYS" value="1"/>
     </php>
 </phpunit>

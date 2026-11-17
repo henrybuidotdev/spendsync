@@ -57,7 +57,7 @@ test('sync fetches only configured senders, stores raw emails and parses them', 
         ->and($account->fresh()->last_error)->toBeNull();
 });
 
-test('the first sync walks the last 90 days in 15-day windows, one queued job each', function () {
+test('the first sync walks the last first_sync_days in 15-day windows, one queued job each', function () {
     $fake = fakeMailbox();
     $account = MailAccount::factory()->create();
     $account->queueSync();
@@ -69,12 +69,12 @@ test('the first sync walks the last 90 days in 15-day windows, one queued job ea
 
     expect($windows->all())->toBe([
         ['2026-08-14', '2026-08-29'],
-        ['2026-08-28', '2026-09-12'],
-        ['2026-09-11', '2026-09-26'],
-        ['2026-09-25', '2026-10-10'],
-        ['2026-10-09', '2026-10-24'],
-        ['2026-10-23', '2026-11-07'],
-        ['2026-11-06', null],
+        ['2026-08-29', '2026-09-13'],
+        ['2026-09-13', '2026-09-28'],
+        ['2026-09-28', '2026-10-13'],
+        ['2026-10-13', '2026-10-28'],
+        ['2026-10-28', '2026-11-12'],
+        ['2026-11-12', null],
     ])
         ->and(RawEmail::count())->toBe(21)
         ->and($account->fresh()->last_synced_at->toDateTimeString())->toBe('2026-11-12 12:00:00')
@@ -103,6 +103,116 @@ test('a second sync starts one day before the last sync and creates no duplicate
     expect(end($fake->searches)['since']->toDateTimeString())->toBe('2026-11-11 12:00:00')
         ->and(RawEmail::count())->toBe(21)
         ->and(Transaction::count())->toBe(16);
+});
+
+test('every window records when it ran, separately from how far it has got', function () {
+    Queue::fake();
+    fakeMailbox();
+    $account = MailAccount::factory()->create();
+
+    (new SyncMailAccount($account))->handle(app(MailboxClient::class), app(ParserRegistry::class));
+
+    expect($account->fresh()->last_synced_at->toDateTimeString())->toBe('2026-08-29 00:00:00')
+        ->and($account->fresh()->last_run_at->toDateTimeString())->toBe('2026-11-12 12:00:00');
+});
+
+test('a later sync goes back resync_days and walks forward to today in 15-day windows', function () {
+    config(['services.mail_sync.resync_days' => 60]);
+    $fake = fakeMailbox();
+    $account = MailAccount::factory()->create(['last_synced_at' => now()->subHour()]);
+
+    SyncMailAccount::dispatchSync($account);
+
+    expect(collect($fake->searches)->map(fn (array $search) => [
+        $search['since']->toDateString(),
+        $search['before']?->toDateString(),
+    ])->all())->toBe([
+        ['2026-09-13', '2026-09-28'],
+        ['2026-09-28', '2026-10-13'],
+        ['2026-10-13', '2026-10-28'],
+        ['2026-10-28', '2026-11-12'],
+        ['2026-11-12', null],
+    ])
+        ->and($account->fresh()->last_synced_at->toDateTimeString())->toBe('2026-11-12 12:00:00');
+});
+
+test('an unfinished later sync never moves last_synced_at backwards', function () {
+    config(['services.mail_sync.resync_days' => 365]);
+    Queue::fake();
+    fakeMailbox();
+    $account = MailAccount::factory()->create(['last_synced_at' => now()->subHour()]);
+
+    (new SyncMailAccount($account))->handle(app(MailboxClient::class), app(ParserRegistry::class));
+
+    expect($account->fresh()->last_synced_at->toDateTimeString())->toBe('2026-11-12 11:00:00');
+    Queue::assertPushed(SyncMailAccount::class, fn (SyncMailAccount $job) => $job->from->toDateString() === '2025-11-27');
+});
+
+test('the first sync goes back first_sync_days', function () {
+    config(['services.mail_sync.first_sync_days' => 30]);
+    $fake = fakeMailbox();
+    $account = MailAccount::factory()->create();
+
+    SyncMailAccount::dispatchSync($account);
+
+    expect(collect($fake->searches)->map(fn (array $search) => [
+        $search['since']->toDateString(),
+        $search['before']?->toDateString(),
+    ])->all())->toBe([
+        ['2026-10-13', '2026-10-28'],
+        ['2026-10-28', '2026-11-12'],
+        ['2026-11-12', null],
+    ]);
+});
+
+test('each window queues the next one starting where it ended', function () {
+    Queue::fake();
+    fakeMailbox();
+    $account = MailAccount::factory()->create();
+
+    (new SyncMailAccount($account))->handle(app(MailboxClient::class), app(ParserRegistry::class));
+
+    Queue::assertPushed(SyncMailAccount::class, fn (SyncMailAccount $job) => $job->from->toDateTimeString() === '2026-08-29 00:00:00');
+});
+
+test('a continuation window starts at its from date, not resync_days before last_synced_at', function () {
+    config(['services.mail_sync.resync_days' => 365]);
+    $fake = fakeMailbox();
+    $account = MailAccount::factory()->create(['last_synced_at' => now()->subHour()]);
+
+    SyncMailAccount::dispatchSync($account, CarbonImmutable::parse('2026-11-01'));
+
+    expect($fake->searches)->toHaveCount(1)
+        ->and($fake->searches[0]['since']->toDateString())->toBe('2026-11-01')
+        ->and($fake->searches[0]['before'])->toBeNull();
+});
+
+test('a sync that fails mid-walk keeps its progress and the next sync resumes from there', function () {
+    $failing = new class extends FakeMailboxClient
+    {
+        public function connect(string $email, #[\SensitiveParameter] string $appPassword): void
+        {
+            if ($this->searches !== []) {
+                throw new MailboxConnectionException('imap_connection_failed');
+            }
+
+            parent::connect($email, $appPassword);
+        }
+    };
+    fakeMailbox($failing);
+    $account = MailAccount::factory()->create();
+
+    expect(fn () => SyncMailAccount::dispatchSync($account))->toThrow(MailboxConnectionException::class)
+        ->and($account->fresh()->last_synced_at->toDateTimeString())->toBe('2026-08-29 00:00:00')
+        ->and($account->fresh()->last_error)->toBe('connection_failed');
+
+    $fake = fakeMailbox();
+
+    SyncMailAccount::dispatchSync($account);
+
+    expect($fake->searches[0]['since']->toDateString())->toBe('2026-08-28')
+        ->and($account->fresh()->last_synced_at->toDateTimeString())->toBe('2026-11-12 12:00:00')
+        ->and($account->fresh()->last_error)->toBeNull();
 });
 
 test('the same email for two different users is stored for each', function () {
@@ -283,8 +393,8 @@ test('the scheduler queues a sync for active accounts in the current minute slot
     Queue::fake();
     $this->travelTo(now()->setTime(10, 0));
     MailAccount::factory()->create(['id' => 60]);
-    MailAccount::factory()->create(['id' => 120, 'last_synced_at' => now()->subHour()]);
-    MailAccount::factory()->create(['id' => 180, 'last_synced_at' => now()->subMinutes(5)]);
+    MailAccount::factory()->create(['id' => 120, 'last_synced_at' => now()->subHour(), 'last_run_at' => now()->subHour()]);
+    MailAccount::factory()->create(['id' => 180, 'last_synced_at' => now()->subMonth(), 'last_run_at' => now()->subMinutes(5)]);
     MailAccount::factory()->needsReconnect()->create(['id' => 240]);
     MailAccount::factory()->create(['id' => 61]);
 

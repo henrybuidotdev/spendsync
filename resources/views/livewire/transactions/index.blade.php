@@ -102,7 +102,7 @@
                 @endif
             @else
                 <p class="font-semibold">{{ __('No transactions yet') }}</p>
-                <p class="mt-1 text-sm text-slate-600">{{ __('When your bank emails a balance change, the transaction shows up here. The first sync looks back 90 days.') }}</p>
+                <p class="mt-1 text-sm text-slate-600">{{ __('When your bank emails a balance change, the transaction shows up here. The first sync looks back :days days.', ['days' => config('services.mail_sync.first_sync_days')]) }}</p>
                 @if(! $account)
                     <a href="{{ route('connect') }}" wire:navigate class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white">{{ __('Connect Gmail') }}</a>
                 @endif

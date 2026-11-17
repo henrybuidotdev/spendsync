@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\MailAccountStatus;
 use App\Jobs\SyncMailAccount;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
 
-#[Fillable(['user_id', 'provider', 'email', 'app_password', 'status', 'last_synced_at', 'last_error'])]
+#[Fillable(['user_id', 'provider', 'email', 'app_password', 'status', 'last_synced_at', 'last_run_at', 'last_error'])]
 #[Hidden(['app_password'])]
 class MailAccount extends Model
 {
@@ -24,6 +25,7 @@ class MailAccount extends Model
             'app_password' => 'encrypted',
             'status' => MailAccountStatus::class,
             'last_synced_at' => 'datetime',
+            'last_run_at' => 'datetime',
         ];
     }
 
@@ -43,11 +45,11 @@ class MailAccount extends Model
     }
 
     /** User-initiated sync: flags the account as syncing (the UI shows a live banner) until the job finishes. */
-    public function queueSync(): void
+    public function queueSync(?CarbonInterface $from = null): void
     {
         Cache::put($this->syncingKey(), true, now()->addMinutes(5));
 
-        SyncMailAccount::dispatch($this);
+        SyncMailAccount::dispatch($this, $from);
     }
 
     public function isSyncing(): bool
@@ -57,7 +59,7 @@ class MailAccount extends Model
 
     public function syncedRecently(): bool
     {
-        return $this->last_synced_at?->gt(now()->subMinutes(15)) ?? false;
+        return $this->last_run_at?->gt(now()->subMinutes(15)) ?? false;
     }
 
     public function finishSyncing(): void

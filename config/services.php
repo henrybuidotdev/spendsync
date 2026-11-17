@@ -40,8 +40,10 @@ return [
         'usd_vnd' => env('FX_USD_VND', 26000),
     ],
 
-    // Later mail syncs start this many days before last_synced_at, to catch late-arriving emails.
+    // A mail sync goes back this many days (from now on the first sync, from last_synced_at after that),
+    // then walks forward to today in 15-day windows.
     'mail_sync' => [
+        'first_sync_days' => (int) env('MAIL_SYNC_FIRST_SYNC_DAYS', 90),
         'resync_days' => (int) env('MAIL_SYNC_RESYNC_DAYS', 1),
     ],
 
