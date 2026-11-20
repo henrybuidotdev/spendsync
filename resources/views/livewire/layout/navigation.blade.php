@@ -22,6 +22,10 @@ new class extends Component
         ] as [$route, $label, $icon, $patterns])
             @php($active = request()->routeIs(...$patterns))
             <a href="{{ route($route) }}" wire:navigate
+               @if($route !== 'settings')
+                   x-data="{ keepMonth() { const url = new URL($el.href); const month = new URLSearchParams(location.search).get('month'); month ? url.searchParams.set('month', month) : url.searchParams.delete('month'); $el.href = url; } }"
+                   x-on:pointerdown="keepMonth" x-on:focus="keepMonth"
+               @endif
                @if($active) aria-current="page" @endif
                class="flex min-h-16 flex-col items-center justify-center gap-1 text-xs font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500 {{ $active ? 'text-emerald-700' : 'text-slate-500 hover:text-slate-800' }}">
                 <x-icon :name="$icon" class="h-6 w-6" />
