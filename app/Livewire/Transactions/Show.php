@@ -4,8 +4,10 @@ namespace App\Livewire\Transactions;
 
 use App\Categorization\CategoryMatcher;
 use App\Enums\MatchField;
+use App\Livewire\Concerns\BlocksDemoWrites;
 use App\Models\Category;
 use App\Models\Transaction;
+use App\Support\Demo;
 use App\Support\Format;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
@@ -15,6 +17,8 @@ use Livewire\Component;
 #[Layout('layouts.app')]
 class Show extends Component
 {
+    use BlocksDemoWrites;
+
     public Transaction $transaction;
 
     public bool $applyToFuture = false;
@@ -164,7 +168,7 @@ class Show extends Component
      */
     private function selectableCategories(): Builder
     {
-        return auth()->user()->availableCategories()->fitting($this->transaction->direction);
+        return Demo::owner()->availableCategories()->fitting($this->transaction->direction);
     }
 
     public function render()

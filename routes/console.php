@@ -15,3 +15,4 @@ Schedule::call(function () {
 })->name('sync-mail-accounts')->everyMinute();
 
 Schedule::command('spendsync:update-exchange-rates')->dailyAt('08:00');
+Schedule::command('spendsync:refresh-demo')->dailyAt('00:05')->timezone(config('app.display_timezone'));

@@ -39,6 +39,8 @@ php artisan serve
 
 Đăng nhập bằng **demo@spendsync.test / password**. Demo seeder nhập toàn bộ mẫu email trong `tests/Fixtures/emails` qua đúng quy trình thật (`spendsync:import-eml`), và thêm vài quy tắc phân loại để một số giao dịch đã có danh mục sẵn. Các mẫu email có ngày tháng 11/2026. Nếu tháng hiện tại trống, trang giao dịch có nút nhảy tới tháng gần nhất có dữ liệu.
 
+Người dùng mới chưa có giao dịch có thể bấm **Xem dữ liệu demo** để xem giao dịch và báo cáo của tài khoản demo (email đặt bằng `DEMO_USER_EMAIL`). Dữ liệu demo chỉ để xem: mọi thao tác lưu hay xóa đều bị chặn, kể cả khi đăng nhập thẳng vào tài khoản demo. Trên production, chạy `php artisan db:seed --class=DemoSeeder` một lần; ngoài môi trường local, tài khoản demo có mật khẩu ngẫu nhiên.
+
 ### Queue worker và scheduler
 
 Việc đồng bộ và phân tích email chạy trên hàng đợi `database`. Mở hai terminal:
@@ -76,6 +78,7 @@ Chi tiết IMAP: `imap.gmail.com:993` qua SSL, có kiểm tra chứng chỉ. App
 | `spendsync:sync {account?}` | Đồng bộ ngay tất cả tài khoản đang hoạt động (hoặc một tài khoản), chạy trực tiếp. Job phân tích email được đưa vào hàng đợi. |
 | `spendsync:reparse {--failed} {--bank=}` | Phân tích lại các email gốc đã lưu. Giữ nguyên danh mục và ghi chú. Dùng sau khi sửa parser. |
 | `spendsync:import-eml {user} {path}` | Nhập file `.eml` (một file hoặc cả thư mục, đệ quy) làm email gốc cho một user (id hoặc email) rồi phân tích. Bỏ qua người gửi không được hỗ trợ. |
+| `spendsync:refresh-demo` | Dời ngày toàn bộ giao dịch (và ngày nhận email gốc) của tài khoản demo lên theo số ngày chẵn để giao dịch mới nhất là hôm nay. Chạy tự động lúc 00:05 mỗi ngày và sau `DemoSeeder`. |
 | `spendsync:parse-stats` | Bảng theo từng ngân hàng: tổng số, đã phân tích, thất bại, tỉ lệ thành công. |
 
 ## Test

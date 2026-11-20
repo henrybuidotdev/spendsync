@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Enums\Direction;
 use App\Livewire\Concerns\WithMonth;
+use App\Support\Demo;
 use App\Support\Format;
 use Carbon\CarbonImmutable;
 use Livewire\Attributes\Layout;
@@ -16,7 +17,7 @@ class Reports extends Component
 
     public function render()
     {
-        $user = auth()->user();
+        $user = Demo::owner();
         [$start, $end] = $this->monthRange();
 
         $spending = $user->transactions()
@@ -75,7 +76,7 @@ class Reports extends Component
             $previousStart->add($monthStart->diff(CarbonImmutable::now()))->min($monthStart) :
             $monthStart;
 
-        return (int) auth()->user()->transactions()
+        return (int) Demo::owner()->transactions()
             ->where('direction', Direction::Out)
             ->where('occurred_at', '>=', $previousStart->utc())
             ->where('occurred_at', '<', $previousEnd->utc())

@@ -7,12 +7,11 @@ use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 
-/** demo@spendsync.test / password, populated by importing every fixture through the real parsing pipeline. */
+/** The read-only demo account (services.demo.email; password "password" locally, random elsewhere), populated by importing every fixture through the real parsing pipeline. */
 class DemoSeeder extends Seeder
 {
-    public const EMAIL = 'demo@spendsync.test';
-
     private const RULES = [
         ['counterparty', 'CONG TY TNHH CONG NGHE ABC', 'Salary'],
         ['counterparty', 'CONG TY TNHH SHOPEE', 'Shopping'],
@@ -24,12 +23,14 @@ class DemoSeeder extends Seeder
 
     public function run(): void
     {
-        User::where('email', self::EMAIL)->first()?->delete();
+        $email = config('services.demo.email');
+
+        User::where('email', $email)->first()?->delete();
 
         $user = User::factory()->create([
             'name' => 'Demo',
-            'email' => self::EMAIL,
-            'password' => 'password',
+            'email' => $email,
+            'password' => app()->isLocal() ? 'password' : Str::random(40),
         ]);
 
         foreach (self::RULES as [$field, $value, $categoryName]) {
@@ -46,5 +47,7 @@ class DemoSeeder extends Seeder
         ]);
 
         $this->command?->info(trim(Artisan::output()));
+
+        Artisan::call('spendsync:refresh-demo');
     }
 }

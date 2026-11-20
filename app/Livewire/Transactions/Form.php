@@ -4,8 +4,10 @@ namespace App\Livewire\Transactions;
 
 use App\Categorization\CategoryMatcher;
 use App\Enums\Direction;
+use App\Livewire\Concerns\BlocksDemoWrites;
 use App\Models\Category;
 use App\Models\Transaction;
+use App\Support\Demo;
 use App\Support\Format;
 use Carbon\CarbonImmutable;
 use Closure;
@@ -16,6 +18,8 @@ use Livewire\Component;
 #[Layout('layouts.app')]
 class Form extends Component
 {
+    use BlocksDemoWrites;
+
     private const DATE_FORMAT = 'Y-m-d\TH:i';
 
     public ?Transaction $transaction = null;
@@ -90,7 +94,7 @@ class Form extends Component
         $isNew = $this->transaction === null;
         $note = trim($this->note);
 
-        $transaction = $this->transaction ?? auth()->user()->transactions()->make(['bank_code' => Transaction::MANUAL]);
+        $transaction = $this->transaction ?? Demo::owner()->transactions()->make(['bank_code' => Transaction::MANUAL]);
 
         $transaction->fill([
             'direction' => $this->direction,
@@ -123,13 +127,13 @@ class Form extends Component
             return null;
         }
 
-        return auth()->user()->availableCategories()->fitting($this->direction)->find($this->categoryId);
+        return Demo::owner()->availableCategories()->fitting($this->direction)->find($this->categoryId);
     }
 
     public function render()
     {
         return view('livewire.transactions.form', [
-            'categories' => auth()->user()->availableCategories()->fitting($this->direction)->ordered()->get(),
+            'categories' => Demo::owner()->availableCategories()->fitting($this->direction)->ordered()->get(),
             'backUrl' => $this->transaction ?
                 route('transactions.show', $this->transaction) :
                 route('transactions'),

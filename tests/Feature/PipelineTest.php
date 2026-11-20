@@ -421,7 +421,7 @@ test('the demo seeder creates a populated, categorized demo account', function (
 
     $user = User::where('email', 'demo@spendsync.test')->sole();
 
-    expect(Hash::check('password', $user->password))->toBeTrue()
+    expect(Hash::check('password', $user->password))->toBeFalse()
         ->and($user->transactions()->count())->toBe(15)
         ->and($user->transactions()->whereNotNull('category_id')->count())->toBe(3)
         ->and($user->rawEmails()->whereNotNull('parse_error')->count())->toBe(0);

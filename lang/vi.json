@@ -271,5 +271,9 @@
     "Create an app password in your Google account and paste it into SpendSync.": "Tạo mật khẩu ứng dụng trong tài khoản Google và dán vào SpendSync.",
     "New transactions show up on their own within a few minutes.": "Giao dịch mới sẽ tự hiện ra sau vài phút.",
     "No Gmail? You can still add transactions manually.": "Không dùng Gmail? Bạn vẫn có thể thêm giao dịch bằng tay.",
-    ":banks. Need another bank? Message us on Zalo": ":banks. Cần thêm ngân hàng khác, nhắn Zalo"
+    ":banks. Need another bank? Message us on Zalo": ":banks. Cần thêm ngân hàng khác, nhắn Zalo",
+    "View demo data": "Xem dữ liệu demo",
+    "You are viewing demo data. Changes are not saved.": "Bạn đang xem dữ liệu demo. Thay đổi sẽ không được lưu.",
+    "Back to my data": "Về dữ liệu của tôi",
+    "This is demo data, so changes can't be saved or deleted. Switch back to your account to make changes.": "Đây là dữ liệu demo nên không thể lưu hay xóa. Hãy chuyển về tài khoản của bạn để thay đổi."
 }

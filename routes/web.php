@@ -20,6 +20,16 @@ Route::get('terms', fn () => view('terms.'.app()->getLocale()))->name('terms');
 
 Route::middleware('auth')->group(function () {
     Route::get('connect', ConnectGmail::class)->name('connect');
+    Route::post('demo', function () {
+        auth()->user()->update(['viewing_demo' => true]);
+
+        return redirect()->route('transactions');
+    })->name('demo.start');
+    Route::delete('demo', function () {
+        auth()->user()->update(['viewing_demo' => false]);
+
+        return redirect()->route('transactions');
+    })->name('demo.stop');
     Route::get('settings/{section?}', Settings::class)->whereIn('section', Settings::SECTIONS)->name('settings');
     Route::view('profile', 'profile')->name('profile');
     Route::get('transactions/create', TransactionsForm::class)->name('transactions.create');

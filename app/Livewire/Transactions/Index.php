@@ -5,6 +5,7 @@ namespace App\Livewire\Transactions;
 use App\Enums\Direction;
 use App\Livewire\Concerns\WithMonth;
 use App\Models\Transaction;
+use App\Support\Demo;
 use App\Support\Format;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
@@ -34,7 +35,7 @@ class Index extends Component
             return;
         }
 
-        if (auth()->user()->availableCategories()->whereKey($this->category)->exists()) {
+        if (Demo::owner()->availableCategories()->whereKey($this->category)->exists()) {
             return;
         }
 
@@ -53,7 +54,7 @@ class Index extends Component
 
     public function render()
     {
-        $user = auth()->user();
+        $user = Demo::owner();
         [$start, $end] = $this->monthRange();
 
         $monthQuery = $user->transactions()->where('occurred_at', '>=', $start)->where('occurred_at', '<', $end);
@@ -96,7 +97,7 @@ class Index extends Component
             return null;
         }
 
-        $latest = auth()->user()->transactions()->max('occurred_at');
+        $latest = Demo::owner()->transactions()->max('occurred_at');
 
         if ($latest === null) {
             return null;

@@ -108,6 +108,12 @@
                         <a href="{{ route('connect') }}" wire:navigate class="inline-flex min-h-11 items-center rounded-xl bg-black px-4 font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Connect Gmail') }}</a>
                         <a href="{{ route('transactions.create') }}" wire:navigate class="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Add transactions manually') }}</a>
                     </div>
+                    @if(\App\Support\Demo::user())
+                        <form method="POST" action="{{ route('demo.start') }}" class="mt-2">
+                            @csrf
+                            <button type="submit" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('View demo data') }}</button>
+                        </form>
+                    @endif
                 @endif
             @endif
         </div>

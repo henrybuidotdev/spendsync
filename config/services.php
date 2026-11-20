@@ -47,6 +47,11 @@ return [
         'resync_days' => (int) env('MAIL_SYNC_RESYNC_DAYS', 1),
     ],
 
+    // Signed-in users can view this seeded account's transactions read-only (see App\Support\Demo).
+    'demo' => [
+        'email' => env('DEMO_USER_EMAIL', 'demo@spendsync.test'),
+    ],
+
     'zalo' => [
         'phone' => env('ZALO_PHONE'),
     ],

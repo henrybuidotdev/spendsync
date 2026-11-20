@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\CategoryRule;
 use App\Models\Transaction;
 use App\Parsing\Support\TextNormalizer;
+use App\Support\Demo;
 use Illuminate\Support\Collection;
 
 /**
@@ -45,6 +46,8 @@ class CategoryMatcher
     /** Deletes the rule only when it points to this transaction's category, so an exception never removes the usual rule. */
     public function forget(Transaction $transaction): void
     {
+        Demo::ensureWritable($transaction);
+
         CategoryRule::where(self::ruleKey($transaction))->where('category_id', $transaction->category_id)->delete();
     }
 
@@ -94,6 +97,8 @@ class CategoryMatcher
      */
     public function backfill(CategoryRule $rule): int
     {
+        Demo::ensureWritable($rule);
+
         $ids = $this->uncategorizedMatching($rule)->pluck('id');
 
         if ($ids->isEmpty()) {
