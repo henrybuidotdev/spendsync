@@ -101,7 +101,6 @@ class ConnectGmail extends Component
     public function render()
     {
         return view('livewire.connect-gmail', [
-            'banks' => config('banks'),
             'reconnecting' => auth()->user()->mailAccount !== null,
         ])->title(__('Connect Gmail'));
     }

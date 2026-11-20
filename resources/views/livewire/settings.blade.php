@@ -129,6 +129,12 @@
                     <li>{{ __('Deleting an email in Gmail does not delete its transaction in the app.') }}</li>
                 </ul>
             </section>
+
+            <x-gmail-privacy />
+
+            <section class="border-t border-slate-200 pt-5" aria-labelledby="banks-heading">
+                <x-supported-banks />
+            </section>
                 @break
 
             @case('categories')

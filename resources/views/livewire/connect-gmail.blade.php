@@ -45,29 +45,7 @@
         </form>
     </section>
 
-    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-        <p class="flex items-center gap-2 font-semibold"><x-icon name="shield" class="h-4 w-4" /> {{ __('Safe & private') }}</p>
-        <p class="mt-1">{{ __('We only read emails from banks. The app password is encrypted. You can revoke it at any time in Google.') }}</p>
-        <p class="mt-2 flex flex-wrap gap-x-4">
-            <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium underline">{{ __('How to revoke') }} ↗</a>
-            <a href="{{ route('privacy') }}" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium underline">{{ __('Privacy policy') }}</a>
-            <a href="{{ route('terms') }}" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium underline">{{ __('Terms of use') }}</a>
-        </p>
-    </div>
+    <x-gmail-privacy />
 
-    <p class="text-sm text-slate-600">
-        {{ __('No Gmail, or your bank is not supported?') }}
-        <a href="{{ route('transactions.create') }}" wire:navigate class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">{{ __('Add transactions manually') }}</a>
-    </p>
-
-    <div>
-        <p class="text-sm font-medium text-slate-600">{{ __('Supported banks') }}</p>
-        <ul class="mt-2 flex flex-wrap gap-2">
-            @foreach($banks as $code => $bank)
-                <li class="rounded-full bg-white px-3 py-1.5 text-sm font-semibold ring-1 ring-slate-200">
-                    <span class="text-emerald-700">{{ $code }}</span> · {{ $bank['name'] }}
-                </li>
-            @endforeach
-        </ul>
-    </div>
+    <x-supported-banks />
 </div>
