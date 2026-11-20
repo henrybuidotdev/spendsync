@@ -1,7 +1,19 @@
 <?php
 
-test('guests are sent to login from the home page', function () {
-    $this->get('/')->assertRedirect('/login');
+use App\Models\User;
+
+test('guests see the home page with sign-up and supported banks', function () {
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('Tự động đọc dữ liệu chi tiêu từ email ngân hàng.')
+        ->assertSee(route('register'))
+        ->assertSee(route('login'))
+        ->assertSee('Vietcombank')
+        ->assertSee('+14.608.000 ₫');
+});
+
+test('signed-in users are sent from the home page to their transactions', function () {
+    $this->actingAs(User::factory()->create())->get('/')->assertRedirect('/transactions');
 });
 
 test('the privacy page is public', function () {

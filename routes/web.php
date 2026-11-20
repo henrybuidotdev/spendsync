@@ -8,6 +8,7 @@ use App\Livewire\Transactions\Index as TransactionsIndex;
 use App\Livewire\Transactions\Show as TransactionsShow;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', fn () => auth()->check() ? redirect()->route('transactions') : view('home'))->name('home');
 Route::get('privacy', fn () => view('privacy.'.app()->getLocale()))->name('privacy');
 Route::get('terms', fn () => view('terms.'.app()->getLocale()))->name('terms');
 
@@ -19,7 +20,7 @@ Route::middleware('auth')->group(function () {
     Route::get('transactions/{transaction}/edit', TransactionsForm::class)->name('transactions.edit')->withTrashed();
 
     Route::middleware('connected')->group(function () {
-        Route::get('/', TransactionsIndex::class)->name('transactions');
+        Route::get('transactions', TransactionsIndex::class)->name('transactions');
         Route::get('transactions/{transaction}', TransactionsShow::class)->name('transactions.show')->withTrashed();
         Route::get('reports', Reports::class)->name('reports');
     });

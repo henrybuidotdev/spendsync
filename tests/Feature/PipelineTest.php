@@ -190,7 +190,7 @@ test('a continuation window starts at its from date, not resync_days before last
 test('a sync that fails mid-walk keeps its progress and the next sync resumes from there', function () {
     $failing = new class extends FakeMailboxClient
     {
-        public function connect(string $email, #[\SensitiveParameter] string $appPassword): void
+        public function connect(string $email, #[SensitiveParameter] string $appPassword): void
         {
             if ($this->searches !== []) {
                 throw new MailboxConnectionException('imap_connection_failed');
@@ -426,7 +426,7 @@ test('the demo seeder creates a populated, categorized demo account', function (
         ->and($user->transactions()->whereNotNull('category_id')->count())->toBe(3)
         ->and($user->rawEmails()->whereNotNull('parse_error')->count())->toBe(0);
 
-    $this->actingAs($user)->get('/')->assertOk()->assertSee('TRAN THI BICH');
+    $this->actingAs($user)->get('/transactions')->assertOk()->assertSee('TRAN THI BICH');
 });
 
 test('the app password never appears in exception traces', function () {

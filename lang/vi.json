@@ -262,5 +262,14 @@
     "Down :percent vs :period": "Giảm :percent so với :period",
     "Same as :period": "Bằng :period",
     "last month": "tháng trước",
-    "this time last month": "cùng kỳ tháng trước"
+    "this time last month": "cùng kỳ tháng trước",
+    "Automatically read your spending from bank emails.": "Tự động đọc dữ liệu chi tiêu từ email ngân hàng.",
+    "Connect Gmail once. Whenever your bank emails you about a transaction, SpendSync records the amount, the payee and the time. You only need to categorize at the end of the day.": "Kết nối Gmail một lần. Mỗi khi ngân hàng gửi email báo giao dịch, SpendSync ghi lại số tiền, người nhận và thời gian. Bạn chỉ cần phân loại vào cuối ngày.",
+    "Example transactions": "Ví dụ danh sách giao dịch",
+    "How it works": "Cách dùng",
+    "Create an account.": "Đăng ký tài khoản.",
+    "Create an app password in your Google account and paste it into SpendSync.": "Tạo mật khẩu ứng dụng trong tài khoản Google và dán vào SpendSync.",
+    "New transactions show up on their own within a few minutes.": "Giao dịch mới sẽ tự hiện ra sau vài phút.",
+    "No Gmail? You can still add transactions manually.": "Không dùng Gmail? Bạn vẫn có thể thêm giao dịch bằng tay.",
+    ":banks. Need another bank? Message us on Zalo": ":banks. Cần thêm ngân hàng khác, nhắn Zalo"
 }

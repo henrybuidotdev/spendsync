@@ -44,7 +44,7 @@ function connectedUser(): User
 /* Onboarding / connect */
 
 test('users without a mailbox are redirected to connect', function () {
-    $this->actingAs(User::factory()->create())->get('/')->assertRedirect('/connect');
+    $this->actingAs(User::factory()->create())->get('/transactions')->assertRedirect('/connect');
     $this->actingAs(User::factory()->create())->get('/reports')->assertRedirect('/connect');
 });
 
@@ -150,7 +150,7 @@ test('the list shows month totals, formatted amounts and day groups', function (
     Transaction::factory()->for($user)->income()->create(['amount' => 5000000, 'counterparty' => 'CONG TY ABC', 'occurred_at' => '2026-11-05 03:00:00']);
     Transaction::factory()->for($user)->create(['amount' => 999000, 'counterparty' => 'THANG TRUOC', 'occurred_at' => '2026-10-20 03:00:00']);
 
-    $this->actingAs($user)->get('/')
+    $this->actingAs($user)->get('/transactions')
         ->assertOk()
         ->assertSee('Tháng 11/2026')
         ->assertSee('TRAN THI BICH')
@@ -208,7 +208,7 @@ test('the list never shows another users transactions', function () {
     $user = connectedUser();
     Transaction::factory()->create(['counterparty' => 'NGUOI KHAC']);
 
-    $this->actingAs($user)->get('/')->assertDontSee('NGUOI KHAC');
+    $this->actingAs($user)->get('/transactions')->assertDontSee('NGUOI KHAC');
 });
 
 test('the list query count does not grow with the number of transactions', function () {
@@ -292,13 +292,13 @@ test('sync now is hidden and ignored while a sync is running', function () {
 test('needs_reconnect accounts get a red banner linking to connect', function () {
     $account = MailAccount::factory()->needsReconnect()->create();
 
-    $this->actingAs($account->user)->get('/')
+    $this->actingAs($account->user)->get('/transactions')
         ->assertSee('Mất kết nối Gmail')
         ->assertSee(route('connect'));
 });
 
 test('a brand-new connected user sees a friendly empty state', function () {
-    $this->actingAs(connectedUser())->get('/')->assertSee('Chưa có giao dịch nào');
+    $this->actingAs(connectedUser())->get('/transactions')->assertSee('Chưa có giao dịch nào');
 });
 
 /* Transaction detail */
@@ -650,7 +650,7 @@ test('the language switch is saved to the user settings', function () {
 
     expect($user->settings()->first()->locale)->toBe(Locale::En);
 
-    $this->actingAs($user->fresh())->get('/')
+    $this->actingAs($user->fresh())->get('/transactions')
         ->assertSee('Transactions')
         ->assertCookie('locale', 'en');
 });
@@ -662,7 +662,7 @@ test('the theme switch is saved to the user settings and rendered on every page'
 
     expect($user->settings()->first()->theme)->toBe(Theme::Dark);
 
-    $this->actingAs($user->fresh())->get('/')
+    $this->actingAs($user->fresh())->get('/transactions')
         ->assertSee("window.appTheme = 'dark'", false)
         ->assertCookie('theme', 'dark');
 });
@@ -678,7 +678,7 @@ test('unknown settings values are ignored', function () {
 test('users who never changed a setting get the defaults', function () {
     $user = connectedUser();
 
-    $this->actingAs($user)->get('/')
+    $this->actingAs($user)->get('/transactions')
         ->assertSee('Giao dịch')
         ->assertSee("window.appTheme = 'system'", false);
 });
@@ -712,7 +712,7 @@ test('every main page renders for a populated account', function () {
     $user = connectedUser();
     $transaction = Transaction::factory()->for($user)->create(['direction' => Direction::Out]);
 
-    foreach (['/', '/reports', '/settings', '/connect', '/profile', route('transactions.show', $transaction)] as $url) {
+    foreach (['/transactions', '/reports', '/settings', '/connect', '/profile', route('transactions.show', $transaction)] as $url) {
         $this->actingAs($user)->get($url)->assertOk();
     }
 });
@@ -733,16 +733,16 @@ test('the syncing banner shows only while a user-started sync is pending and pol
     $account = $user->mailAccount;
     $account->update(['last_synced_at' => now(), 'last_run_at' => now()]);
 
-    $this->actingAs($user)->get('/')->assertDontSee('Đang đồng bộ');
+    $this->actingAs($user)->get('/transactions')->assertDontSee('Đang đồng bộ');
 
     $account->queueSync();
 
-    $this->actingAs($user)->get('/')->assertSee('Đang đồng bộ')->assertSee('wire:poll.3s', false);
+    $this->actingAs($user)->get('/transactions')->assertSee('Đang đồng bộ')->assertSee('wire:poll.3s', false);
 
     app()->instance(MailboxClient::class, new FakeMailboxClient);
     (new SyncMailAccount($account))->handle(app(MailboxClient::class), app(ParserRegistry::class));
 
-    $this->actingAs($user)->get('/')->assertDontSee('Đang đồng bộ');
+    $this->actingAs($user)->get('/transactions')->assertDontSee('Đang đồng bộ');
 });
 
 test('the syncing flag clears even when the sync fails', function () {
@@ -762,14 +762,14 @@ test('rows show the category emoji, its initial when it has no emoji, or ? when 
     Transaction::factory()->for($user)->create(['category_id' => $food->id]);
     Transaction::factory()->for($user)->create(['category_id' => $coffee->id]);
 
-    $this->actingAs($user)->get('/')
+    $this->actingAs($user)->get('/transactions')
         ->assertSee('🍜')
         ->assertSeeHtml('aria-hidden="true">C</span>')
         ->assertDontSeeHtml('aria-hidden="true">?</span>');
 
     Transaction::factory()->for($user)->create();
 
-    $this->actingAs($user)->get('/')->assertSeeHtml('aria-hidden="true">?</span>');
+    $this->actingAs($user)->get('/transactions')->assertSeeHtml('aria-hidden="true">?</span>');
 });
 
 test('settings offers an emoji picker and an icon can be removed', function () {
@@ -956,7 +956,7 @@ test('delete data wipes the users data but keeps the login, other users and syst
         ->and($other->mailAccounts()->count())->toBe(1)
         ->and(Category::system()->count())->toBe(44);
 
-    $this->actingAs($user)->get('/')->assertRedirect('/connect');
+    $this->actingAs($user)->get('/transactions')->assertRedirect('/connect');
 });
 
 test('sync and parse jobs are configured to drop themselves when their model was deleted', function () {
@@ -1090,13 +1090,13 @@ test('a manual transaction can be deleted, a synced one cannot', function () {
 test('users without Gmail can start with manual transactions', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user)->get('/')->assertRedirect('/connect');
+    $this->actingAs($user)->get('/transactions')->assertRedirect('/connect');
     $this->actingAs($user)->get('/connect')->assertSee(route('transactions.create'));
     $this->actingAs($user)->get('/transactions/create')->assertOk()->assertSee('Thêm giao dịch');
 
     Transaction::factory()->for($user)->manual()->create();
 
-    $this->actingAs($user)->get('/')->assertOk();
+    $this->actingAs($user)->get('/transactions')->assertOk();
 });
 
 test('each debt/loan category fits one direction', function () {
@@ -1332,7 +1332,7 @@ test('edit and delete buttons only show on manual transactions', function () {
 });
 
 test('the transactions page links to the add form', function () {
-    $this->actingAs(connectedUser())->get('/')->assertSee(route('transactions.create'));
+    $this->actingAs(connectedUser())->get('/transactions')->assertSee(route('transactions.create'));
 });
 
 test('guests cannot add, edit or delete transactions', function () {
