@@ -64,7 +64,7 @@ $register = function () {
             {{ __('By signing up, you agree to the') }}
             <a href="{{ route('terms') }}" target="_blank" rel="noopener" class="underline hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950">{{ __('Terms of use') }}</a>
             {{ __('and') }}
-            <a href="{{ route('privacy') }}" target="_blank" rel="noopener" class="underline hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950">{{ __('Privacy policy') }}</a>.
+            <a href="{{ route('privacy') }}" target="_blank" rel="noopener" class="underline hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950">{{ __('Privacy') }}</a>.
         </p>
 
         <x-primary-button class="w-full">{{ __('Register') }}</x-primary-button>
