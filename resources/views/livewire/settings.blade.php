@@ -112,7 +112,9 @@
                     @endif
 
                     <div class="mt-3 flex flex-wrap gap-2">
-                        <a href="{{ route('connect') }}" wire:navigate class="inline-flex min-h-11 items-center rounded-xl bg-black px-4 text-sm font-medium text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Reconnect') }}</a>
+                        @if($account->status !== MailAccountStatus::Active)
+                            <a href="{{ route('connect') }}" wire:navigate class="inline-flex min-h-11 items-center rounded-xl bg-black px-4 text-sm font-medium text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Reconnect') }}</a>
+                        @endif
                         @if($account->status !== MailAccountStatus::Disabled)
                             <button type="button" wire:click="disconnect" wire:confirm="{{ __('Disconnect Gmail? The app password is deleted; your transactions are kept.') }}"
                                     class="min-h-11 rounded-xl bg-white px-4 text-sm font-medium text-red-600 ring-1 ring-red-200 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">{{ __('Disconnect') }}</button>
@@ -127,7 +129,7 @@
             <section class="border-t border-slate-200 pt-5" aria-labelledby="sync-heading">
                 <h2 id="sync-heading" class="font-semibold">{{ __('How syncing works') }}</h2>
                 <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
-                    <li>{{ __('Syncs automatically every hour. You can also tap "Sync now" above.') }}</li>
+                    <li>{{ __('Syncs automatically every hour. You can also tap "Sync now" above if it appears.') }}</li>
                     <li>{{ __('Only balance-change emails from supported banks are read. Other emails are never read, and nothing is marked as read.') }}</li>
                     <li>{{ __('The first sync looks back :days days. Each later sync starts :resync day(s) before the last successful sync, and emails already imported are skipped.', ['days' => config('services.mail_sync.first_sync_days'), 'resync' => config('services.mail_sync.resync_days')]) }}</li>
                     <li>{{ __('Deleting an email in Gmail does not delete its transaction in the app.') }}</li>

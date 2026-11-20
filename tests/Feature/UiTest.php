@@ -1438,3 +1438,21 @@ test('reports compare spending with the previous month', function () {
         ->call('previousMonth')
         ->assertDontSee('so với');
 });
+
+test('gmail settings show reconnect and disconnect buttons by status', function (MailAccountStatus $status, bool $reconnect, bool $disconnect) {
+    $account = MailAccount::factory()->create(['status' => $status]);
+
+    $component = Livewire::actingAs($account->user)->test(Settings::class, ['section' => 'gmail']);
+
+    $reconnect
+        ? $component->assertSee('Kết nối lại')
+        : $component->assertDontSee('Kết nối lại');
+
+    $disconnect
+        ? $component->assertSeeHtml('wire:click="disconnect"')
+        : $component->assertDontSeeHtml('wire:click="disconnect"');
+})->with([
+    'connected' => [MailAccountStatus::Active, false, true],
+    'needs reconnect' => [MailAccountStatus::NeedsReconnect, true, true],
+    'disconnected' => [MailAccountStatus::Disabled, true, false],
+]);
