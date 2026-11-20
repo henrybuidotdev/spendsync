@@ -11,12 +11,12 @@ Ngân hàng hỗ trợ: **Vietcombank (VCB)**, **CAKE by VPBank (CAKE)**, **VPBa
 Yêu cầu: PHP 8.3+ với `intl`, `mbstring`, `pdo_sqlite`; Composer; Node 20+.
 
 ```bash
-> composer install
-> cp .env.example .env
-> php artisan key:generate
-> touch database/database.sqlite
-> php artisan migrate --seed
-> npm install && npm run build
+composer install
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate --seed
+npm install && npm run build
 ```
 
 ### Danh mục mặc định
