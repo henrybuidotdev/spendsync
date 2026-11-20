@@ -33,6 +33,6 @@
 
 <x-privacy-layout title="Điều khoản sử dụng" :sections="$sections">
     <x-slot:intro>
-        <p class="text-slate-600">Ngắn gọn, dễ hiểu: ứng dụng làm gì, bạn cần lưu ý gì. Cập nhật lần cuối: 13/11/2026.</p>
+        <p class="text-slate-600 text-sm">Cập nhật lần cuối: 20/11/2026.</p>
     </x-slot:intro>
 </x-privacy-layout>

@@ -33,6 +33,6 @@
 
 <x-privacy-layout title="Terms of use" :sections="$sections">
     <x-slot:intro>
-        <p class="text-slate-600">Short and plain: what the app does and what to keep in mind. Last updated: 13/11/2026.</p>
+        <p class="text-slate-600 text-sm">Last update: 20/11/2026.</p>
     </x-slot:intro>
 </x-privacy-layout>

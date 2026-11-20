@@ -23,10 +23,6 @@
 
 <x-privacy-layout title="Privacy" :sections="$sections">
     <x-slot:intro>
-        <p class="text-slate-600">Short and plain: what we read, what we store, and how you delete it all.</p>
+        <p class="text-slate-600 text-sm">Last update: 20/11/2026.</p>
     </x-slot:intro>
-
-    {{-- <p class="text-sm">
-        <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">Revoke the app password at Google ↗</a>
-    </p> --}}
 </x-privacy-layout>

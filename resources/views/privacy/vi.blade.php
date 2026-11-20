@@ -23,10 +23,6 @@
 
 <x-privacy-layout title="Quyền riêng tư" :sections="$sections">
     <x-slot:intro>
-        <p class="text-slate-600">Ngắn gọn, dễ hiểu: chúng tôi đọc gì, lưu gì và cách bạn xóa hết.</p>
+        <p class="text-slate-600 text-sm">Cập nhật lần cuối: 20/11/2026.</p>
     </x-slot:intro>
-
-    {{-- <p class="text-sm">
-        <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">Thu hồi mật khẩu ứng dụng tại Google ↗</a>
-    </p> --}}
 </x-privacy-layout>
