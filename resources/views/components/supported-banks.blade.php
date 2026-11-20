@@ -9,7 +9,7 @@
         @endforeach
     </ul>
     <p class="mt-2 text-sm text-slate-600">
-        {{ __('Need support for your bank? Add us on Zalo') }}
+        {{ __('Need support for your bank? Contact on Zalo') }}
         <a href="https://zalo.me/0869478154" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">(0869478154) ↗</a>
     </p>
     <p class="text-sm text-slate-600">

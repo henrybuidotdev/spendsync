@@ -42,7 +42,7 @@ test('each bank has at least three transaction fixtures and one non-transaction 
 test('registry exposes all configured senders and matches display-name senders', function () {
     $registry = app(ParserRegistry::class);
 
-    expect($registry->senders())->toContain('vcbdigibank@info.vietcombank.com.vn', 'no-reply@cake.vn')
+    expect($registry->senders())->toContain('vcbdigibank@info.vietcombank.com.vn', 'no-reply@cake.vn', 'vpbankonline@vpb.com.vn')
         ->and($registry->findFor('Vietcombank <VCBDigibank@info.vietcombank.com.vn>', 'x')?->bankCode())->toBe('VCB')
         ->and($registry->findFor('scam@vietcombank.com.vn.evil.io', 'x'))->toBeNull();
 });

@@ -3,6 +3,7 @@
 use App\Enums\Direction;
 use App\Parsing\Banks\CakeParser;
 use App\Parsing\Banks\VietcombankParser;
+use App\Parsing\Banks\VpBankParser;
 
 /*
  * Supported banks: code => display name, sender addresses (lowercase), parser class
@@ -29,12 +30,12 @@ return [
         'directions' => [Direction::In, Direction::Out],
     ],
 
-    // 'VPB' => [
-    //     'name' => 'VPBank',
-    //     'senders' => [
-    //         'vpbankonline@vpb.com.vn', // TODO verify
-    //     ],
-    //     'parser' => '',
-    //     'directions' => [Direction::Out],
-    // ],
+    'VPB' => [
+        'name' => 'VPBank',
+        'senders' => [
+            'vpbankonline@vpb.com.vn', // verified with a real transfer confirmation
+        ],
+        'parser' => VpBankParser::class,
+        'directions' => [Direction::Out],
+    ],
 ];
