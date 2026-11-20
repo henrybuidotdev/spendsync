@@ -3,7 +3,7 @@
     "short_name": "SpendSync",
     "description": "Tự động ghi chép thu chi từ email ngân hàng",
     "lang": "vi",
-    "start_url": "/",
+    "start_url": "/transactions",
     "scope": "/",
     "display": "standalone",
     "background_color": "#F7F7F6",

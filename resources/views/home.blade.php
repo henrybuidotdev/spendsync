@@ -30,8 +30,12 @@
                     <span aria-hidden="true"><span class="font-bold">{{ $brandHead }}</span><span class="font-normal">{{ $brandTail }}</span></span>
                 </a>
                 <nav class="flex items-center text-sm font-medium">
-                    <a href="{{ route('login') }}" class="inline-flex min-h-9 items-center rounded-xl bg-black px-3 text-xs font-semibold text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Log in') }}</a>
-                    <a href="{{ route('register') }}" class="ml-1 inline-flex min-h-11 items-center px-2.5 text-slate-700 hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Register') }}</a>
+                    @auth
+                        <a href="{{ route('transactions') }}" class="inline-flex min-h-9 items-center rounded-xl bg-black px-3 text-xs font-semibold text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('View transactions') }}</a>
+                    @else
+                        <a href="{{ route('login') }}" class="inline-flex min-h-9 items-center rounded-xl bg-black px-3 text-xs font-semibold text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Log in') }}</a>
+                        <a href="{{ route('register') }}" class="ml-1 inline-flex min-h-11 items-center px-2.5 text-slate-700 hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Register') }}</a>
+                    @endauth
                 </nav>
             </header>
 

@@ -12,8 +12,13 @@ test('guests see the home page with sign-up and supported banks', function () {
         ->assertSee('+14.608.000 ₫');
 });
 
-test('signed-in users are sent from the home page to their transactions', function () {
-    $this->actingAs(User::factory()->create())->get('/')->assertRedirect('/transactions');
+test('signed-in users can open the home page, which links to their transactions instead of sign-up', function () {
+    $this->actingAs(User::factory()->create())->get('/')
+        ->assertOk()
+        ->assertSee('Xem giao dịch')
+        ->assertSee(route('transactions'))
+        ->assertDontSee(route('register'))
+        ->assertDontSee(route('login'));
 });
 
 test('the privacy page is public', function () {
@@ -29,7 +34,7 @@ test('the privacy page follows the chosen language', function () {
 });
 
 test('the PWA manifest and service worker are served', function () {
-    expect(json_decode(file_get_contents(public_path('manifest.webmanifest')), true))->toHaveKey('start_url', '/')
+    expect(json_decode(file_get_contents(public_path('manifest.webmanifest')), true))->toHaveKey('start_url', '/transactions')
         ->and(file_exists(public_path('sw.js')))->toBeTrue();
 });
 
