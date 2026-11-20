@@ -18,6 +18,7 @@ use App\Parsing\ParsedEmailInput;
 use App\Parsing\ParserRegistry;
 use App\Parsing\Support\ExchangeRates;
 use App\Parsing\UnparseableEmailException;
+use App\Support\Format;
 use Carbon\CarbonImmutable;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Support\Facades\DB;
@@ -421,9 +422,15 @@ test('the demo seeder creates a populated, categorized demo account', function (
 
     $user = User::where('email', 'demo@spendsync.test')->sole();
 
+    $months = $user->transactions()->pluck('occurred_at')->map->format('Y-m')->unique();
+
     expect(Hash::check('password', $user->password))->toBeFalse()
-        ->and($user->transactions()->count())->toBe(15)
-        ->and($user->transactions()->whereNotNull('category_id')->count())->toBe(3)
+        ->and($user->transactions()->withTrashed()->whereNotNull('raw_email_id')->count())->toBe(15)
+        ->and($user->transactions()->onlyTrashed()->count())->toBe(5)
+        ->and($user->transactions()->count())->toBeGreaterThan(250)
+        ->and($user->transactions()->whereNull('category_id')->count())->toBeLessThan(25)
+        ->and($months->count())->toBeGreaterThanOrEqual(4)
+        ->and(Format::local(CarbonImmutable::parse($user->transactions()->max('occurred_at'), 'UTC'))->toDateString())->toBe(Format::local(now())->toDateString())
         ->and($user->rawEmails()->whereNotNull('parse_error')->count())->toBe(0);
 
     $this->actingAs($user)->get('/transactions')->assertOk()->assertSee('TRAN THI BICH');

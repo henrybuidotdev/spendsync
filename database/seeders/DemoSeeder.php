@@ -4,12 +4,14 @@ namespace Database\Seeders;
 
 use App\Enums\MatchField;
 use App\Models\Category;
+use App\Models\Transaction;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 
-/** The read-only demo account (services.demo.email; password "password" locally, random elsewhere), populated by importing every fixture through the real parsing pipeline. */
+/** The read-only demo account (services.demo.email; password "password" locally, random elsewhere), populated by importing every fixture through the real parsing pipeline plus a generated DemoLedger. */
 class DemoSeeder extends Seeder
 {
     private const RULES = [
@@ -19,6 +21,18 @@ class DemoSeeder extends Seeder
         ['description', 'grab', 'Taxi'],
         ['description', 'highlands', 'Coffee'],
         ['description', 'tien dien', 'Electricity bill'],
+        ['counterparty', 'TRAN THI BICH', 'Rentals'],
+        ['counterparty', 'QUAN AN NHAT', 'Restaurants'],
+        ['counterparty', 'PAYOO Aeon Mall Binh Tan', 'Shopping'],
+        ['counterparty', 'CONG AN THANH PHO DA NANG', 'Other'],
+        ['description', 'topup viettel', 'Phone bill'],
+    ];
+
+    /** Imported fixtures that would skew the reports: a test transfer, transfers between own accounts, a cancelled card charge. */
+    private const HIDDEN_COUNTERPARTIES = [
+        'LE VAN CUONG' => 'Cho anh Cường mượn, theo dõi riêng',
+        'NGUYEN VAN AN' => 'Chuyển giữa tài khoản của tôi',
+        'ANTHROPIC* CLAUDE SUB +14152360599 US' => 'Giao dịch thẻ đã bị hủy và hoàn tiền',
     ];
 
     public function run(): void
@@ -47,6 +61,16 @@ class DemoSeeder extends Seeder
         ]);
 
         $this->command?->info(trim(Artisan::output()));
+
+        foreach (self::HIDDEN_COUNTERPARTIES as $counterparty => $note) {
+            $user->transactions()->where('counterparty', $counterparty)->each(function (Transaction $transaction) use ($note): void {
+                $transaction->update(['note' => $note]);
+                $transaction->delete();
+            });
+        }
+
+        $newest = CarbonImmutable::parse($user->transactions()->max('occurred_at') ?? now(), 'UTC');
+        $user->transactions()->createMany((new DemoLedger)->build($newest));
 
         Artisan::call('spendsync:refresh-demo');
     }

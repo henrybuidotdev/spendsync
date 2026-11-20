@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\RawEmail;
 use App\Models\Transaction;
-use App\Support\Demo;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 
@@ -12,11 +12,11 @@ class RefreshDemoCommand extends Command
 {
     protected $signature = 'spendsync:refresh-demo';
 
-    protected $description = 'Move the demo account\'s transactions (and their emails\' received dates) forward by whole days so the newest one is today';
+    protected $description = 'Move the demo account\'s transactions (and their emails\' received dates) by whole days so the newest one is today';
 
     public function handle(): int
     {
-        $demo = Demo::user();
+        $demo = User::firstWhere('email', config('services.demo.email'));
 
         if ($demo === null) {
             $this->comment('No demo account; nothing to refresh.');
@@ -37,13 +37,13 @@ class RefreshDemoCommand extends Command
         $today = CarbonImmutable::now($timezone)->startOfDay();
         $days = (int) CarbonImmutable::parse($newest, 'UTC')->setTimezone($timezone)->startOfDay()->diffInDays($today);
 
-        if ($days <= 0) {
+        if ($days === 0) {
             $this->comment('Demo transactions are already up to date.');
 
             return self::SUCCESS;
         }
 
-        $this->info("Moving {$transactions->count()} demo transactions forward by {$days} days...");
+        $this->info("Moving {$transactions->count()} demo transactions by {$days} days...");
 
         // ponytail: one save per row, fine for a demo-sized dataset; switch to a single UPDATE if it grows large.
         $transactions->each(function (Transaction $transaction) use ($days): void {

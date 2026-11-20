@@ -153,3 +153,12 @@ test('refresh-demo does nothing without a demo account', function () {
 
     $this->artisan('spendsync:refresh-demo')->assertSuccessful();
 });
+
+test('refresh-demo moves demo data back when it is ahead of today', function () {
+    Transaction::query()->forceDelete();
+    $future = Transaction::factory()->for($this->demo)->create(['occurred_at' => '2026-11-15 03:00:00']);
+
+    $this->artisan('spendsync:refresh-demo')->assertSuccessful();
+
+    expect($future->fresh()->occurred_at->toDateTimeString())->toBe('2026-11-12 03:00:00');
+});
