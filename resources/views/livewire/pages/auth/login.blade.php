@@ -31,7 +31,7 @@ $login = function () {
     <form wire:submit="login" class="space-y-4">
         <div>
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="form.email" id="email" class="mt-1 block w-full" type="email" name="email" required autofocus autocomplete="username" />
+            <x-text-input wire:model="form.email" id="email" class="mt-1 block w-full" type="email" name="email" required autofocus autocomplete="email" />
             <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
         </div>
 

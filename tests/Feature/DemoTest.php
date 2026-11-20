@@ -174,3 +174,11 @@ test('the demo account can log out but not change its profile', function () {
 
     expect(fn () => $this->demo->update(['name' => 'Hacked']))->toThrow(DemoDataIsReadOnly::class);
 });
+
+test('logging out turns demo mode off', function () {
+    $this->actingAs($this->viewer);
+
+    auth()->logout();
+
+    expect($this->viewer->fresh()->viewing_demo)->toBeFalse();
+});

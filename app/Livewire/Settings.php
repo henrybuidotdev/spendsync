@@ -194,7 +194,7 @@ class Settings extends Component
     {
         $logout();
 
-        $this->redirect('/');
+        $this->redirect(route('login'));
     }
 
     public function render()

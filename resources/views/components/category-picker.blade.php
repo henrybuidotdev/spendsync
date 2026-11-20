@@ -30,15 +30,17 @@
 
     <x-modal name="category-picker" maxWidth="md" sheet>
         <div class="px-4 pb-4" role="dialog" aria-modal="true" aria-labelledby="category-picker-title">
-            <div class="sticky top-0 z-10 -mx-4 flex items-center justify-between gap-2 bg-white px-4 py-3">
-                <h2 id="category-picker-title" class="text-lg font-semibold">{{ __('Choose a category') }}</h2>
-                <button type="button" x-on:click="$dispatch('close-modal', 'category-picker')" class="-mr-2 flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="{{ __('Close') }}"><x-icon name="x" class="h-5 w-5" /></button>
-            </div>
+            <div class="sticky top-0 z-10 -mx-4 bg-white px-4">
+                <div class="flex items-center justify-between gap-2 py-3">
+                    <h2 id="category-picker-title" class="text-lg font-semibold">{{ __('Choose a category') }}</h2>
+                    <button type="button" x-on:click="$dispatch('close-modal', 'category-picker')" class="-mr-2 flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="{{ __('Close') }}"><x-icon name="x" class="h-5 w-5" /></button>
+                </div>
 
-            <div class="tabs" role="group" aria-label="{{ __('Category type') }}">
-                @foreach($types as $case)
-                    <button type="button" x-on:click="tab = @js($case->value)" x-bind:aria-pressed="tab === @js($case->value)" class="tab">{{ $case->label() }}</button>
-                @endforeach
+                <div class="tabs" role="group" aria-label="{{ __('Category type') }}">
+                    @foreach($types as $case)
+                        <button type="button" x-on:click="tab = @js($case->value)" x-bind:aria-pressed="tab === @js($case->value)" class="tab">{{ $case->label() }}</button>
+                    @endforeach
+                </div>
             </div>
 
             @foreach($types as $case)
