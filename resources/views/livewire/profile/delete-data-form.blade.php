@@ -37,7 +37,7 @@ $deleteData = function () {
     <h3 class="text-sm font-semibold text-slate-900">{{ __('Delete data') }}</h3>
     <p class="mt-1 text-sm text-slate-600">{{ __('Deletes transactions, synced bank emails, rules, your own categories and the Gmail connection. Your login is kept so you can start over.') }}</p>
     <button type="button" x-data x-on:click.prevent="$dispatch('open-modal', 'confirm-data-deletion')"
-            class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-white px-4 text-sm font-semibold text-red-600 ring-1 ring-red-300 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">{{ __('Delete data') }}</button>
+            class="mt-3 inline-flex min-h-11 items-center rounded-xl bg-white px-4 text-sm font-semibold text-red-600 hover:text-white ring-1 ring-red-300 hover:ring-red-600 hover:bg-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">{{ __('Delete data') }}</button>
 
     <x-modal name="confirm-data-deletion" :show="$errors->isNotEmpty()" focusable>
         <form wire:submit="deleteData" class="p-6">
