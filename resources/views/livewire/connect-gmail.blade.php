@@ -45,7 +45,7 @@
         </form>
     </section>
 
-    <x-gmail-privacy />
-
     <x-supported-banks />
+
+    <x-gmail-privacy />
 </div>

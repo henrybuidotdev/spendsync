@@ -130,11 +130,11 @@
                 </ul>
             </section>
 
-            <x-gmail-privacy />
-
             <section class="border-t border-slate-200 pt-5" aria-labelledby="banks-heading">
                 <x-supported-banks />
             </section>
+
+            <x-gmail-privacy />
                 @break
 
             @case('categories')
