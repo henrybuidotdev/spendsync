@@ -9,10 +9,10 @@
         @endforeach
     </ul>
     <p class="mt-2 text-sm text-slate-600">
-        {{ __('Need support for your bank? Contact on Zalo') }}
-        <a href="https://zalo.me/0869478154" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">(0869478154) ↗</a>
+        {{ __('Need support for your bank or report a bug? Contact on Zalo') }}
+        <a href="https://zalo.me/0869478154" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">0869478154</a>
     </p>
-    <p class="text-sm text-slate-600">
+    <p class="mt-2 text-sm text-slate-600">
         {{ __('No Gmail, or your bank is not yet supported?') }}
         <a href="{{ route('transactions.create') }}" wire:navigate class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">{{ __('Add transactions manually') }}</a>
     </p>
