@@ -97,7 +97,7 @@
                 <span aria-hidden="true">&nbsp;·&nbsp;</span>
                 <a href="{{ route('terms') }}" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Terms of use') }}</a>
                 <span aria-hidden="true">&nbsp;·&nbsp;</span>
-                <a href="{{ config('app.source_url') }}" target="_blank" rel="noopener" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Source code') }}</a>
+                <a href="{{ config('app.source_url') }}" target="_blank" rel="noopener" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Source on GitHub') }}</a>
                 <span aria-hidden="true">&nbsp;·&nbsp;</span>
                 @foreach(\App\Enums\Locale::cases() as $locale)
                     @continue($locale->value === app()->getLocale())
