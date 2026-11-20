@@ -243,10 +243,10 @@ test('sync help texts show the configured look-back days', function () {
     $user = connectedUser();
 
     Livewire::actingAs($user)->test(Settings::class, ['section' => 'gmail'])
-        ->assertSee('Lần đồng bộ đầu lấy 30 ngày gần nhất. Các lần sau lấy từ 3 ngày trước');
+        ->assertSee('Lần đồng bộ đầu tiên lấy 30 ngày gần nhất. Các lần sau lấy từ 3 ngày trước');
 
     Livewire::actingAs($user)->test(Index::class)
-        ->assertSee('Lần đồng bộ đầu lấy 30 ngày gần nhất.');
+        ->assertSee('Lần đồng bộ đầu tiên lấy 30 ngày gần nhất.');
 });
 
 test('sync now is hidden and ignored within 15 minutes of the last sync', function () {
