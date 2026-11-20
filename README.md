@@ -8,7 +8,7 @@ Ngân hàng hỗ trợ: **Vietcombank (VCB)**, **CAKE by VPBank (CAKE)**, **VPBa
 
 ## Cài đặt
 
-Yêu cầu: PHP 8.3+ với `intl`, `mbstring`, `pdo_sqlite`; Composer; Node 20+.
+Yêu cầu: PHP 8.4+ với `intl`, `mbstring`, `pdo_sqlite`; Composer; Node 20+.
 
 ```bash
 composer install

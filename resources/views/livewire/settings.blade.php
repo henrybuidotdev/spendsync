@@ -48,6 +48,8 @@
             <a href="{{ route('privacy') }}" target="_blank" rel="noopener" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Privacy') }}</a>
             <span aria-hidden="true">&nbsp;·&nbsp;</span>
             <a href="{{ route('terms') }}" target="_blank" rel="noopener" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Terms of use') }}</a>
+            <span aria-hidden="true">&nbsp;·&nbsp;</span>
+            <a href="{{ config('app.source_url') }}" target="_blank" rel="noopener" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Source code') }}</a>
         </p>
     @else
         <a href="{{ route('settings') }}" wire:navigate class="-ml-1 inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"><x-icon name="chevron-left" class="h-4 w-4" /> {{ __('Settings') }}</a>

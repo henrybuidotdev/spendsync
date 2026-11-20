@@ -67,6 +67,8 @@ return [
 
     'timezone' => 'UTC',
 
+    'source_url' => env('APP_SOURCE_URL', 'https://github.com/henrybuidotdev/spendsync'),
+
     'display_timezone' => env('APP_TIMEZONE', 'Asia/Ho_Chi_Minh'),
 
     /*
