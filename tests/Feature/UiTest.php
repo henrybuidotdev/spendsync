@@ -43,9 +43,11 @@ function connectedUser(): User
 
 /* Onboarding / connect */
 
-test('users without a mailbox are redirected to connect', function () {
-    $this->actingAs(User::factory()->create())->get('/transactions')->assertRedirect('/connect');
-    $this->actingAs(User::factory()->create())->get('/reports')->assertRedirect('/connect');
+test('users without a mailbox can use the app without being sent to connect', function () {
+    $this->actingAs(User::factory()->create())->get('/transactions')->assertOk()
+        ->assertSee(route('connect'))
+        ->assertSee('Nhập giao dịch thủ công');
+    $this->actingAs(User::factory()->create())->get('/reports')->assertOk();
 });
 
 test('the connect page shows the guide, trust box and supported banks', function () {
@@ -283,6 +285,7 @@ test('sync now is hidden and ignored while a sync is running', function () {
 
     Livewire::actingAs($user)->test(Settings::class, ['section' => 'gmail'])
         ->assertSee('Đang đồng bộ')
+        ->assertDontSee('Đồng bộ lần cuối')
         ->assertDontSeeHtml('wire:click="syncNow"')
         ->call('syncNow');
 
@@ -956,7 +959,7 @@ test('delete data wipes the users data but keeps the login, other users and syst
         ->and($other->mailAccounts()->count())->toBe(1)
         ->and(Category::system()->count())->toBe(44);
 
-    $this->actingAs($user)->get('/transactions')->assertRedirect('/connect');
+    $this->actingAs($user)->get('/transactions')->assertOk();
 });
 
 test('sync and parse jobs are configured to drop themselves when their model was deleted', function () {
@@ -1090,7 +1093,7 @@ test('a manual transaction can be deleted, a synced one cannot', function () {
 test('users without Gmail can start with manual transactions', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user)->get('/transactions')->assertRedirect('/connect');
+    $this->actingAs($user)->get('/transactions')->assertOk();
     $this->actingAs($user)->get('/connect')->assertSee(route('transactions.create'));
     $this->actingAs($user)->get('/transactions/create')->assertOk()->assertSee('Thêm giao dịch');
 

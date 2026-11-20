@@ -12,7 +12,7 @@
         @php
             $rows = [
                 ['gmail', 'mail', __('Gmail'), match ($account?->status) {
-                    MailAccountStatus::Active => __('Active'),
+                    MailAccountStatus::Active => __('Connected'),
                     MailAccountStatus::NeedsReconnect => __('Needs reconnect'),
                     MailAccountStatus::Disabled => __('Disconnected'),
                     null => __('Not connected'),
@@ -67,24 +67,26 @@
             <section aria-labelledby="page-heading">
 
                 @if($account)
-                    <p class="mt-2 break-all font-medium">{{ $account->email }}</p>
-                    <p class="mt-1 text-sm">
+                    <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span class="break-all font-medium">{{ $account->email }}</span>
                         @switch($account->status)
                             @case(MailAccountStatus::Active)
-                                <span class="rounded-full bg-emerald-100 px-2 py-0.5 font-medium text-emerald-800">{{ __('Active') }}</span>
+                                <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-sm font-medium text-emerald-800">{{ __('Connected') }}</span>
                                 @break
                             @case(MailAccountStatus::NeedsReconnect)
-                                <span class="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-800">{{ __('Needs reconnect') }}</span>
+                                <span class="rounded-full bg-red-100 px-2 py-0.5 text-sm font-medium text-red-800">{{ __('Needs reconnect') }}</span>
                                 @break
                             @default
-                                <span class="rounded-full bg-slate-200 px-2 py-0.5 font-medium text-slate-700">{{ __('Disconnected') }}</span>
+                                <span class="rounded-full bg-slate-200 px-2 py-0.5 text-sm font-medium text-slate-700">{{ __('Disconnected') }}</span>
                         @endswitch
                     </p>
                     <p class="mt-2 flex flex-wrap items-center gap-x-2 text-sm text-slate-600">
-                        <span>
-                            {{ __('Last synced') }}:
-                            {{ $account->last_run_at ? Format::local($account->last_run_at)->format('H:i d/m/Y').' ('.Format::local($account->last_run_at)->diffForHumans().')' : __('never') }}
-                        </span>
+                        @unless($account->status === MailAccountStatus::Active && $account->isSyncing())
+                            <span>
+                                {{ __('Last synced') }}:
+                                {{ $account->last_run_at ? Format::local($account->last_run_at)->format('H:i d/m/Y').' ('.Format::local($account->last_run_at)->diffForHumans().')' : __('never') }}
+                            </span>
+                        @endunless
                         @if($account->status === MailAccountStatus::Active)
                             @if($account->isSyncing())
                                 <span wire:poll.3s role="status" class="inline-flex min-h-11 items-center font-medium text-slate-500">

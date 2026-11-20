@@ -24,12 +24,9 @@ Route::middleware('auth')->group(function () {
     Route::view('profile', 'profile')->name('profile');
     Route::get('transactions/create', TransactionsForm::class)->name('transactions.create');
     Route::get('transactions/{transaction}/edit', TransactionsForm::class)->name('transactions.edit')->withTrashed();
-
-    Route::middleware('connected')->group(function () {
-        Route::get('transactions', TransactionsIndex::class)->name('transactions');
-        Route::get('transactions/{transaction}', TransactionsShow::class)->name('transactions.show')->withTrashed();
-        Route::get('reports', Reports::class)->name('reports');
-    });
+    Route::get('transactions', TransactionsIndex::class)->name('transactions');
+    Route::get('transactions/{transaction}', TransactionsShow::class)->name('transactions.show')->withTrashed();
+    Route::get('reports', Reports::class)->name('reports');
 });
 
 require __DIR__.'/auth.php';

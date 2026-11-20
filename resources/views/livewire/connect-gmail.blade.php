@@ -1,4 +1,6 @@
 <div class="space-y-5">
+    <a href="{{ route('transactions') }}" wire:navigate class="-ml-1 inline-flex min-h-11 items-center gap-1 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"><x-icon name="chevron-left" class="h-4 w-4" /> {{ __('Transactions') }}</a>
+
     <x-flash />
 
     <div>
