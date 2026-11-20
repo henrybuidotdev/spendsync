@@ -7,11 +7,11 @@
         <div class="mx-auto min-h-screen max-w-lg bg-slate-50 pb-24">
             @if(\App\Support\Demo::isActive() && request()->routeIs('transactions*', 'reports'))
                 <div role="status" class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 bg-amber-100 px-4 py-2 text-sm text-amber-900">
-                    <p>{{ __('You are viewing demo data. Changes are not saved.') }}</p>
+                    <p>{{ __('You are viewing demo data, they can\'t be updated.') }}</p>
                     <form method="POST" action="{{ route('demo.stop') }}">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="inline-flex min-h-11 items-center font-semibold underline focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600">{{ __('Back to my data') }}</button>
+                        <button type="submit" class="inline-flex min-h-11 items-center font-semibold underline focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600">{{ __('Reset demo data') }}</button>
                     </form>
                 </div>
             @endif
@@ -35,7 +35,7 @@
                 <form method="POST" action="{{ route('demo.stop') }}" class="inline">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="font-semibold underline">{{ __('Back to my data') }}</button>
+                    <button type="submit" class="font-semibold underline">{{ __('Reset demo data') }}</button>
                 </form>
             </div>
         @endif

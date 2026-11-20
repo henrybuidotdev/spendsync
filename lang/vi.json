@@ -273,7 +273,7 @@
     "No Gmail? You can still add transactions manually.": "Không dùng Gmail? Bạn vẫn có thể thêm giao dịch bằng tay.",
     ":banks. Need another bank? Message us on Zalo": ":banks. Cần thêm ngân hàng khác, nhắn Zalo",
     "View demo data": "Xem dữ liệu demo",
-    "You are viewing demo data. Changes are not saved.": "Bạn đang xem dữ liệu demo. Thay đổi sẽ không được lưu.",
-    "Back to my data": "Về dữ liệu của tôi",
+    "You are viewing demo data, they can't be updated.": "Bạn đang xem dữ liệu demo, mọi thay đổi sẽ không được lưu lại.",
+    "Reset demo data": "Xoá dữ liệu demo",
     "This is demo data, so changes can't be saved or deleted. Switch back to your account to make changes.": "Đây là dữ liệu demo nên không thể lưu hay xóa. Hãy chuyển về tài khoản của bạn để thay đổi."
 }
