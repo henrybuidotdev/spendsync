@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Locale;
 use App\Models\User;
 
 test('guests see the home page with sign-up and supported banks', function () {
@@ -44,4 +45,24 @@ test('the terms page is public, follows the chosen language and is linked from s
     $this->withCookie('locale', 'en')->get('/terms')->assertOk()->assertSee('Terms of use');
 
     $this->get('/register')->assertSee(route('terms'))->assertSee(route('privacy'));
+});
+
+test('the home page switches language for guests and remembers it for signed-in users', function () {
+    $this->get('/')->assertSee('English')->assertSee(route('locale', 'en'));
+
+    $this->from('/')->get('/locale/en')
+        ->assertRedirect('/')
+        ->assertCookie('locale', 'en');
+
+    $this->withCookie('locale', 'en')->get('/')
+        ->assertSee('<html lang="en"', false)
+        ->assertSee('Automatically read your spending from bank emails.')
+        ->assertSee('Tiếng Việt');
+
+    $user = User::factory()->create();
+    $this->actingAs($user)->get('/locale/en');
+
+    expect($user->settings()->first()->locale)->toBe(Locale::En);
+
+    $this->get('/locale/fr')->assertNotFound();
 });

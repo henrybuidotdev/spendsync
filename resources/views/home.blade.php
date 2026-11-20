@@ -92,6 +92,11 @@
                 <a href="{{ route('privacy') }}" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Privacy') }}</a>
                 <span aria-hidden="true">&nbsp;·&nbsp;</span>
                 <a href="{{ route('terms') }}" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Terms of use') }}</a>
+                <span aria-hidden="true">&nbsp;·&nbsp;</span>
+                @foreach(\App\Enums\Locale::cases() as $locale)
+                    @continue($locale->value === app()->getLocale())
+                    <a href="{{ route('locale', $locale) }}" lang="{{ $locale->value }}" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ $locale->label() }}</a>
+                @endforeach
             </footer>
         </div>
     </body>

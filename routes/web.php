@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Locale;
 use App\Livewire\ConnectGmail;
 use App\Livewire\Reports;
 use App\Livewire\Settings;
@@ -9,6 +10,11 @@ use App\Livewire\Transactions\Show as TransactionsShow;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
+Route::get('locale/{locale}', function (Locale $locale) {
+    auth()->user()?->settings()->updateOrCreate([], ['locale' => $locale]);
+
+    return redirect()->back(fallback: route('home'))->withCookie(cookie()->forever('locale', $locale->value));
+})->name('locale');
 Route::get('privacy', fn () => view('privacy.'.app()->getLocale()))->name('privacy');
 Route::get('terms', fn () => view('terms.'.app()->getLocale()))->name('terms');
 
