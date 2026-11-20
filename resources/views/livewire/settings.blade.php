@@ -56,7 +56,7 @@
             <h1 id="page-heading" class="text-2xl font-semibold tracking-tight">{{ $title }}</h1>
             @if($section === 'categories')
                 {{-- Hidden, not removed, on Debt/Loan so the header doesn't shift when switching tabs. --}}
-                <button type="button" x-on:click="$dispatch('open-modal', 'add-category')" @class(['-mr-2 inline-flex min-h-11 items-center gap-1 rounded-xl px-2 font-medium text-emerald-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500', 'invisible' => $categoryType === 'debt_loan'])>+ {{ __('Add') }}</button>
+                <button type="button" x-on:click="$dispatch('open-modal', 'add-category')" @class(['inline-flex min-h-9 items-center gap-1 rounded-xl bg-black px-3 text-xs font-semibold text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2', 'invisible' => $categoryType === 'debt_loan'])>+ {{ __('Add') }}</button>
             @endif
         </div>
 
