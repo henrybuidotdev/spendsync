@@ -356,9 +356,9 @@ test('after choosing a category, the button fills in matching uncategorized tran
         ->assertDontSee('Tìm thấy')
         ->assertDontSee('Tự động lưu')
         ->call('setCategory', $food->id)
-        ->assertSee('Tìm thấy 1 giao dịch với')
+        ->assertSee('Tìm thấy 1 giao dịch khác với')
         ->assertSee('bạn có muốn lưu "Ăn uống" cho các giao dịch đó không?', false)
-        ->assertSee('Tự động lưu "Ăn uống" cho các giao dịch trong tương lai với', false)
+        ->assertSee('Tự động lưu danh mục "Ăn uống" cho các giao dịch trong tương lai với', false)
         ->assertSet('applyToFuture', false)
         ->call('applyToUncategorized')
         ->assertSee('Đã áp dụng cho 1 giao dịch.')
@@ -380,7 +380,7 @@ test('ticking the checkbox creates a rule without filling in past transactions',
         ->assertSee('Đã lưu quy tắc.')
         ->assertSee('Quản lý quy tắc')
         ->assertSee(route('settings', 'rules'))
-        ->assertSee('Tìm thấy 1 giao dịch với');
+        ->assertSee('Tìm thấy 1 giao dịch khác với');
 
     expect($sibling->fresh()->category_id)->toBeNull()
         ->and(CategoryRule::sole()->match_value)->toBe('bun bo hue')

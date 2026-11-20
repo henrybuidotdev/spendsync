@@ -35,7 +35,7 @@
             @if($backfillCount > 0)
                 <div class="mt-5 flex items-center gap-3 rounded-xl bg-amber-50 p-3 text-sm">
                     <p class="flex-1">{!! __('Found :count "Uncategorized" transactions with :target. Set them to ":category" too?', ['count' => $backfillCount, ...$ruleTexts]) !!}</p>
-                    <x-primary-button type="button" wire:click="applyToUncategorized" class="shrink-0">{{ __('Apply') }}</x-primary-button>
+                    <x-primary-button type="button" wire:click="applyToUncategorized" class="shrink-0">{{ __('OK, do it') }}</x-primary-button>
                 </div>
             @endif
 
