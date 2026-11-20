@@ -84,9 +84,10 @@
                 </section>
             </main>
 
-            <footer class="mt-14 flex flex-wrap gap-x-4 border-t border-slate-200 pt-2 text-sm">
-                <a href="{{ route('privacy') }}" class="inline-flex min-h-11 items-center text-slate-600 underline hover:text-slate-900">{{ __('Privacy') }}</a>
-                <a href="{{ route('terms') }}" class="inline-flex min-h-11 items-center text-slate-600 underline hover:text-slate-900">{{ __('Terms of use') }}</a>
+            <footer class="mt-14 text-center text-sm text-slate-500">
+                <a href="{{ route('privacy') }}" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Privacy') }}</a>
+                <span aria-hidden="true">&nbsp;·&nbsp;</span>
+                <a href="{{ route('terms') }}" class="inline-flex items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ __('Terms of use') }}</a>
             </footer>
         </div>
     </body>
