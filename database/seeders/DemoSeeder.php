@@ -41,9 +41,11 @@ class DemoSeeder extends Seeder
 
         User::where('email', $email)->first()?->delete();
 
-        $user = User::factory()->create([
+        // Not a factory: production installs without dev dependencies, so Faker isn't there.
+        $user = User::forceCreate([
             'name' => 'Demo User',
             'email' => $email,
+            'email_verified_at' => now(),
             'password' => app()->isLocal() ? 'password' : Str::random(40),
         ]);
 
