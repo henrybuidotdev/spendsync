@@ -1,8 +1,7 @@
 <?php
 
 use App\Enums\Direction;
-use App\Parsing\Banks\MbBankParser;
-use App\Parsing\Banks\TechcombankParser;
+use App\Parsing\Banks\CakeParser;
 use App\Parsing\Banks\VietcombankParser;
 
 /*
@@ -21,21 +20,21 @@ return [
         'directions' => [Direction::Out],
     ],
 
-    'TCB' => [
-        'name' => 'Techcombank',
+    'CAKE' => [
+        'name' => 'CAKE by VPBank',
         'senders' => [
-            'alert@techcombank.com.vn', // TODO verify
+            'no-reply@cake.vn', // verified with real transfer alerts
         ],
-        'parser' => TechcombankParser::class,
+        'parser' => CakeParser::class,
         'directions' => [Direction::In, Direction::Out],
     ],
 
-    'MB' => [
-        'name' => 'MB Bank',
-        'senders' => [
-            'mbbank@mbbank.com.vn', // TODO verify
-        ],
-        'parser' => MbBankParser::class,
-        'directions' => [Direction::In, Direction::Out],
-    ],
+    // 'VPB' => [
+    //     'name' => 'VPBank',
+    //     'senders' => [
+    //         'vpbankonline@vpb.com.vn', // TODO verify
+    //     ],
+    //     'parser' => '',
+    //     'directions' => [Direction::Out],
+    // ],
 ];

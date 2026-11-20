@@ -50,9 +50,9 @@ test('sync fetches only configured senders, stores raw emails and parses them', 
     SyncMailAccount::dispatchSync($account);
 
     expect($fake->searches[0]['senders'])->toBe(app(ParserRegistry::class)->senders())
-        ->and(RawEmail::count())->toBe(21)
+        ->and(RawEmail::count())->toBe(16)
         ->and(RawEmail::whereNull('parsed_at')->count())->toBe(0)
-        ->and(Transaction::where('user_id', $account->user_id)->count())->toBe(16)
+        ->and(Transaction::where('user_id', $account->user_id)->count())->toBe(12)
         ->and($account->fresh()->last_synced_at)->not->toBeNull()
         ->and($account->fresh()->last_error)->toBeNull();
 });
@@ -76,7 +76,7 @@ test('the first sync walks the last first_sync_days in 15-day windows, one queue
         ['2026-10-28', '2026-11-12'],
         ['2026-11-12', null],
     ])
-        ->and(RawEmail::count())->toBe(21)
+        ->and(RawEmail::count())->toBe(16)
         ->and($account->fresh()->last_synced_at->toDateTimeString())->toBe('2026-11-12 12:00:00')
         ->and($account->isSyncing())->toBeFalse();
 });
@@ -101,8 +101,8 @@ test('a second sync starts one day before the last sync and creates no duplicate
     SyncMailAccount::dispatchSync($account);
 
     expect(end($fake->searches)['since']->toDateTimeString())->toBe('2026-11-11 12:00:00')
-        ->and(RawEmail::count())->toBe(21)
-        ->and(Transaction::count())->toBe(16);
+        ->and(RawEmail::count())->toBe(16)
+        ->and(Transaction::count())->toBe(12);
 });
 
 test('every window records when it ran, separately from how far it has got', function () {
@@ -223,8 +223,8 @@ test('the same email for two different users is stored for each', function () {
     SyncMailAccount::dispatchSync($first);
     SyncMailAccount::dispatchSync($second);
 
-    expect(Transaction::where('user_id', $first->user_id)->count())->toBe(16)
-        ->and(Transaction::where('user_id', $second->user_id)->count())->toBe(16);
+    expect(Transaction::where('user_id', $first->user_id)->count())->toBe(12)
+        ->and(Transaction::where('user_id', $second->user_id)->count())->toBe(12);
 });
 
 test('invalid credentials mark the account as needs_reconnect', function () {
@@ -285,15 +285,15 @@ test('import-eml imports a folder once and parses everything', function () {
     $user = User::factory()->create();
 
     $this->artisan('spendsync:import-eml', ['user' => $user->email, 'path' => fixturesPath()])
-        ->expectsOutputToContain('Imported 21 of 21 files.')
+        ->expectsOutputToContain('Imported 16 of 16 files.')
         ->assertSuccessful();
 
     $this->artisan('spendsync:import-eml', ['user' => $user->email, 'path' => fixturesPath()])
-        ->expectsOutputToContain('Imported 0 of 21 files.');
+        ->expectsOutputToContain('Imported 0 of 16 files.');
 
-    expect($user->transactions()->count())->toBe(16)
+    expect($user->transactions()->count())->toBe(12)
         ->and($user->rawEmails()->whereNotNull('parse_error')->count())->toBe(0)
-        ->and($user->transactions()->where('bank_code', 'MB')->sum('amount'))->toBe(2000000 + 150000 + 459000 + 1250000);
+        ->and($user->transactions()->where('bank_code', 'CAKE')->sum('amount'))->toBe(2000 + 2000 + 1250000);
 });
 
 test('re-parsing the email of a hidden transaction keeps it hidden instead of duplicating it', function () {
@@ -341,7 +341,7 @@ test('emails without a parser are marked unsupported_sender', function () {
 test('non-transaction bank emails are marked parsed with no transaction', function () {
     $user = User::factory()->create();
 
-    $this->artisan('spendsync:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/MB/90_otp.eml']);
+    $this->artisan('spendsync:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/CAKE/90_otp.eml']);
 
     expect($user->rawEmails()->first()->parsed_at)->not->toBeNull()
         ->and($user->transactions()->count())->toBe(0);
@@ -349,7 +349,7 @@ test('non-transaction bank emails are marked parsed with no transaction', functi
 
 test('reparse --failed fixes emails after a parser fix and keeps the category', function () {
     $user = User::factory()->create();
-    $this->artisan('spendsync:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/TCB']);
+    $this->artisan('spendsync:import-eml', ['user' => $user->id, 'path' => fixturesPath().'/CAKE']);
     $transaction = $user->transactions()->first();
     $transaction->update(['category_id' => $user->availableCategories()->first()->id, 'amount' => 1]);
     $user->rawEmails()->first()->update(['parse_error' => 'old_bug', 'parsed_at' => null]);
@@ -361,7 +361,7 @@ test('reparse --failed fixes emails after a parser fix and keeps the category', 
     expect(RawEmail::whereNotNull('parse_error')->count())->toBe(0)
         ->and($user->transactions()->count())->toBe(3);
 
-    $this->artisan('spendsync:reparse', ['--bank' => 'tcb'])->expectsOutputToContain('Reparsed 4 emails');
+    $this->artisan('spendsync:reparse', ['--bank' => 'cake'])->expectsOutputToContain('Reparsed 4 emails');
 
     expect($transaction->fresh()->amount)->not->toBe(1)
         ->and($transaction->fresh()->category_id)->toBe($user->availableCategories()->first()->id);
@@ -372,8 +372,7 @@ test('parse-stats shows 100% for the fixtures', function () {
 
     $this->artisan('spendsync:parse-stats')
         ->expectsTable(['Bank', 'Total', 'Parsed', 'Failed', 'Success'], [
-            ['MB', 5, 5, 0, '100%'],
-            ['TCB', 4, 4, 0, '100%'],
+            ['CAKE', 4, 4, 0, '100%'],
             ['VCB', 12, 12, 0, '100%'],
         ])
         ->assertSuccessful();
@@ -386,7 +385,7 @@ test('spendsync:sync syncs active accounts now', function () {
 
     $this->artisan('spendsync:sync')->expectsOutputToContain('Synced 1 accounts.')->assertSuccessful();
 
-    expect(Transaction::count())->toBe(16);
+    expect(Transaction::count())->toBe(12);
 });
 
 test('the scheduler queues a sync for active accounts in the current minute slot that have not synced recently', function () {
@@ -422,11 +421,11 @@ test('the demo seeder creates a populated, categorized demo account', function (
     $user = User::where('email', 'demo@spendsync.test')->sole();
 
     expect(Hash::check('password', $user->password))->toBeTrue()
-        ->and($user->transactions()->count())->toBe(16)
-        ->and($user->transactions()->whereNotNull('category_id')->count())->toBe(6)
+        ->and($user->transactions()->count())->toBe(12)
+        ->and($user->transactions()->whereNotNull('category_id')->count())->toBe(3)
         ->and($user->rawEmails()->whereNotNull('parse_error')->count())->toBe(0);
 
-    $this->actingAs($user)->get('/')->assertOk()->assertSee('PHAM MINH DUC');
+    $this->actingAs($user)->get('/')->assertOk()->assertSee('TRAN THI BICH');
 });
 
 test('the app password never appears in exception traces', function () {

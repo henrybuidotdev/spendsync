@@ -1,8 +1,6 @@
 <?php
 
 use App\Mail\Inbox\FetchedMessage;
-use App\Parsing\Banks\MbBankParser;
-use App\Parsing\Banks\TechcombankParser;
 use App\Parsing\Banks\VietcombankParser;
 use App\Parsing\ParsedEmailInput;
 use App\Parsing\ParserRegistry;
@@ -44,7 +42,7 @@ test('each bank has at least three transaction fixtures and one non-transaction 
 test('registry exposes all configured senders and matches display-name senders', function () {
     $registry = app(ParserRegistry::class);
 
-    expect($registry->senders())->toContain('vcbdigibank@info.vietcombank.com.vn', 'alert@techcombank.com.vn', 'mbbank@mbbank.com.vn')
+    expect($registry->senders())->toContain('vcbdigibank@info.vietcombank.com.vn', 'no-reply@cake.vn')
         ->and($registry->findFor('Vietcombank <VCBDigibank@info.vietcombank.com.vn>', 'x')?->bankCode())->toBe('VCB')
         ->and($registry->findFor('scam@vietcombank.com.vn.evil.io', 'x'))->toBeNull();
 });
@@ -59,11 +57,11 @@ test('a transaction email with a redacted amount throws amount_missing', functio
 })->throws(UnparseableEmailException::class, 'amount_missing');
 
 test('a transaction email without sign or type throws direction_unknown', function () {
-    (new TechcombankParser)->parse(input("Số tiền/Amount: VND 100,000\nNội dung/Description: X"));
+    (new VietcombankParser)->parse(input("Số tiền: 100,000 VND\nNội dung: X"));
 })->throws(UnparseableEmailException::class, 'direction_unknown');
 
 test('direction comes from keywords when the amount has no sign', function (string $type, string $direction) {
-    $result = (new TechcombankParser)->parse(input("Loại giao dịch: {$type}\nSố tiền: 100.000đ"));
+    $result = (new VietcombankParser)->parse(input("Loại giao dịch: {$type}\nSố tiền: 100.000đ"));
 
     expect($result->direction->value)->toBe($direction);
 })->with([
@@ -76,14 +74,14 @@ test('direction comes from keywords when the amount has no sign', function (stri
 ]);
 
 test('falls back to received_at in local time when the body has no time', function () {
-    $result = (new MbBankParser)->parse(input('Phát sinh: -10,000 VND'));
+    $result = (new VietcombankParser)->parse(input('Số tiền: -10,000 VND'));
 
     expect($result->occurredAt->toIso8601String())->toBe('2026-11-12T10:00:00+07:00');
 });
 
 test('bank emails without an amount field are not transactions', function () {
     expect((new VietcombankParser)->parse(input('Sao kê tài khoản tháng 10 đã sẵn sàng.', 'Sao kê')))->toBeNull()
-        ->and((new MbBankParser)->parse(input('Ưu đãi hoàn tiền. Phát sinh: +50,000 VND', 'Khuyến mãi')))->toBeNull();
+        ->and((new VietcombankParser)->parse(input('Ưu đãi hoàn tiền. Số tiền: +50,000 VND', 'Khuyến mãi')))->toBeNull();
 });
 
 test('amount label without colon inside html table cells is parsed', function () {

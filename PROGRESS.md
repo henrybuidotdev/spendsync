@@ -24,9 +24,10 @@
 ## Needs real samples
 
 - VCB (`app/Parsing/Banks/VietcombankParser.php`) — **receipts are now real** ("Biên lai chuyển tiền qua tài khoản", "Biên lai thanh toán"): 47/47 of the owner's real emails parse; 3 redacted real fixtures + 1 real non-transaction (transfer limit). Still synthetic: the "Thông báo biến động số dư" layout (fixtures 02–04) and the OTP fixture — no real ones seen yet.
-- TCB (`app/Parsing/Banks/TechcombankParser.php`) — synthetic bilingual format; 3 + 1 promo.
-- MB (`app/Parsing/Banks/MbBankParser.php`) — synthetic HTML + compact pipe format; 4 + 1 OTP.
-- Sender addresses: VCB `vcbdigibank@info.vietcombank.com.vn` is verified against real mail; TCB and MB are still guesses (`// TODO verify`).
+- CAKE (`app/Parsing/Banks/CakeParser.php`) — built from 2 real transfer alerts (in + out), sender `no-reply@cake.vn` verified; 2 redacted real fixtures + 1 synthetic large amount + 1 synthetic OTP.
+- TCB and MB parsers and fixtures were removed (they were fully synthetic); add them back from real transaction emails.
+- VPBank is listed but commented out in `config/banks.php` until it has a parser.
+- Sender addresses: VCB `vcbdigibank@info.vietcombank.com.vn` and CAKE `no-reply@cake.vn` are verified against real mail.
 
 ## Test status
 

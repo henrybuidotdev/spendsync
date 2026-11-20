@@ -55,8 +55,7 @@ test('the connect page shows the guide, trust box and supported banks', function
         ->assertSee('https://myaccount.google.com/apppasswords')
         ->assertSee('Chúng tôi chỉ đọc email từ ngân hàng')
         ->assertSee('Vietcombank')
-        ->assertSee('Techcombank')
-        ->assertSee('MB Bank');
+        ->assertSee('CAKE by VPBank');
 });
 
 test('connecting with a valid app password saves the account and starts a sync', function () {
@@ -306,11 +305,11 @@ test('a brand-new connected user sees a friendly empty state', function () {
 
 test('the detail page shows parsed fields and the bank name', function () {
     $user = connectedUser();
-    $transaction = Transaction::factory()->for($user)->create(['bank_code' => 'TCB', 'reference' => 'FT123']);
+    $transaction = Transaction::factory()->for($user)->create(['bank_code' => 'CAKE', 'reference' => 'FT123']);
 
     $this->actingAs($user)->get(route('transactions.show', $transaction))
         ->assertOk()
-        ->assertSee('Techcombank')
+        ->assertSee('CAKE by VPBank')
         ->assertSee('FT123');
 });
 
