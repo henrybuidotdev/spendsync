@@ -162,3 +162,15 @@ test('refresh-demo moves demo data back when it is ahead of today', function () 
 
     expect($future->fresh()->occurred_at->toDateTimeString())->toBe('2026-11-12 03:00:00');
 });
+
+test('the demo account can log out but not change its profile', function () {
+    $this->actingAs($this->demo);
+
+    auth()->logout();
+
+    $this->assertGuest();
+
+    $this->actingAs($this->demo);
+
+    expect(fn () => $this->demo->update(['name' => 'Hacked']))->toThrow(DemoDataIsReadOnly::class);
+});

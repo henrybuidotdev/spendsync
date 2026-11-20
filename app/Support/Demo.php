@@ -51,8 +51,26 @@ class Demo
             return;
         }
 
+        if (self::isSessionBookkeeping($model)) {
+            return;
+        }
+
         if (self::owns($model)) {
             throw new DemoDataIsReadOnly;
         }
+    }
+
+    /** Login with "remember me" and logout rotate the remember token, even on the demo account. */
+    private static function isSessionBookkeeping(Model $model): bool
+    {
+        if (! $model instanceof User) {
+            return false;
+        }
+
+        if (! $model->exists) {
+            return false;
+        }
+
+        return array_keys($model->getDirty()) === ['remember_token'];
     }
 }
