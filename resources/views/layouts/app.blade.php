@@ -16,6 +16,8 @@
             </main>
         </div>
 
-        <livewire:layout.navigation />
+        @persist('navigation')
+            <livewire:layout.navigation />
+        @endpersist
     </body>
 </html>
