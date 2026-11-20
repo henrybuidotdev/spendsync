@@ -1,6 +1,15 @@
 @php use App\Support\Format; @endphp
 
 <div class="space-y-4">
+    @if($account?->isSyncing())
+        <div wire:poll.3s role="status" class="sticky top-0 z-20 mx-[calc(50%-50vw)] -mt-4 bg-emerald-100 text-sm text-emerald-900">
+            <p class="mx-auto max-w-lg px-4 py-2">
+                <span class="block">{{ __('Syncing data') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></span>
+                <span class="block">{{ __('It can take up to 10 minutes, so you don\'t need to wait here.') }}</span>
+            </p>
+        </div>
+    @endif
+
     <x-flash />
 
     @if($account?->status === \App\Enums\MailAccountStatus::NeedsReconnect)
@@ -13,11 +22,6 @@
     <div class="flex items-center justify-between gap-2">
         <h1 class="text-2xl font-semibold tracking-tight">{{ __('Transactions') }}</h1>
         <div class="flex items-center gap-3">
-            @if($account?->isSyncing())
-                <p wire:poll.3s role="status" class="inline-flex min-h-11 items-center text-sm font-medium text-slate-500">
-                    {{ __('Syncing') }}<span class="typing-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
-                </p>
-            @endif
             <a href="{{ route('transactions.create') }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 rounded-xl bg-black px-4 text-sm font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">+ {{ __('Add') }}</a>
         </div>
     </div>

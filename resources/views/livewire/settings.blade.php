@@ -115,7 +115,7 @@
                         @if($account->status !== MailAccountStatus::Active)
                             <a href="{{ route('connect') }}" wire:navigate class="inline-flex min-h-11 items-center rounded-xl bg-black px-4 text-sm font-medium text-white hover:bg-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">{{ __('Reconnect') }}</a>
                         @endif
-                        @if($account->status !== MailAccountStatus::Disabled)
+                        @if($account->status !== MailAccountStatus::Disabled && ! ($account->status === MailAccountStatus::Active && $account->isSyncing()))
                             <button type="button" wire:click="disconnect" wire:confirm="{{ __('Disconnect Gmail? The app password is deleted; your transactions are kept.') }}"
                                     class="min-h-11 rounded-xl bg-white px-4 text-sm font-medium text-red-600 ring-1 ring-red-200 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">{{ __('Disconnect') }}</button>
                         @endif

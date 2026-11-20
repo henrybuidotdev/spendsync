@@ -287,6 +287,7 @@ test('sync now is hidden and ignored while a sync is running', function () {
         ->assertSee('Đang đồng bộ')
         ->assertDontSee('Đồng bộ lần cuối')
         ->assertDontSeeHtml('wire:click="syncNow"')
+        ->assertDontSeeHtml('wire:click="disconnect"')
         ->call('syncNow');
 
     Queue::assertPushed(SyncMailAccount::class, 1);
