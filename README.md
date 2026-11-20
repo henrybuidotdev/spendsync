@@ -1,35 +1,35 @@
 # SpendSync
 
-Mobile-first spending tracker for Vietnamese bank customers. You connect Gmail with a **Google app password**. Every 5 minutes the app reads **only** emails from supported bank senders over IMAP (read-only), parses each transaction (amount, direction, counterparty, time, balance, description), and shows it in a web app (installable as a PWA). There you can categorize transactions and see monthly totals.
+Ứng dụng theo dõi chi tiêu cho khách hàng ngân hàng Việt Nam, thiết kế ưu tiên điện thoại. Bạn kết nối Gmail bằng **mật khẩu ứng dụng Google**. Ứng dụng đọc qua IMAP (chỉ đọc) **duy nhất** các email từ địa chỉ của ngân hàng được hỗ trợ, phân tích từng giao dịch (số tiền, chiều tiền, người nhận/gửi, thời gian, nội dung) và hiển thị trên web app (cài được như PWA). Tại đó bạn phân loại giao dịch và xem tổng theo tháng.
 
-Stack: Laravel 13, Livewire 3 + Volt (Breeze), Tailwind, SQLite, database queue, Pest, `webklex/php-imap`.
+Công nghệ: Laravel 13, Livewire 3 + Volt (Breeze), Tailwind, SQLite, hàng đợi database, Pest, `webklex/php-imap`.
 
-Supported banks (VCB receipts verified on real emails; the rest synthetic, see "Known limitations"): **Vietcombank (VCB)**, **Techcombank (TCB)**, **MB Bank (MB)**.
+Ngân hàng hỗ trợ: **Vietcombank (VCB)**, **CAKE by VPBank (CAKE)**, **VPBank NEO (VPB)**.
 
-## Setup
+## Cài đặt
 
-Requirements: PHP 8.3+ with `intl`, `mbstring`, `pdo_sqlite`; Composer; Node 20+.
+Yêu cầu: PHP 8.3+ với `intl`, `mbstring`, `pdo_sqlite`; Composer; Node 20+.
 
 ```bash
-composer install
-cp .env.example .env
-php artisan key:generate
-touch database/database.sqlite
-php artisan migrate --seed
-npm install && npm run build
+> composer install
+> cp .env.example .env
+> php artisan key:generate
+> touch database/database.sqlite
+> php artisan migrate --seed
+> npm install && npm run build
 ```
 
-### Default categories
+### Danh mục mặc định
 
-The shared categories every user sees live in `database/seeders/SystemCategorySeeder.php`. To add one, add a line there and run:
+Các danh mục dùng chung mà mọi người dùng đều thấy nằm trong `database/seeders/SystemCategorySeeder.php`. Để thêm một danh mục, thêm một dòng vào đó rồi chạy:
 
 ```bash
 php artisan db:seed --class=SystemCategorySeeder
 ```
 
-It is safe to run again: it only creates categories that don't exist yet (matched by name and type) and never changes existing data. When it creates one, a user's own category with the same name and type is merged into it. Changing the icon or name of an existing line has no effect on existing rows (a rename creates a new category), so do those in a migration.
+Lệnh này chạy lại nhiều lần vẫn an toàn: nó chỉ tạo danh mục chưa có (so theo tên và loại) và không bao giờ sửa dữ liệu đã có. Khi tạo một danh mục mới, danh mục riêng của người dùng trùng tên và loại sẽ được gộp vào nó. Đổi icon hay tên của một dòng đã có không ảnh hưởng tới dữ liệu cũ (đổi tên sẽ tạo danh mục mới), nên những thay đổi đó cần làm bằng migration.
 
-### Demo without Gmail
+### Chạy demo không cần Gmail
 
 ```bash
 php artisan migrate:fresh --seed
@@ -37,56 +37,58 @@ php artisan db:seed --class=DemoSeeder
 php artisan serve
 ```
 
-Log in as **demo@spendsync.test / password**. The demo seeder imports every fixture in `tests/Fixtures/emails` through the real pipeline (`spendsync:import-eml`), and adds a few category rules so some transactions are already categorized. The fixtures are dated November 2026. If the current month is empty, the transactions page offers a button that jumps to the latest month with data.
+Đăng nhập bằng **demo@spendsync.test / password**. Demo seeder nhập toàn bộ mẫu email trong `tests/Fixtures/emails` qua đúng quy trình thật (`spendsync:import-eml`), và thêm vài quy tắc phân loại để một số giao dịch đã có danh mục sẵn. Các mẫu email có ngày tháng 11/2026. Nếu tháng hiện tại trống, trang giao dịch có nút nhảy tới tháng gần nhất có dữ liệu.
 
-### Queue worker and scheduler
+### Queue worker và scheduler
 
-Syncs and parsing run on the `database` queue. In two terminals:
+Việc đồng bộ và phân tích email chạy trên hàng đợi `database`. Mở hai terminal:
 
 ```bash
-php artisan queue:work      # runs SyncMailAccount / ParseRawEmail jobs
-php artisan schedule:work   # every minute: queues syncs for that minute's slot of accounts
+php artisan queue:work      # chạy các job SyncMailAccount / ParseRawEmail
+php artisan schedule:work   # mỗi phút: xếp lịch đồng bộ cho nhóm tài khoản của phút đó
 ```
 
-In production, use a single cron entry `* * * * * php artisan schedule:run` plus a supervised `queue:work`.
+Trên production, dùng một dòng cron `* * * * * php artisan schedule:run` cùng một `queue:work` có supervisor giám sát.
 
-#### How syncs are spread
+#### Cách chia lịch đồng bộ
 
-Each active account syncs about once an hour, in its own minute slot: `id % 60`. Every minute the scheduler queues a `SyncMailAccount` job only for the accounts in that minute's slot, so IMAP load is spread over the whole hour instead of hitting every mailbox at :00.
+Mỗi tài khoản đang hoạt động được đồng bộ khoảng một lần mỗi giờ, vào phút riêng của nó: `id % 60`. Mỗi phút, scheduler chỉ xếp job `SyncMailAccount` cho các tài khoản thuộc phút đó, nên tải IMAP được rải đều cả giờ thay vì dồn vào tất cả hộp thư lúc :00.
 
-- Accounts that synced less than 30 minutes ago (`last_synced_at`) are skipped, so a manual "Sync now" or a fresh connect isn't repeated by the schedule right after.
-- Jobs are queued without a delay, so a manual sync is never blocked by a scheduled job waiting in the queue (`SyncMailAccount` allows one queued job per account).
-- If a minute's `schedule:run` is missed (for example during a deploy), the accounts in that slot sync an hour later.
+- Tài khoản vừa đồng bộ chưa tới 30 phút (`last_synced_at`) sẽ được bỏ qua, để lần "Đồng bộ ngay" thủ công hoặc lần kết nối mới không bị lịch chạy lặp lại ngay sau đó.
+- Job được xếp không có độ trễ, nên lần đồng bộ thủ công không bao giờ bị chặn bởi một job theo lịch đang chờ trong hàng đợi (`SyncMailAccount` chỉ cho phép một job đang chờ cho mỗi tài khoản).
+- Nếu lỡ một lần `schedule:run` (ví dụ lúc deploy), các tài khoản của phút đó sẽ được đồng bộ ở giờ kế tiếp.
 
-### Connect a real Gmail
+### Kết nối Gmail thật
 
-1. Turn on 2-Step Verification for the Google account.
-2. Open <https://myaccount.google.com/apppasswords> and create an app password named "SpendSync".
-3. Sign up in the app. You land on `/connect`. Paste the Gmail address and the 16-letter password (spaces are fine).
-4. The app tests the IMAP login right away, saves the password encrypted, and queues the first sync (it looks back 30 days). Keep `queue:work` running.
+1. Bật Xác minh 2 bước cho tài khoản Google.
+2. Mở <https://myaccount.google.com/apppasswords> và tạo một mật khẩu ứng dụng tên "SpendSync".
+3. Đăng ký trong app. Bạn sẽ được đưa tới `/connect`. Dán địa chỉ Gmail và mật khẩu 16 chữ cái (có dấu cách cũng được).
+4. App thử đăng nhập IMAP ngay, lưu mật khẩu đã mã hóa, rồi xếp lần đồng bộ đầu tiên (đọc lại 90 ngày, chỉnh bằng `MAIL_SYNC_FIRST_SYNC_DAYS`). Nhớ để `queue:work` chạy.
 
-IMAP details: `imap.gmail.com:993` over SSL with certificate validation. The app searches `[Gmail]/All Mail` (falling back to `INBOX`) with `FROM <bank sender> SINCE <date>` per sender. Messages are fetched with PEEK, so nothing is ever marked read, moved or deleted.
+Chi tiết IMAP: `imap.gmail.com:993` qua SSL, có kiểm tra chứng chỉ. App tìm trong `[Gmail]/All Mail` (nếu không có thì dùng `INBOX`) với `FROM <địa chỉ ngân hàng> SINCE <ngày>` cho từng địa chỉ gửi. Email được tải bằng PEEK, nên không bao giờ bị đánh dấu đã đọc, di chuyển hay xóa.
 
-To revoke access, delete the app password in Google, or use **Settings → Disconnect**, which deletes the stored password.
+Để thu hồi quyền truy cập, xóa mật khẩu ứng dụng trong Google, hoặc vào **Cài đặt → Ngắt kết nối** để xóa mật khẩu đã lưu.
 
-## Artisan commands
+## Lệnh Artisan
 
-| Command | What it does |
+| Lệnh | Tác dụng |
 | --- | --- |
-| `spendsync:sync {account?}` | Sync all active accounts (or one) now, inline. Parse jobs go to the queue. |
-| `spendsync:reparse {--failed} {--bank=}` | Re-run parsing over stored raw emails. Keeps categories and notes. Use after fixing a parser. |
-| `spendsync:import-eml {user} {path}` | Import `.eml` files (a file or a folder, recursive) as raw emails for a user id/email and parse them. Skips unsupported senders. |
-| `spendsync:parse-stats` | Table per bank: total, parsed, failed, success %. |
+| `spendsync:sync {account?}` | Đồng bộ ngay tất cả tài khoản đang hoạt động (hoặc một tài khoản), chạy trực tiếp. Job phân tích email được đưa vào hàng đợi. |
+| `spendsync:reparse {--failed} {--bank=}` | Phân tích lại các email gốc đã lưu. Giữ nguyên danh mục và ghi chú. Dùng sau khi sửa parser. |
+| `spendsync:import-eml {user} {path}` | Nhập file `.eml` (một file hoặc cả thư mục, đệ quy) làm email gốc cho một user (id hoặc email) rồi phân tích. Bỏ qua người gửi không được hỗ trợ. |
+| `spendsync:parse-stats` | Bảng theo từng ngân hàng: tổng số, đã phân tích, thất bại, tỉ lệ thành công. |
 
-## Tests
+## Test
 
 ```bash
 php artisan test
 ```
 
-No test touches the network. `FakeMailboxClient` replaces IMAP: it serves `.eml` fixtures and can simulate auth or connection failures. `tests/Unit/BankParserFixturesTest.php` parses every `tests/Fixtures/emails/{BANK}/*.eml` and compares the result with its sibling `*.expected.json` (`null` means "bank email but not a transaction", such as an OTP or promo).
+Tất cả các test chạy tại local và không gọi ra mạng internet. `FakeMailboxClient` thay cho IMAP: nó trả về các mẫu `.eml` và có thể giả lập lỗi đăng nhập hoặc lỗi kết nối. `tests/Unit/BankParserFixturesTest.php` phân tích mọi file `tests/Fixtures/emails/{BANK}/*.eml` và so kết quả với file `*.expected.json` cùng tên (`null` nghĩa là "email ngân hàng nhưng không phải giao dịch", ví dụ OTP hoặc quảng cáo).
 
-## How it works
+Test trình duyệt (`tests/Browser`) dùng Pest Browser Plugin với Playwright.
+
+## Cách hoạt động
 
 ```
 Gmail ──IMAP SEARCH FROM+SINCE──▶ SyncMailAccount ──firstOrCreate(user_id, message_id)──▶ raw_emails
@@ -96,43 +98,43 @@ Gmail ──IMAP SEARCH FROM+SINCE──▶ SyncMailAccount ──firstOrCreate(
                        ParserRegistry::findFor(from) ─▶ BankParser::parse() ─▶ transactions ─▶ CategoryMatcher
 ```
 
-- `app/Mail/Inbox`: the `MailboxClient` interface, `WebklexGmailClient` (real) and `FakeMailboxClient` (tests).
-- `app/Parsing`: the parser interface, DTOs, `ParserRegistry`, and `Support/{Money,Date,Text}` helpers. Bank parsers live in `Banks/`.
-- `app/Jobs`: `SyncMailAccount` (unique per account, 120s timeout, 2 tries) and `ParseRawEmail`.
-- Categories: 12 shared system defaults (`user_id` NULL, read-only) plus each user's own. Use `$user->availableCategories()` to list what a user can pick.
-- `app/Categorization/CategoryMatcher.php`: counterparty rules match the whole accent-stripped name. Description rules match a substring. Counterparty rules are checked first.
-- Times are stored in UTC and shown in `Asia/Ho_Chi_Minh` (`APP_TIMEZONE`, used as `config('app.display_timezone')`).
+- `app/Mail/Inbox`: interface `MailboxClient`, `WebklexGmailClient` (thật) và `FakeMailboxClient` (dùng cho test).
+- `app/Parsing`: interface parser, các DTO, `ParserRegistry`, và các helper `Support/{Money,Date,Text}`. Parser của từng ngân hàng nằm trong `Banks/`.
+- `app/Jobs`: `SyncMailAccount` (duy nhất cho mỗi tài khoản, timeout 120 giây, thử 2 lần) và `ParseRawEmail`.
+- Danh mục: các danh mục hệ thống dùng chung (`user_id` NULL, chỉ đọc) cộng với danh mục riêng của từng người dùng. Dùng `$user->availableCategories()` để lấy danh sách một người dùng có thể chọn. Danh mục Vay/Nợ là cố định, người dùng không tạo được.
+- `app/Categorization/CategoryMatcher.php`: quy tắc theo người nhận/gửi so khớp toàn bộ tên đã bỏ dấu. Quy tắc theo nội dung so khớp một đoạn con. Quy tắc theo người nhận/gửi được xét trước.
+- Thời gian lưu theo UTC và hiển thị theo `Asia/Ho_Chi_Minh` (`APP_TIMEZONE`, dùng qua `config('app.display_timezone')`).
+- Số dư tài khoản trong email không được đọc hay lưu.
 
-## Adding a new bank parser
+## Thêm parser cho ngân hàng mới
 
-1. **Config the sender.** Add an entry to `config/banks.php`:
+1. **Khai báo người gửi.** Thêm một mục vào `config/banks.php`:
    ```php
    'ACB' => [
        'name' => 'ACB',
-       'senders' => ['mailalert@acb.com.vn'], // lowercase; only these are ever searched
+       'senders' => ['mailalert@acb.com.vn'], // chữ thường; chỉ những địa chỉ này được tìm
        'parser' => \App\Parsing\Banks\AcbParser::class,
+       'directions' => [Direction::In, Direction::Out], // ngân hàng gửi email cho tiền vào, tiền ra hay cả hai
    ],
    ```
-2. **Write the parser class** in `app/Parsing/Banks/AcbParser.php`. Extend `AbstractBankParser`, return the code from `bankCode()`, and implement `parse()`. The `field($text, 'Label|Other label')` helper reads `Label: value` lines from the normalized text (HTML is already flattened, one table row per line). Pass the raw strings to `$this->transaction(...)`, which parses money and dates, works out direction from the `+`/`-` sign or keywords (ghi có/credit/nhận vs ghi nợ/debit/trừ), and falls back to the received time. Return `null` for non-transaction emails. `$this->transaction()` throws `UnparseableEmailException` when the amount or direction is missing.
-3. **Add fixtures.** Save real (redacted) emails as `tests/Fixtures/emails/ACB/01_something.eml`, plus one OTP or promo email. Next to each one, write `01_something.expected.json` with `direction`, `amount`, `balance_after`, `counterparty`, `description`, `reference` and `occurred_at` (ISO 8601 with `+07:00`), or `null`.
-4. **Test.** Run `php artisan test --filter=fixture`. The data-driven test picks up the new folder automatically, and it also requires at least 3 transaction fixtures and 1 non-transaction fixture per bank.
-5. **Re-parse stored emails.** Run `php artisan spendsync:reparse --bank=ACB` (or `--failed`), then check `php artisan spendsync:parse-stats`.
+2. **Viết class parser** trong `app/Parsing/Banks/AcbParser.php`. Kế thừa `AbstractBankParser`, trả mã ngân hàng từ `bankCode()`, và viết `parse()`. Helper `field($text, 'Nhãn|Nhãn khác')` đọc các dòng `Nhãn: giá trị` từ văn bản đã chuẩn hóa (HTML đã được làm phẳng, mỗi dòng bảng thành một dòng). Truyền các chuỗi gốc vào `$this->transaction(...)`: hàm này tự đọc số tiền và ngày, xác định chiều tiền từ dấu `+`/`-` hoặc từ khóa (ghi có/credit/nhận và ghi nợ/debit/trừ), và dùng thời gian nhận email nếu không có ngày. Trả về `null` cho email không phải giao dịch. `$this->transaction()` ném `UnparseableEmailException` khi thiếu số tiền hoặc chiều tiền.
+3. **Thêm mẫu email.** Lưu email thật (đã che thông tin) thành `tests/Fixtures/emails/ACB/01_something.eml`, kèm một email OTP hoặc quảng cáo. Cạnh mỗi file, viết `01_something.expected.json` với `direction`, `amount`, `counterparty`, `counterparty_account`, `description`, `reference`, `occurred_at` (ISO 8601 với `+07:00`), `currency`, `original_amount` và `amount_estimated`, hoặc `null`.
+4. **Chạy test.** Chạy `php artisan test --filter=fixture`. Test theo dữ liệu tự nhận thư mục mới, và yêu cầu mỗi ngân hàng có ít nhất 3 mẫu giao dịch và 1 mẫu không phải giao dịch.
+5. **Phân tích lại email đã lưu.** Chạy `php artisan spendsync:reparse --bank=ACB` (hoặc `--failed`), rồi xem `php artisan spendsync:parse-stats`.
 
-## Security and privacy
+## Bảo mật và quyền riêng tư
 
-- `mail_accounts.app_password` uses the `encrypted` cast and is `$hidden`. The connect form clears the Livewire property before validation, and password parameters carry `#[\SensitiveParameter]`, so they are redacted from stack traces. Errors are stored as short codes (`invalid_credentials`, `connection_failed`).
-- Parse failures log only `raw_email_id`, `bank_code` and a reason, never the body.
-- Every query is scoped to the signed-in user. Policies exist for Transaction, Category, CategoryRule and MailAccount, and tests prove isolation.
-- The connect form is rate-limited to 5 attempts per 10 minutes per user. "Sync now" is limited to once a minute.
-- The original email is shown only to its owner, and only as escaped plain text.
-- `/privacy` explains in Vietnamese what is read, what is stored and how to delete it. **Settings → Danger Zone** has two actions, both password-confirmed: **Delete data** wipes transactions, emails, rules, the user's own categories and the Gmail connection but keeps the login; **Delete account** removes the user and everything they own (FK cascades).
+- `mail_accounts.app_password` dùng cast `encrypted` và nằm trong `$hidden`. Form kết nối xóa thuộc tính Livewire trước khi validate, và các tham số mật khẩu có `#[\SensitiveParameter]`, nên bị che khỏi stack trace. Lỗi được lưu dạng mã ngắn (`invalid_credentials`, `connection_failed`).
+- Khi phân tích thất bại, log chỉ ghi `raw_email_id`, `bank_code` và lý do, không bao giờ ghi nội dung email.
+- Mọi truy vấn đều giới hạn trong người dùng đang đăng nhập. Có policy cho Transaction, Category, CategoryRule và MailAccount, và có test chứng minh dữ liệu được tách biệt.
+- Form kết nối giới hạn 5 lần thử mỗi 10 phút cho mỗi người dùng. "Đồng bộ ngay" giới hạn mỗi phút một lần.
+- Email gốc chỉ hiển thị cho chủ sở hữu, và chỉ dưới dạng văn bản thuần đã escape.
+- `/privacy` và `/terms` có bản tiếng Việt và tiếng Anh (mỗi ngôn ngữ một view), giải thích những gì được đọc, được lưu và cách xóa. **Cài đặt → Vùng nguy hiểm** có hai thao tác, đều cần xác nhận mật khẩu: **Xóa dữ liệu** xóa giao dịch, email, quy tắc, danh mục riêng và kết nối Gmail nhưng giữ tài khoản đăng nhập; **Xóa tài khoản** xóa người dùng cùng mọi thứ họ sở hữu (cascade qua khóa ngoại).
 
-## Known limitations
+## Giới hạn đã biết
 
-- **Vietcombank receipts are built from real (redacted) emails; everything else is synthetic.** Techcombank, MB, and the Vietcombank balance-change format follow the typical Vietnamese notification style but have never seen a real email. Replace them with real samples before trusting the numbers (see `PROGRESS.md → Needs real samples`).
-- Transfers between your own accounts count as spending.
-- One Gmail account per user.
-- For localized Gmail UIs, the All Mail folder lookup only knows the English and Vietnamese names. Otherwise it falls back to `INBOX`, which misses archived mail.
-- Category rules are matched in PHP (SQL can't strip Vietnamese accents), so backfill is O(user's transactions). That's fine at MVP scale.
-- The PWA caches static build assets only. There is no offline data.
-- The language choice is stored in the session, not on the user.
+- Chuyển tiền giữa các tài khoản của chính bạn vẫn bị tính là chi tiêu.
+- Mỗi người dùng chỉ một tài khoản Gmail.
+- Với Gmail dùng ngôn ngữ khác, việc tìm thư mục All Mail chỉ biết tên tiếng Anh và tiếng Việt. Nếu không tìm thấy, app dùng `INBOX`, nên sẽ bỏ sót thư đã lưu trữ.
+- Quy tắc phân loại được so khớp trong PHP (SQL không bỏ dấu tiếng Việt được), nên việc áp dụng lại cho giao dịch cũ có độ phức tạp O(số giao dịch của người dùng). Ở quy mô MVP thì chấp nhận được.
+- PWA chỉ cache file build tĩnh. Không có dữ liệu offline.
