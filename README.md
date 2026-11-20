@@ -138,3 +138,7 @@ Gmail ──IMAP SEARCH FROM+SINCE──▶ SyncMailAccount ──firstOrCreate(
 - Với Gmail dùng ngôn ngữ khác, việc tìm thư mục All Mail chỉ biết tên tiếng Anh và tiếng Việt. Nếu không tìm thấy, app dùng `INBOX`, nên sẽ bỏ sót thư đã lưu trữ.
 - Quy tắc phân loại được so khớp trong PHP (SQL không bỏ dấu tiếng Việt được), nên việc áp dụng lại cho giao dịch cũ có độ phức tạp O(số giao dịch của người dùng). Ở quy mô MVP thì chấp nhận được.
 - PWA chỉ cache file build tĩnh. Không có dữ liệu offline.
+
+## Giấy phép
+
+[AGPL-3.0](LICENSE). Nếu bạn chạy bản đã sửa đổi thành dịch vụ cho người khác dùng, bạn phải công khai mã nguồn của bản đó.

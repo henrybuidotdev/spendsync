@@ -8,10 +8,12 @@
             </li>
         @endforeach
     </ul>
-    <p class="mt-2 text-sm text-slate-600">
-        {{ __('Need support for your bank or report a bug? Contact on Zalo') }}
-        <a href="https://zalo.me/0869478154" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">0869478154</a>
-    </p>
+    @if(config('services.zalo.phone'))
+        <p class="mt-2 text-sm text-slate-600">
+            {{ __('Need support for your bank or report a bug? Contact on Zalo') }}
+            <a href="https://zalo.me/{{ config('services.zalo.phone') }}" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">{{ config('services.zalo.phone') }}</a>
+        </p>
+    @endif
     <p class="mt-2 text-sm text-slate-600">
         {{ __('No Gmail, or your bank is not yet supported?') }}
         <a href="{{ route('transactions.create') }}" wire:navigate class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">{{ __('Add transactions manually') }}</a>

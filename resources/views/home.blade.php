@@ -82,8 +82,12 @@
                 <section class="mt-10">
                     <h2 class="font-semibold">{{ __('Supported banks') }}</h2>
                     <p class="mt-2 leading-relaxed text-slate-700">
-                        {{ __(':banks. Need another bank? Message us on Zalo', ['banks' => $banks]) }}
-                        <a href="https://zalo.me/0869478154" target="_blank" rel="noopener" class="font-medium text-emerald-700 underline">0869478154</a>.
+                        @if(config('services.zalo.phone'))
+                            {{ __(':banks. Need another bank? Message us on Zalo', ['banks' => $banks]) }}
+                            <a href="https://zalo.me/{{ config('services.zalo.phone') }}" target="_blank" rel="noopener" class="font-medium text-emerald-700 underline">{{ config('services.zalo.phone') }}</a>.
+                        @else
+                            {{ $banks }}.
+                        @endif
                     </p>
                 </section>
             </main>

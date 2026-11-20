@@ -47,4 +47,8 @@ return [
         'resync_days' => (int) env('MAIL_SYNC_RESYNC_DAYS', 1),
     ],
 
+    'zalo' => [
+        'phone' => env('ZALO_PHONE'),
+    ],
+
 ];

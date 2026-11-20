@@ -1,10 +1,10 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "henrybuidotdev/spendsync",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
-    "license": "MIT",
+    "description": "Spending tracker that reads Vietnamese bank emails via IMAP.",
+    "keywords": ["laravel", "finance", "imap"],
+    "license": "AGPL-3.0-only",
     "require": {
         "php": "^8.3",
         "laravel/framework": "^13.17",
