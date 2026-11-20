@@ -11,14 +11,6 @@ layout('layouts.guest');
 
 form(LoginForm::class);
 
-// TEMP demo prefill (local only) — remove before launch.
-mount(function () {
-    if (app()->isLocal()) {
-        $this->form->email = 'demo@spendsync.test';
-        $this->form->password = 'password';
-    }
-});
-
 $login = function () {
     $this->validate();
 

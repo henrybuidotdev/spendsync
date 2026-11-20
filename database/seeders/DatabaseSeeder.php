@@ -15,13 +15,13 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        if (User::where('email', 'test@example.com')->exists()) {
+        if (User::where('email', 'test@spendsync.co')->exists()) {
             return;
         }
 
         User::factory()->create([
             'name' => 'Test User',
-            'email' => 'test@example.com',
+            'email' => 'test@spendsync.co',
         ]);
     }
 }

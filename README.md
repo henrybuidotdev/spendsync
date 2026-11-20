@@ -37,7 +37,7 @@ php artisan db:seed --class=DemoSeeder
 php artisan serve
 ```
 
-Đăng nhập bằng **demo@spendsync.test / password**. Demo seeder nhập toàn bộ mẫu email trong `tests/Fixtures/emails` qua đúng quy trình thật (`spendsync:import-eml`), và thêm vài quy tắc phân loại để một số giao dịch đã có danh mục sẵn. Các mẫu email có ngày tháng 11/2026. Nếu tháng hiện tại trống, trang giao dịch có nút nhảy tới tháng gần nhất có dữ liệu.
+Đăng nhập bằng **demo@spendsync.co / password**. Demo seeder nhập toàn bộ mẫu email trong `tests/Fixtures/emails` qua đúng quy trình thật (`spendsync:import-eml`), và thêm vài quy tắc phân loại để một số giao dịch đã có danh mục sẵn. Các mẫu email có ngày tháng 11/2026. Nếu tháng hiện tại trống, trang giao dịch có nút nhảy tới tháng gần nhất có dữ liệu.
 
 Người dùng mới chưa có giao dịch có thể bấm **Xem dữ liệu demo** để xem giao dịch và báo cáo của tài khoản demo (email đặt bằng `DEMO_USER_EMAIL`). Dữ liệu demo chỉ để xem: mọi thao tác lưu hay xóa đều bị chặn, kể cả khi đăng nhập thẳng vào tài khoản demo. Trên production, chạy `php artisan db:seed --class=DemoSeeder` một lần; ngoài môi trường local, tài khoản demo có mật khẩu ngẫu nhiên.
 

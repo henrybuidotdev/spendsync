@@ -42,7 +42,7 @@ class DemoSeeder extends Seeder
         User::where('email', $email)->first()?->delete();
 
         $user = User::factory()->create([
-            'name' => 'Demo',
+            'name' => 'Demo User',
             'email' => $email,
             'password' => app()->isLocal() ? 'password' : Str::random(40),
         ]);

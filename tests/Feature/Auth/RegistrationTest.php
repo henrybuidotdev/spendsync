@@ -15,7 +15,7 @@ test('registration screen can be rendered', function () {
 test('new users can register', function () {
     $component = Volt::test('pages.auth.register')
         ->set('name', 'Test User')
-        ->set('email', 'test@example.com')
+        ->set('email', 'test@spendsync.co')
         ->set('password', 'password');
 
     $component->call('register');
@@ -32,7 +32,7 @@ test('first-time visitors see Vietnamese', function () {
 test('a new account starts in Vietnamese even if the browser last used English', function () {
     Volt::test('pages.auth.register')
         ->set('name', 'Test User')
-        ->set('email', 'test@example.com')
+        ->set('email', 'test@spendsync.co')
         ->set('password', 'password')
         ->call('register');
 

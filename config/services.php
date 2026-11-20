@@ -49,7 +49,7 @@ return [
 
     // Signed-in users can view this seeded account's transactions read-only (see App\Support\Demo).
     'demo' => [
-        'email' => env('DEMO_USER_EMAIL', 'demo@spendsync.test'),
+        'email' => env('DEMO_USER_EMAIL', 'demo@spendsync.co'),
     ],
 
     'zalo' => [

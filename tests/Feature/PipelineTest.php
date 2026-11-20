@@ -420,7 +420,7 @@ test('the demo seeder creates a populated, categorized demo account', function (
     $this->seed(DemoSeeder::class);
     $this->seed(DemoSeeder::class);
 
-    $user = User::where('email', 'demo@spendsync.test')->sole();
+    $user = User::where('email', 'demo@spendsync.co')->sole();
 
     $months = $user->transactions()->pluck('occurred_at')->map->format('Y-m')->unique();
 

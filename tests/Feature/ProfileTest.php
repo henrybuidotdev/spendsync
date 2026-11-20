@@ -40,7 +40,7 @@ test('email cannot be changed from the profile form', function () {
     $this->actingAs($user);
 
     Volt::test('profile.update-profile-information-form')
-        ->set('email', 'test@example.com');
+        ->set('email', 'test@spendsync.co');
 })->throws(PublicPropertyNotFoundException::class);
 
 test('user can delete their account', function () {
