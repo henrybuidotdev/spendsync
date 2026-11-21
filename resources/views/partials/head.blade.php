@@ -20,6 +20,7 @@
 </script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>{{ isset($title) ? $title.' · ' : '' }}{{ config('app.name') }}</title>
+<meta name="description" content="{{ $description ?? __('Connect Gmail once. Whenever your bank emails you about a transaction, SpendSync records the amount, the payee and the time. You only need to categorize at the end of the day.') }}">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
