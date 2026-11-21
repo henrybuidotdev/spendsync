@@ -47,6 +47,11 @@ test('the terms page is public, follows the chosen language and is linked from s
     $this->get('/register')->assertSee(route('terms'))->assertSee(route('privacy'));
 });
 
+test('the privacy and terms pages link to each other', function () {
+    $this->get('/privacy')->assertSee('href="'.route('terms').'"', false)->assertDontSee('href="'.route('privacy').'"', false);
+    $this->get('/terms')->assertSee('href="'.route('privacy').'"', false)->assertDontSee('href="'.route('terms').'"', false);
+});
+
 test('the home page switches language for guests and remembers it for signed-in users', function () {
     $this->get('/')->assertSee('English')->assertSee(route('locale', 'en'));
 

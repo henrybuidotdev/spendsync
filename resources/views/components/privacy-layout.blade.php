@@ -24,6 +24,17 @@
             @endforeach
 
             {{ $slot }}
+
+            <nav class="flex items-center justify-center gap-2 pt-2 text-sm text-slate-500" aria-label="{{ __('Legal') }}">
+                @foreach (['privacy' => __('Privacy'), 'terms' => __('Terms of use')] as $route => $label)
+                    @if (! $loop->first)<span aria-hidden="true">·</span>@endif
+                    @if (request()->routeIs($route))
+                        <span class="inline-flex min-h-11 items-center font-medium text-slate-700" aria-current="page">{{ $label }}</span>
+                    @else
+                        <a href="{{ route($route) }}" class="inline-flex min-h-11 items-center underline hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">{{ $label }}</a>
+                    @endif
+                @endforeach
+            </nav>
         </main>
     </body>
 </html>
