@@ -27,6 +27,7 @@
                            el.setSelectionRange(caret, caret);
                        },
                    }"
+                   @unless($transaction) x-init="$nextTick(() => $el.focus())" @endunless
                    x-bind:value="amount" x-on:input="format($el)"
                    class="mt-1 block min-h-12 w-full rounded-xl border-slate-300 text-base font-num focus:border-emerald-500 focus:ring-emerald-500">
             @error('amount') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
