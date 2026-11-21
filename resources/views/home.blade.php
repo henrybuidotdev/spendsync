@@ -42,6 +42,7 @@
             <main>
                 <h1 class="mt-14 text-3xl font-bold leading-tight tracking-tight">{{ __('Automatically read your spending from bank emails.') }}</h1>
                 <p class="mt-4 leading-relaxed text-slate-700">{{ __('Connect Gmail once. Whenever your bank emails you about a transaction, SpendSync records the amount, the payee and the time. You only need to categorize at the end of the day.') }}</p>
+                <p class="mt-3 text-sm font-medium text-slate-500">{{ __('Open Source') }} <span aria-hidden="true">·</span> {{ __('Simple UI') }} <span aria-hidden="true">·</span> {{ __('Automatically') }}</p>
 
                 <section aria-label="{{ __('Example transactions') }}" class="mt-12">
                     <h2 class="mb-1 flex items-baseline justify-between gap-2 px-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
