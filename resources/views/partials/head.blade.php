@@ -20,7 +20,17 @@
 </script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>{{ isset($title) ? $title.' · ' : '' }}{{ config('app.name') }}</title>
-<meta name="description" content="{{ $description ?? __('Connect Gmail once. Whenever your bank emails you about a transaction, SpendSync records the amount, the payee and the time. You only need to categorize at the end of the day.') }}">
+@php($description ??= __('Connect Gmail once. Whenever your bank emails you about a transaction, SpendSync records the amount, the payee and the time. You only need to categorize at the end of the day.'))
+<meta name="description" content="{{ $description }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ config('app.name') }}">
+<meta property="og:title" content="{{ isset($title) ? $title.' · ' : '' }}{{ config('app.name') }}">
+<meta property="og:description" content="{{ $description }}">
+<meta property="og:url" content="{{ url()->current() }}">
+<meta property="og:image" content="{{ asset('og-image.png') }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
