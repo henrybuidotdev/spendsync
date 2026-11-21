@@ -69,7 +69,7 @@ Mỗi tài khoản đang hoạt động được đồng bộ khoảng một l�
 
 Chi tiết IMAP: `imap.gmail.com:993` qua SSL, có kiểm tra chứng chỉ. App tìm trong `[Gmail]/All Mail` (nếu không có thì dùng `INBOX`) với `FROM <địa chỉ ngân hàng> SINCE <ngày>` cho từng địa chỉ gửi. Email được tải bằng PEEK, nên không bao giờ bị đánh dấu đã đọc, di chuyển hay xóa.
 
-Để thu hồi quyền truy cập, xóa mật khẩu ứng dụng trong Google, hoặc vào **Cài đặt → Ngắt kết nối** để xóa mật khẩu đã lưu.
+Để thu hồi quyền truy cập, xóa mật khẩu ứng dụng trong Google, hoặc vào **Cài đặt → Gmail → Ngắt kết nối** để xóa mật khẩu đã lưu.
 
 ## Lệnh Artisan
 

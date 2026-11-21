@@ -13,16 +13,16 @@
             'Chúng tôi không bán hay chia sẻ dữ liệu của bạn với ai.',
         ],
         'Cách ngắt kết nối và xóa dữ liệu' => [
-            'Ngắt kết nối: Cài đặt → Ngắt kết nối. Mật khẩu ứng dụng bị xóa ngay, giao dịch cũ vẫn giữ.',
+            'Ngắt kết nối: Cài đặt → Gmail → Ngắt kết nối. Mật khẩu ứng dụng bị xóa ngay, giao dịch cũ vẫn giữ.',
             'Thu hồi tại Google: vào myaccount.google.com/apppasswords và xóa mật khẩu "SpendSync". Ứng dụng sẽ mất quyền đọc ngay lập tức.',
-            'Xóa dữ liệu: Cài đặt → Vùng nguy hiểm → Xóa dữ liệu. Email, giao dịch, danh mục, quy tắc và kết nối Gmail bị xóa vĩnh viễn; tài khoản đăng nhập được giữ lại.',
-            'Xóa tài khoản: Cài đặt → Vùng nguy hiểm → Xóa tài khoản. Tài khoản đăng nhập cùng toàn bộ dữ liệu bị xóa vĩnh viễn.',
+            'Xóa dữ liệu: Cài đặt → Hồ sơ & mật khẩu → Vùng nguy hiểm → Xóa dữ liệu. Email, giao dịch, danh mục, quy tắc và kết nối Gmail bị xóa vĩnh viễn; tài khoản đăng nhập được giữ lại.',
+            'Xóa tài khoản: Cài đặt → Hồ sơ & mật khẩu → Vùng nguy hiểm → Xóa tài khoản. Tài khoản đăng nhập cùng toàn bộ dữ liệu bị xóa vĩnh viễn.',
         ],
     ];
 @endphp
 
 <x-privacy-layout title="Quyền riêng tư" :sections="$sections">
     <x-slot:intro>
-        <p class="text-slate-600 text-sm">Cập nhật lần cuối: 20/11/2026.</p>
+        <p class="text-slate-600 text-sm">Cập nhật lần cuối: 21/11/2026.</p>
     </x-slot:intro>
 </x-privacy-layout>
