@@ -41,3 +41,26 @@ test('editing shows the saved amount grouped and saves the new one', function ()
 
     expect($manual->fresh()->amount)->toBe(30000);
 });
+
+test('the amount field is focused when adding a transaction', function () {
+    $user = User::factory()->create();
+    MailAccount::factory()->for($user)->create();
+
+    $this->actingAs($user);
+
+    $page = visit('/transactions/create');
+
+    expect($page->script("document.activeElement?.id"))->toBe('amount');
+});
+
+test('the amount field is not focused when editing a transaction', function () {
+    $user = User::factory()->create();
+    MailAccount::factory()->for($user)->create();
+    $manual = Transaction::factory()->for($user)->manual()->create();
+
+    $this->actingAs($user);
+
+    $page = visit(route('transactions.edit', $manual));
+
+    expect($page->script("document.activeElement?.id"))->not->toBe('amount');
+});
