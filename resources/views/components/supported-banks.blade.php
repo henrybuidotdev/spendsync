@@ -16,6 +16,6 @@
     @endif
     <p class="mt-2 text-sm text-slate-600">
         {{ __('No Gmail, or your bank is not yet supported?') }}
-        <a href="{{ route('transactions.create') }}" wire:navigate class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">{{ __('Add transactions manually') }}</a>
+        <a href="{{ route('transactions.create') }}" wire:navigate data-keyboard="numeric" class="inline-flex min-h-11 items-center font-medium text-emerald-700 underline">{{ __('Add transactions manually') }}</a>
     </p>
 </div>
