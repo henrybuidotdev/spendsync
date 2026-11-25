@@ -1,0 +1,18 @@
+<?php
+
+use App\Enums\MailAccountStatus;
+use App\Jobs\SyncMailAccount;
+use App\Models\MailAccount;
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::call(function () {
+    MailAccount::where('status', MailAccountStatus::Active)
+        ->whereRaw('id % 60 = ?', [now()->minute])
+        ->where(fn ($query) => $query
+            ->whereNull('last_run_at')
+            ->orWhere('last_run_at', '<', now()->subMinutes(30)))
+        ->each(fn (MailAccount $account) => SyncMailAccount::dispatch($account));
+})->name('sync-mail-accounts')->everyMinute();
+
+Schedule::command('spendsync:update-exchange-rates')->dailyAt('08:00');
+Schedule::command('spendsync:refresh-demo')->dailyAt('00:05')->timezone(config('app.display_timezone'));

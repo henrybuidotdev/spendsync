@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Livewire's wire:navigate progress bar: brand colour, thick enough to notice on phones. */
+:root {
+    --livewire-progress-bar-color: theme('colors.emerald.500');
+}
+
+#nprogress .bar {
+    height: 3px !important;
+}
+
+/* "..." typed one dot at a time: 1, 2, 3, repeat. */
+.typing-dots > span {
+    animation: typing-dot 1.2s step-end infinite;
+}
+
+.typing-dots > span:nth-child(2) {
+    animation-name: typing-dot-2;
+}
+
+.typing-dots > span:nth-child(3) {
+    animation-name: typing-dot-3;
+}
+
+@keyframes typing-dot { 0%, 100% { visibility: visible; } }
+@keyframes typing-dot-2 { 0% { visibility: hidden; } 33.333% { visibility: visible; } }
+@keyframes typing-dot-3 { 0% { visibility: hidden; } 66.666% { visibility: visible; } }
+
+@media (prefers-reduced-motion: reduce) {
+    .typing-dots > span {
+        animation: none;
+    }
+}
+
+/* Underline tabs. The selected tab is marked by aria-pressed (buttons) or aria-current (links), so markup needs no conditional classes. */
+@layer components {
+    .tabs {
+        @apply flex overflow-x-auto shadow-[inset_0_-1px_0_rgb(var(--c-neutral-200))];
+    }
+
+    .tab {
+        @apply flex min-h-11 flex-1 shrink-0 items-center justify-center whitespace-nowrap border-b-2 border-transparent px-3 text-sm font-medium text-slate-500 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500;
+    }
+
+    .tab[aria-pressed="true"],
+    .tab[aria-current="page"] {
+        @apply border-black text-slate-900;
+    }
+
+    /* Segmented control for picking a setting value (language, theme). */
+    .segmented {
+        @apply grid auto-cols-fr grid-flow-col gap-1 rounded-full bg-slate-100 p-1;
+    }
+
+    .segment {
+        @apply min-h-11 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500;
+    }
+
+    .segment[aria-pressed="true"] {
+        @apply bg-white text-slate-900 shadow-sm;
+    }
+}

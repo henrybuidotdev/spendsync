@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\Direction;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+#[Fillable(['user_id', 'raw_email_id', 'bank_code', 'direction', 'amount', 'currency', 'original_amount', 'amount_estimated', 'counterparty', 'counterparty_account', 'description', 'reference', 'occurred_at', 'category_id', 'note'])]
+class Transaction extends Model
+{
+    use HasFactory;
+    use SoftDeletes;
+
+    public const MANUAL = 'manual';
+
+    protected function casts(): array
+    {
+        return [
+            'direction' => Direction::class,
+            'amount' => 'integer',
+            'original_amount' => 'integer',
+            'amount_estimated' => 'boolean',
+            'occurred_at' => 'datetime',
+        ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function rawEmail(): BelongsTo
+    {
+        return $this->belongsTo(RawEmail::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function isIncome(): bool
+    {
+        return $this->direction === Direction::In;
+    }
+
+    public function signedAmount(): int
+    {
+        return $this->isIncome() ? $this->amount : -$this->amount;
+    }
+
+    public function isManual(): bool
+    {
+        return $this->bank_code === self::MANUAL;
+    }
+
+    public function label(): string
+    {
+        return $this->counterparty ?: ($this->description ?: $this->bank_code);
+    }
+}
